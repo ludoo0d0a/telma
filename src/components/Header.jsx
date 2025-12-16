@@ -42,10 +42,10 @@ const Header = () => {
                     <Link to='/journeys' className='navbar-item' onClick={() => setIsActive(false)}>
                         Itinéraires
                     </Link>
-                    <Link to='/metz-bettembourg' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
+                    <Link to='/trajet/metz/bettembourg' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         🚂 Metz→Bettembourg
                     </Link>
-                    <Link to='/metz/thionville' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
+                    <Link to='/trajet/metz/thionville' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         🚂 Metz→Thionville
                     </Link>
                     <Link to='/places' className='navbar-item' onClick={() => setIsActive(false)}>

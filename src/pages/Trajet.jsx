@@ -22,6 +22,7 @@ const Trajet = () => {
     const [error, setError] = useState(null);
     const [fromId, setFromId] = useState(null);
     const [toId, setToId] = useState(null);
+    const [disruptions, setDisruptions] = useState([]);
     
     const [fromName, setFromName] = useState(() => decodeLocationName(from) || '');
     const [toName, setToName] = useState(() => decodeLocationName(to) || '');
@@ -77,7 +78,7 @@ const Trajet = () => {
         if (toId && toName) {
             const fromSlug = encodeURIComponent(station.name.toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent(toName.toLowerCase().replace(/\s+/g, '-'));
-            navigate(`/${fromSlug}/${toSlug}`, { replace: true });
+            navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
 
@@ -89,7 +90,7 @@ const Trajet = () => {
         if (fromId && fromName) {
             const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent(station.name.toLowerCase().replace(/\s+/g, '-'));
-            navigate(`/${fromSlug}/${toSlug}`, { replace: true });
+            navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
 
@@ -108,6 +109,7 @@ const Trajet = () => {
         try {
             setLoading(true);
             setError(null);
+            setDisruptions([]); // Clear previous disruptions
             
             // Build datetime from filter date and time
             const [hours, minutes] = filterTime.split(':');
@@ -118,6 +120,7 @@ const Trajet = () => {
             
             // Fetch journeys for the selected date and next 2 days
             const allJourneys = [];
+            const allDisruptions = [];
             const filterDateObj = new Date(filterDate);
             
             // Fetch for selected date and next 2 days
@@ -141,13 +144,24 @@ const Trajet = () => {
                     data_freshness: 'realtime' // Get real-time data including delays
                 });
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:130',message:'Journeys received',data:{day,journeyCount:data.journeys?.length||0,hasError:!!data.error,error:data.error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:130',message:'Journeys received',data:{day,journeyCount:data.journeys?.length||0,hasError:!!data.error,error:data.error,disruptionsCount:data.disruptions?.length||0,disruptions:data.disruptions?.slice(0,2).map(d=>({severity:d.severity,message:d.message?.substring(0,100)})),hasDisruptions:!!data.disruptions},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
                 // #endregion
                 
                 if (data.journeys) {
                     allJourneys.push(...data.journeys);
                 }
+                
+                // Collect disruptions from API response
+                if (data.disruptions && Array.isArray(data.disruptions)) {
+                    allDisruptions.push(...data.disruptions);
+                    // #region agent log
+                    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:150',message:'Disruption structure',data:{day,disruptionCount:data.disruptions.length,sampleDisruption:data.disruptions[0]?{severity:data.disruptions[0].severity,hasMessages:!!data.disruptions[0].messages,messagesCount:data.disruptions[0].messages?.length||0,hasImpactedObjects:!!data.disruptions[0].impacted_objects,impactedObjectsCount:data.disruptions[0].impacted_objects?.length||0,impactedStopsCount:data.disruptions[0].impacted_objects?.[0]?.impacted_stops?.length||0}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                    // #endregion
+                }
             }
+            
+            // Store disruptions in state
+            setDisruptions(allDisruptions);
             
             // Filter journeys to only show those after the filter datetime
             const filterDateTimeMs = filterDateTime.getTime();
@@ -519,6 +533,121 @@ const Trajet = () => {
                                     <>Vérifiez votre connexion et réessayez.</>
                                 )}
                             </p>
+                        </div>
+                    )}
+
+                    {!loading && disruptions.length > 0 && (
+                        <div className='box mb-5'>
+                            <h3 className='title is-5 mb-4'>
+                                <span className='icon has-text-warning mr-2'>
+                                    <i className='fas fa-exclamation-triangle'></i>
+                                </span>
+                                Perturbations ({disruptions.length})
+                            </h3>
+                            {disruptions.map((disruption, index) => {
+                                // Handle severity - can be string, object with name, or object with other properties
+                                let severityText = 'unknown';
+                                if (typeof disruption.severity === 'string') {
+                                    severityText = disruption.severity;
+                                } else if (disruption.severity && typeof disruption.severity === 'object') {
+                                    severityText = disruption.severity.name || disruption.severity.label || JSON.stringify(disruption.severity);
+                                }
+                                
+                                const severityLevel = severityText.toLowerCase();
+                                
+                                // Determine notification type based on severity
+                                let notificationClass = 'is-warning';
+                                let icon = 'fa-exclamation-triangle';
+                                if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
+                                    notificationClass = 'is-danger';
+                                    icon = 'fa-ban';
+                                } else if (severityLevel.includes('information') || severityLevel.includes('info') || severityLevel.includes('information')) {
+                                    notificationClass = 'is-info';
+                                    icon = 'fa-info-circle';
+                                } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
+                                    notificationClass = 'is-warning';
+                                    icon = 'fa-clock';
+                                }
+                                
+                                return (
+                                    <div key={index} className={`notification ${notificationClass} mb-3`}>
+                                        <div className='is-flex is-align-items-center mb-2'>
+                                            <span className='icon mr-2'>
+                                                <i className={`fas ${icon}`}></i>
+                                            </span>
+                                            <strong>
+                                                {severityText !== 'unknown' ? severityText : 'Perturbation'}
+                                            </strong>
+                                        </div>
+                                        {/* Display messages from messages array */}
+                                        {disruption.messages && Array.isArray(disruption.messages) && disruption.messages.length > 0 && (
+                                            <div className='content mb-2'>
+                                                {disruption.messages.map((msg, msgIndex) => (
+                                                    <p key={msgIndex} className='mb-2'>
+                                                        {msg.text || msg.message || JSON.stringify(msg)}
+                                                    </p>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {/* Fallback to single message field if messages array doesn't exist */}
+                                        {(!disruption.messages || disruption.messages.length === 0) && disruption.message && (
+                                            <p className='mb-2'>{disruption.message}</p>
+                                        )}
+                                        {disruption.impacted_objects && disruption.impacted_objects.length > 0 && (
+                                            <div className='content is-small mt-2'>
+                                                <p className='has-text-weight-semibold'>Objets impactés:</p>
+                                                {disruption.impacted_objects.map((obj, objIndex) => (
+                                                    <div key={objIndex} className='mb-3'>
+                                                        <p className='has-text-weight-medium mb-1'>
+                                                            {obj.pt_object?.name || obj.pt_object?.id || `Objet ${objIndex + 1}`}
+                                                        </p>
+                                                        {/* Display impacted stops */}
+                                                        {obj.impacted_stops && Array.isArray(obj.impacted_stops) && obj.impacted_stops.length > 0 && (
+                                                            <div className='ml-3'>
+                                                                <p className='has-text-weight-semibold is-size-7 mb-1'>Arrêts impactés:</p>
+                                                                <ul className='is-size-7'>
+                                                                    {obj.impacted_stops.map((stop, stopIndex) => (
+                                                                        <li key={stopIndex}>
+                                                                            {stop.name || stop.stop_point?.name || stop.stop_area?.name || stop.id || 'Arrêt inconnu'}
+                                                                        </li>
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        )}
+                                                        {/* Display other pt_object properties */}
+                                                        {obj.pt_object && (
+                                                            <div className='ml-3 is-size-7'>
+                                                                {obj.pt_object.name && (
+                                                                    <p><strong>Nom:</strong> {obj.pt_object.name}</p>
+                                                                )}
+                                                                {obj.pt_object.id && (
+                                                                    <p><strong>ID:</strong> {obj.pt_object.id}</p>
+                                                                )}
+                                                                {obj.pt_object.embedded_type && (
+                                                                    <p><strong>Type:</strong> {obj.pt_object.embedded_type}</p>
+                                                                )}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {disruption.application_periods && disruption.application_periods.length > 0 && (
+                                            <div className='content is-small mt-2'>
+                                                <p className='has-text-weight-semibold'>Période d'application:</p>
+                                                <ul>
+                                                    {disruption.application_periods.map((period, periodIndex) => (
+                                                        <li key={periodIndex}>
+                                                            Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : 'N/A'} 
+                                                            {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : 'N/A'}
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     )}
 

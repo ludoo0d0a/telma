@@ -12,7 +12,6 @@ import Reports from './pages/Reports'
 import Lines from './pages/Lines'
 import Isochrones from './pages/Isochrones'
 import SwaggerUIPage from './pages/SwaggerUI'
-import MetzBettembourg from './pages/MetzBettembourg'
 import Trajet from './pages/Trajet'
 import Favorites from './pages/Favorites'
 import Snowfall from 'react-snowfall'
@@ -38,8 +37,7 @@ function App() {
                 <Route path='/lines' element={<Lines />} />
                 <Route path='/isochrones' element={<Isochrones />} />
                 <Route path='/api-docs' element={<SwaggerUIPage />} />
-                <Route path='/metz-bettembourg' element={<MetzBettembourg />} />
-                <Route path='/:from/:to' element={<Trajet />} />
+                <Route path='/trajet/:from/:to' element={<Trajet />} />
                 <Route path='/favorites' element={<Favorites />} />
                 <Route path='/:city' element={<City />}>
                     <Route path=':codeStation' element={<TrainStation />} />
