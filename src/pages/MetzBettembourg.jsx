@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getJourneys, formatDateTime, searchPlaces } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName } from '../components/Utils';
+import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay, getWagonCount, getJourneyInfo } from '../components/Utils';
 
 const MetzBettembourg = () => {
     const [terTrains, setTerTrains] = useState([]);
@@ -196,193 +196,6 @@ const MetzBettembourg = () => {
         }
     };
 
-    const formatTime = (date) => {
-        return `${date.getHours()}h${getFullMinutes(date)}`;
-    };
-
-    const formatDate = (date) => {
-        const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-        const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc'];
-        return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]}`;
-    };
-
-    const getDelay = (baseTime, realTime) => {
-        if (!baseTime || !realTime) return null;
-        const base = parseUTCDate(baseTime);
-        const real = parseUTCDate(realTime);
-        const delayMs = real.getTime() - base.getTime();
-        if (delayMs === 0) return 'À l\'heure';
-        const delayMinutes = Math.floor(delayMs / (1000 * 60));
-        if (delayMinutes >= 60) {
-            return `+${Math.floor(delayMinutes / 60)}h${delayMinutes % 60}min`;
-        }
-        return `+${delayMinutes}min`;
-    };
-
-    const getTransportIcon = (commercialMode, network) => {
-        const mode = (commercialMode || '').toLowerCase();
-        const net = (network || '').toLowerCase();
-        
-        if (mode.includes('tgv') || net.includes('tgv')) {
-            return { icon: 'fa-train', color: 'has-text-danger', tagColor: 'is-danger', label: 'TGV' };
-        }
-        if (mode.includes('intercités') || net.includes('intercités') || mode.includes('intercity')) {
-            return { icon: 'fa-train', color: 'has-text-warning', tagColor: 'is-warning', label: 'Intercités' };
-        }
-        if (mode === 'ter' || net.includes('ter')) {
-            return { icon: 'fa-train', color: 'has-text-info', tagColor: 'is-info', label: 'TER' };
-        }
-        if (mode === 'fluo' || net.includes('fluo')) {
-            return { icon: 'fa-train', color: 'has-text-success', tagColor: 'is-success', label: 'FLUO' };
-        }
-        if (mode.includes('rer') || net.includes('rer')) {
-            return { icon: 'fa-subway', color: 'has-text-primary', tagColor: 'is-primary', label: 'RER' };
-        }
-        if (mode.includes('metro') || net.includes('metro')) {
-            return { icon: 'fa-subway', color: 'has-text-primary', tagColor: 'is-primary', label: 'Métro' };
-        }
-        if (mode.includes('tram') || net.includes('tram')) {
-            return { icon: 'fa-tram', color: 'has-text-link', tagColor: 'is-link', label: 'Tram' };
-        }
-        if (mode.includes('bus') || net.includes('bus')) {
-            return { icon: 'fa-bus', color: 'has-text-success', tagColor: 'is-success', label: 'Bus' };
-        }
-        // Default for other train types
-        return { icon: 'fa-train', color: 'has-text-grey', tagColor: 'is-light', label: commercialMode || 'Train' };
-    };
-
-    const getWagonCount = (section) => {
-        // Try to find wagon/car count from various possible fields
-        // Check vehicle_journey, vehicle, or other fields that might contain this info
-        if (!section) return null;
-        
-        // Check for vehicle_journey with vehicle information
-        const vehicleJourney = section.vehicle_journey;
-        if (vehicleJourney) {
-            // Check if vehicle_journey has direct vehicle info
-            if (vehicleJourney.vehicle) {
-                const vehicle = vehicleJourney.vehicle;
-                // Check for wagon count, car count, or capacity
-                if (vehicle.wagon_count !== undefined) return vehicle.wagon_count;
-                if (vehicle.car_count !== undefined) return vehicle.car_count;
-                if (vehicle.length !== undefined) return vehicle.length;
-                if (vehicle.capacity !== undefined) {
-                    // Capacity might be seats, not wagons, but we can try
-                    return vehicle.capacity;
-                }
-            }
-            // Check for headsigns or other indicators
-            if (vehicleJourney.headsigns) {
-                // Sometimes headsigns contain train composition info
-                const headsign = vehicleJourney.headsigns[0];
-                if (headsign) {
-                    const match = headsign.match(/(\d+)\s*(wagon|car|voiture)/i);
-                    if (match) return parseInt(match[1]);
-                }
-            }
-        }
-        
-        // Check for trip information
-        const trip = section.trip;
-        if (trip) {
-            if (trip.vehicle_journey) {
-                const vj = trip.vehicle_journey;
-                if (vj.vehicle) {
-                    const vehicle = vj.vehicle;
-                    if (vehicle.wagon_count !== undefined) return vehicle.wagon_count;
-                    if (vehicle.car_count !== undefined) return vehicle.car_count;
-                    if (vehicle.length !== undefined) return vehicle.length;
-                }
-            }
-        }
-        
-        // Check display_informations for any hints
-        const displayInfo = section.display_informations;
-        if (displayInfo) {
-            // Check physical_mode name which might indicate train type/length
-            const physicalMode = displayInfo.physical_mode;
-            if (physicalMode && typeof physicalMode === 'string') {
-                // Some physical modes indicate train length (e.g., "Train long", "Train court")
-                const modeLower = physicalMode.toLowerCase();
-                if (modeLower.includes('long')) return 'Long';
-                if (modeLower.includes('court') || modeLower.includes('short')) return 'Court';
-            }
-            // Check additional_informations
-            const additionalInfo = displayInfo.additional_informations;
-            if (additionalInfo) {
-                const match = additionalInfo.match(/(\d+)\s*(wagon|car|voiture)/i);
-                if (match) return parseInt(match[1]);
-            }
-        }
-        
-        return null;
-    };
-
-    const getJourneyInfo = (journey) => {
-        const firstSection = journey.sections?.find(s => s.type === 'public_transport');
-        const lastSection = journey.sections?.slice().reverse().find(s => s.type === 'public_transport');
-        
-        const commercialMode = firstSection?.display_informations?.commercial_mode || '';
-        const network = firstSection?.display_informations?.network || '';
-        const transportInfo = getTransportIcon(commercialMode, network);
-        
-        // Try to get wagon count
-        const wagonCount = getWagonCount(firstSection);
-        
-        // Extract vehicle journey ID from first section
-        let vehicleJourneyId = null;
-        if (firstSection) {
-            // Try from vehicle_journey.id
-            if (firstSection.vehicle_journey?.id) {
-                vehicleJourneyId = firstSection.vehicle_journey.id;
-            }
-            // Try from links (similar to Departures/Arrivals)
-            else if (firstSection.links && firstSection.links.length > 1) {
-                const vehicleJourneyLink = firstSection.links.find(link => 
-                    link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
-                );
-                if (vehicleJourneyLink) {
-                    vehicleJourneyId = vehicleJourneyLink.id;
-                }
-            }
-            // Try from trip.vehicle_journey
-            else if (firstSection.trip?.vehicle_journey?.id) {
-                vehicleJourneyId = firstSection.trip.vehicle_journey.id;
-            }
-        }
-        
-        return {
-            trainNumber: firstSection?.display_informations?.headsign || 
-                         firstSection?.display_informations?.trip_short_name || 
-                         'N/A',
-            vehicleJourneyId: vehicleJourneyId,
-            commercialMode: commercialMode || 'Train',
-            network: network,
-            transportIcon: transportInfo.icon,
-            transportColor: transportInfo.color,
-            transportTagColor: transportInfo.tagColor,
-            transportLabel: transportInfo.label,
-            wagonCount: wagonCount,
-            departureStation: cleanLocationName(
-                firstSection?.from?.stop_point?.name || 
-                firstSection?.from?.stop_area?.name || 
-                'Metz'
-            ),
-            arrivalStation: cleanLocationName(
-                lastSection?.to?.stop_point?.name || 
-                lastSection?.to?.stop_area?.name || 
-                'Bettembourg'
-            ),
-            departureTime: journey.departure_date_time,
-            arrivalTime: journey.arrival_date_time,
-            baseDepartureTime: firstSection?.base_departure_date_time || journey.departure_date_time,
-            baseArrivalTime: lastSection?.base_arrival_date_time || journey.arrival_date_time,
-            realDepartureTime: firstSection?.departure_date_time || journey.departure_date_time,
-            realArrivalTime: lastSection?.arrival_date_time || journey.arrival_date_time,
-            duration: journey.durations?.total || 0,
-            sections: journey.sections || []
-        };
-    };
 
     const handleRefresh = async () => {
         if (fromId && toId) {
@@ -564,7 +377,7 @@ const MetzBettembourg = () => {
                                     </thead>
                                     <tbody>
                                         {terTrains.map((journey, index) => {
-                                            const info = getJourneyInfo(journey);
+                                            const info = getJourneyInfo(journey, 'Metz', 'Bettembourg');
                                             const depDate = parseUTCDate(info.departureTime);
                                             const arrDate = parseUTCDate(info.arrivalTime);
                                             const depDelay = getDelay(info.baseDepartureTime, info.realDepartureTime);
@@ -573,7 +386,7 @@ const MetzBettembourg = () => {
                                             return (
                                                 <tr key={index}>
                                                     <td>
-                                                        <span className='tag is-dark has-text-weight-semibold'>{formatDate(depDate)}</span>
+                                                        <span className='tag is-dark has-text-weight-semibold'>{formatDate(depDate, 'short')}</span>
                                                     </td>
                                                     <td>
                                                         <div>

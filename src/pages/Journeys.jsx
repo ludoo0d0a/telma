@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getJourneys, formatDateTime } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes, cleanLocationName } from '../components/Utils';
+import { parseUTCDate, getFullMinutes, cleanLocationName, formatTime } from '../components/Utils';
 
 const Journeys = () => {
     const [from, setFrom] = useState('');
@@ -44,9 +44,6 @@ const Journeys = () => {
         return `${minutes}min`;
     };
 
-    const formatTime = (date) => {
-        return `${date.getHours()}:${getFullMinutes(date)}`;
-    };
 
     return (
         <>
@@ -138,13 +135,13 @@ const Journeys = () => {
                                                             <span>
                                                                 {cleanLocationName(section.from?.stop_point?.name || 'Départ')}:{' '}
                                                                 {section.departure_date_time
-                                                                    ? formatTime(parseUTCDate(section.departure_date_time))
+                                                                    ? formatTime(parseUTCDate(section.departure_date_time), ':')
                                                                     : 'N/A'}
                                                             </span>
                                                             <span>
                                                                 {cleanLocationName(section.to?.stop_point?.name || 'Arrivée')}:{' '}
                                                                 {section.arrival_date_time
-                                                                    ? formatTime(parseUTCDate(section.arrival_date_time))
+                                                                    ? formatTime(parseUTCDate(section.arrival_date_time), ':')
                                                                     : 'N/A'}
                                                             </span>
                                                         </div>

@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getVehicleJourney, autocompletePT } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName } from '../components/Utils';
+import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate } from '../components/Utils';
 
 const Train = () => {
     const { id } = useParams();
@@ -35,7 +35,13 @@ const Train = () => {
                 setError(null);
                 // Decode the ID if it's URL encoded
                 const decodedId = decodeURIComponent(id);
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:36',message:'Fetching train details',data:{rawId:id,decodedId:decodedId,idLength:decodedId?.length,startsWithVehicleJourney:decodedId?.startsWith('vehicle_journey')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
                 const data = await getVehicleJourney(decodedId, 'sncf');
+                // #region agent log
+                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:40',message:'API response received',data:{hasVehicleJourneys:!!data.vehicle_journeys,vehicleJourneysCount:data.vehicle_journeys?.length||0,firstVJId:data.vehicle_journeys?.[0]?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                // #endregion
                 
                 if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
                     setTrainData(data.vehicle_journeys[0]);
@@ -116,50 +122,6 @@ const Train = () => {
         navigate(`/train/${encodeURIComponent(train.id)}`);
     };
 
-    const formatTime = (date) => {
-        if (!date) return 'N/A';
-        const d = parseUTCDate(date);
-        return `${d.getHours()}h${getFullMinutes(d)}`;
-    };
-
-    const formatDate = (date) => {
-        if (!date) return 'N/A';
-        const d = parseUTCDate(date);
-        const days = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
-        const months = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'];
-        return `${days[d.getDay()]} ${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-    };
-
-    const getTransportIcon = (commercialMode, network) => {
-        const mode = (commercialMode || '').toLowerCase();
-        const net = (network || '').toLowerCase();
-        
-        if (mode.includes('tgv') || net.includes('tgv')) {
-            return { icon: 'fa-train', color: 'has-text-danger', tagColor: 'is-danger', label: 'TGV' };
-        }
-        if (mode.includes('intercités') || net.includes('intercités') || mode.includes('intercity')) {
-            return { icon: 'fa-train', color: 'has-text-warning', tagColor: 'is-warning', label: 'Intercités' };
-        }
-        if (mode === 'ter' || net.includes('ter')) {
-            return { icon: 'fa-train', color: 'has-text-info', tagColor: 'is-info', label: 'TER' };
-        }
-        if (mode === 'fluo' || net.includes('fluo')) {
-            return { icon: 'fa-train', color: 'has-text-success', tagColor: 'is-success', label: 'FLUO' };
-        }
-        if (mode.includes('rer') || net.includes('rer')) {
-            return { icon: 'fa-subway', color: 'has-text-primary', tagColor: 'is-primary', label: 'RER' };
-        }
-        if (mode.includes('metro') || net.includes('metro')) {
-            return { icon: 'fa-subway', color: 'has-text-primary', tagColor: 'is-primary', label: 'Métro' };
-        }
-        if (mode.includes('tram') || net.includes('tram')) {
-            return { icon: 'fa-tram', color: 'has-text-link', tagColor: 'is-link', label: 'Tram' };
-        }
-        if (mode.includes('bus') || net.includes('bus')) {
-            return { icon: 'fa-bus', color: 'has-text-success', tagColor: 'is-success', label: 'Bus' };
-        }
-        return { icon: 'fa-train', color: 'has-text-grey', tagColor: 'is-light', label: commercialMode || 'Train' };
-    };
 
     // Show search interface when no ID is provided
     if (!id) {
@@ -393,10 +355,25 @@ const Train = () => {
                                                 const baseTime = index === stopTimes.length - 1 ? baseDeparture : baseArrival;
                                                 const realTime = index === stopTimes.length - 1 ? realDeparture : realArrival;
                                                 
-                                                const delay = calculateDelay(
-                                                    parseUTCDate(baseTime),
-                                                    parseUTCDate(realTime)
-                                                );
+                                                // #region agent log
+                                                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:393',message:'Stop time data',data:{index,hasBaseArrival:!!baseArrival,hasRealArrival:!!realArrival,hasBaseDeparture:!!baseDeparture,hasRealDeparture:!!realDeparture,baseTime:baseTime,realTime:realTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                                                // #endregion
+                                                
+                                                // Only calculate delay if both times are available
+                                                let delay = null;
+                                                if (baseTime && realTime) {
+                                                    try {
+                                                        delay = calculateDelay(
+                                                            parseUTCDate(baseTime),
+                                                            parseUTCDate(realTime)
+                                                        );
+                                                    } catch (err) {
+                                                        // #region agent log
+                                                        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:401',message:'Error calculating delay',data:{error:err.message,baseTime,realTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                                                        // #endregion
+                                                        delay = null;
+                                                    }
+                                                }
 
                                                 const stopPoint = stop.stop_point || {};
                                                 const stopArea = stopPoint.stop_area || {};
@@ -414,19 +391,25 @@ const Train = () => {
                                                                 <span className='tag is-danger is-light ml-2'>Arrivée</span>
                                                             )}
                                                         </td>
-                                                        <td>{formatTime(baseTime)}</td>
+                                                        <td>{baseTime ? formatTime(parseUTCDate(baseTime)) : 'N/A'}</td>
                                                         <td>
                                                             {realTime && realTime !== baseTime ? (
-                                                                <span className='has-text-danger'>{formatTime(realTime)}</span>
+                                                                <span className='has-text-danger'>{formatTime(parseUTCDate(realTime))}</span>
+                                                            ) : baseTime ? (
+                                                                formatTime(parseUTCDate(baseTime))
                                                             ) : (
-                                                                formatTime(baseTime)
+                                                                'N/A'
                                                             )}
                                                         </td>
                                                         <td>
-                                                            {delay && delay !== 'À l\'heure' ? (
-                                                                <span className='tag is-danger'>{delay}</span>
+                                                            {delay ? (
+                                                                delay !== 'À l\'heure' && delay !== 'à l\'heure' ? (
+                                                                    <span className='tag is-danger'>{delay}</span>
+                                                                ) : (
+                                                                    <span className='tag is-success'>À l'heure</span>
+                                                                )
                                                             ) : (
-                                                                <span className='tag is-success'>À l'heure</span>
+                                                                <span className='tag is-light'>N/A</span>
                                                             )}
                                                         </td>
                                                         <td>{platform}</td>
