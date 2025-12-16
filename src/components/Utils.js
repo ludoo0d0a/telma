@@ -247,12 +247,23 @@ export const getJourneyInfo = (journey, fromName = null, toName = null) => {
     // Extract vehicle journey ID from first section
     let vehicleJourneyId = null;
     if (firstSection) {
-        // Try from vehicle_journey.id
-        if (firstSection.vehicle_journey?.id) {
-            vehicleJourneyId = firstSection.vehicle_journey.id;
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.js:247',message:'Extracting vehicle journey ID',data:{hasVehicleJourney:!!firstSection.vehicle_journey,vehicleJourneyType:typeof firstSection.vehicle_journey,vehicleJourneyId:firstSection.vehicle_journey?.id,hasLinks:!!firstSection.links,linksCount:firstSection.links?.length,hasTrip:!!firstSection.trip,hasTripVehicleJourney:!!firstSection.trip?.vehicle_journey},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        // #endregion
+        
+        // Try from vehicle_journey.id (ensure we get the ID string, not the object)
+        if (firstSection.vehicle_journey) {
+            // If vehicle_journey is a string (ID), use it directly
+            if (typeof firstSection.vehicle_journey === 'string') {
+                vehicleJourneyId = firstSection.vehicle_journey;
+            }
+            // If vehicle_journey is an object, extract the ID
+            else if (firstSection.vehicle_journey.id) {
+                vehicleJourneyId = firstSection.vehicle_journey.id;
+            }
         }
         // Try from links (similar to Departures/Arrivals)
-        else if (firstSection.links && firstSection.links.length > 1) {
+        if (!vehicleJourneyId && firstSection.links && firstSection.links.length > 0) {
             const vehicleJourneyLink = firstSection.links.find(link => 
                 link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
             );
@@ -261,9 +272,20 @@ export const getJourneyInfo = (journey, fromName = null, toName = null) => {
             }
         }
         // Try from trip.vehicle_journey
-        else if (firstSection.trip?.vehicle_journey?.id) {
-            vehicleJourneyId = firstSection.trip.vehicle_journey.id;
+        if (!vehicleJourneyId && firstSection.trip?.vehicle_journey) {
+            // If trip.vehicle_journey is a string (ID), use it directly
+            if (typeof firstSection.trip.vehicle_journey === 'string') {
+                vehicleJourneyId = firstSection.trip.vehicle_journey;
+            }
+            // If trip.vehicle_journey is an object, extract the ID
+            else if (firstSection.trip.vehicle_journey.id) {
+                vehicleJourneyId = firstSection.trip.vehicle_journey.id;
+            }
         }
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.js:280',message:'Vehicle journey ID extracted',data:{vehicleJourneyId,vehicleJourneyIdType:typeof vehicleJourneyId,isString:typeof vehicleJourneyId === 'string',isObject:typeof vehicleJourneyId === 'object'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
     }
     
     return {

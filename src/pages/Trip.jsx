@@ -158,15 +158,22 @@ const Trip = () => {
                                         )}
                                     </div>
                                 </div>
-                                {info.vehicleJourneyId && (
-                                    <Link 
-                                        to={`/train/${encodeURIComponent(info.vehicleJourneyId)}`}
-                                        className='button is-small is-link'
-                                    >
-                                        <span className='icon'><i className='fas fa-train'></i></span>
-                                        <span>Voir les détails du train</span>
-                                    </Link>
-                                )}
+                                {info.vehicleJourneyId && (() => {
+                                    // Ensure we have a string ID, not an object
+                                    let trainId = info.vehicleJourneyId;
+                                    if (typeof trainId === 'object' && trainId !== null) {
+                                        trainId = trainId.id || trainId.href || null;
+                                    }
+                                    return trainId ? (
+                                        <Link 
+                                            to={`/train/${encodeURIComponent(trainId)}`}
+                                            className='button is-small is-link'
+                                        >
+                                            <span className='icon'><i className='fas fa-train'></i></span>
+                                            <span>Voir les détails du train</span>
+                                        </Link>
+                                    ) : null;
+                                })()}
                             </div>
                             <div className='column'>
                                 <div className='content'>

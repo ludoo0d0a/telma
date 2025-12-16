@@ -60,6 +60,1585 @@
         },
         "description": "Depth of detail in response"
       }
+    },
+    "schemas": {
+      "Link": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Object ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "Object type"
+          },
+          "rel": {
+            "type": "string",
+            "description": "Relation type"
+          },
+          "templated": {
+            "type": "boolean",
+            "description": "Whether the link is templated"
+          }
+        }
+      },
+      "Coord": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "string",
+            "format": "double",
+            "description": "Latitude"
+          },
+          "lon": {
+            "type": "string",
+            "format": "double",
+            "description": "Longitude"
+          }
+        }
+      },
+      "Coverage": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Coverage area ID"
+          },
+          "start_production_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Start production date (YYYYMMDD)"
+          },
+          "end_production_date": {
+            "type": "string",
+            "format": "date",
+            "description": "End production date (YYYYMMDD)"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["running", "closed"],
+            "description": "Coverage status"
+          },
+          "shape": {
+            "type": "string",
+            "description": "Geographic shape (POLYGON)"
+          }
+        }
+      },
+      "CommercialMode": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Commercial mode ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Commercial mode name"
+          }
+        }
+      },
+      "PhysicalMode": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Physical mode ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Physical mode name"
+          }
+        }
+      },
+      "Network": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Network ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Network name"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "Line": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Line ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Line name"
+          },
+          "code": {
+            "type": "string",
+            "description": "Line code"
+          },
+          "color": {
+            "type": "string",
+            "description": "Line color (hex)"
+          },
+          "text_color": {
+            "type": "string",
+            "description": "Text color (hex)"
+          },
+          "commercial_mode": {
+            "$ref": "#/components/schemas/CommercialMode"
+          },
+          "physical_modes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhysicalMode"
+            }
+          },
+          "network": {
+            "$ref": "#/components/schemas/Network"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "Route": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Route ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Route name"
+          },
+          "direction": {
+            "$ref": "#/components/schemas/StopArea"
+          },
+          "line": {
+            "$ref": "#/components/schemas/Line"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "StopPoint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stop point ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Stop point name"
+          },
+          "coord": {
+            "$ref": "#/components/schemas/Coord"
+          },
+          "stop_area": {
+            "$ref": "#/components/schemas/StopArea"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "StopArea": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stop area ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Stop area name"
+          },
+          "coord": {
+            "$ref": "#/components/schemas/Coord"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "Timezone"
+          },
+          "stop_points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopPoint"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "JourneyPattern": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Journey pattern ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Journey pattern name"
+          },
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "StopTime": {
+        "type": "object",
+        "properties": {
+          "arrival_time": {
+            "type": "string",
+            "description": "Arrival time (HHmmss)"
+          },
+          "departure_time": {
+            "type": "string",
+            "description": "Departure time (HHmmss)"
+          },
+          "headsign": {
+            "type": "string",
+            "description": "Headsign"
+          },
+          "pickup_allowed": {
+            "type": "boolean",
+            "description": "Whether pickup is allowed"
+          },
+          "drop_off_allowed": {
+            "type": "boolean",
+            "description": "Whether drop off is allowed"
+          },
+          "skipped_stop": {
+            "type": "boolean",
+            "description": "Whether stop is skipped"
+          },
+          "stop_point": {
+            "$ref": "#/components/schemas/StopPoint"
+          },
+          "utc_arrival_time": {
+            "type": "string",
+            "description": "UTC arrival time (YYYYMMDDTHHmmss)"
+          },
+          "utc_departure_time": {
+            "type": "string",
+            "description": "UTC departure time (YYYYMMDDTHHmmss)"
+          }
+        }
+      },
+      "VehicleJourney": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Vehicle journey ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Vehicle journey name"
+          },
+          "headsign": {
+            "type": "string",
+            "description": "Headsign"
+          },
+          "journey_pattern": {
+            "$ref": "#/components/schemas/JourneyPattern"
+          },
+          "stop_times": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopTime"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "DisplayInformation": {
+        "type": "object",
+        "properties": {
+          "direction": {
+            "type": "string",
+            "description": "Direction"
+          },
+          "code": {
+            "type": "string",
+            "description": "Code"
+          },
+          "network": {
+            "type": "string",
+            "description": "Network name"
+          },
+          "trip_short_name": {
+            "type": "string",
+            "description": "Trip short name"
+          },
+          "headsign": {
+            "type": "string",
+            "description": "Headsign (destination or train number)"
+          },
+          "label": {
+            "type": "string",
+            "description": "Label"
+          },
+          "color": {
+            "type": "string",
+            "description": "Color (hex)"
+          },
+          "text_color": {
+            "type": "string",
+            "description": "Text color (hex)"
+          },
+          "commercial_mode": {
+            "type": "string",
+            "description": "Commercial mode name"
+          },
+          "physical_mode": {
+            "type": "string",
+            "description": "Physical mode name"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description"
+          },
+          "equipments": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of equipment types"
+          },
+          "route_id": {
+            "type": "string",
+            "description": "Route ID"
+          },
+          "line_id": {
+            "type": "string",
+            "description": "Line ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Display name"
+          }
+        }
+      },
+      "DateTime": {
+        "type": "object",
+        "properties": {
+          "date_time": {
+            "type": "string",
+            "description": "Date and time (YYYYMMDDTHHmmss)"
+          },
+          "base_date_time": {
+            "type": "string",
+            "description": "Base date and time (YYYYMMDDTHHmmss)"
+          },
+          "data_freshness": {
+            "type": "string",
+            "enum": ["base_schedule", "realtime"],
+            "description": "Data freshness"
+          }
+        }
+      },
+      "Departure": {
+        "type": "object",
+        "properties": {
+          "display_informations": {
+            "$ref": "#/components/schemas/DisplayInformation"
+          },
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "stop_point": {
+            "$ref": "#/components/schemas/StopPoint"
+          },
+          "stop_date_time": {
+            "$ref": "#/components/schemas/DateTime"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "Arrival": {
+        "type": "object",
+        "properties": {
+          "display_informations": {
+            "$ref": "#/components/schemas/DisplayInformation"
+          },
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "stop_point": {
+            "$ref": "#/components/schemas/StopPoint"
+          },
+          "stop_date_time": {
+            "$ref": "#/components/schemas/DateTime"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "Geocode": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Address name"
+          },
+          "label": {
+            "type": "string",
+            "description": "Full address label"
+          },
+          "id": {
+            "type": "string",
+            "description": "Address ID"
+          },
+          "type": {
+            "type": "string",
+            "description": "Address type"
+          },
+          "coord": {
+            "$ref": "#/components/schemas/Coord",
+            "description": "Address coordinates"
+          },
+          "house_number": {
+            "type": "string",
+            "description": "House number"
+          },
+          "street": {
+            "type": "string",
+            "description": "Street name"
+          },
+          "administrative_regions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Administrative region ID"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Administrative region name"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Administrative region label"
+                },
+                "level": {
+                  "type": "integer",
+                  "description": "Administrative level"
+                },
+                "zip_code": {
+                  "type": "string",
+                  "description": "ZIP code"
+                },
+                "insee": {
+                  "type": "string",
+                  "description": "INSEE code"
+                }
+              }
+            },
+            "description": "List of administrative regions"
+          }
+        }
+      },
+      "Place": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Place ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Place name"
+          },
+          "quality": {
+            "type": "integer",
+            "description": "Quality score (0-100, higher is better)"
+          },
+          "embedded_type": {
+            "type": "string",
+            "enum": ["stop_area", "stop_point", "address", "poi", "administrative_region"],
+            "description": "Embedded type - determines which embedded object is populated"
+          },
+          "stop_area": {
+            "$ref": "#/components/schemas/StopArea",
+            "description": "Stop area object (when embedded_type is 'stop_area')"
+          },
+          "stop_point": {
+            "$ref": "#/components/schemas/StopPoint",
+            "description": "Stop point object (when embedded_type is 'stop_point')"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Geocode",
+            "description": "Address object (when embedded_type is 'address')"
+          },
+          "poi": {
+            "type": "object",
+            "description": "Point of interest object (when embedded_type is 'poi')",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "POI ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "POI name"
+              },
+              "coord": {
+                "$ref": "#/components/schemas/Coord"
+              },
+              "poi_type": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+          "administrative_region": {
+            "type": "object",
+            "description": "Administrative region object (when embedded_type is 'administrative_region')",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Administrative region ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Administrative region name"
+              },
+              "label": {
+                "type": "string",
+                "description": "Administrative region label"
+              },
+              "coord": {
+                "$ref": "#/components/schemas/Coord"
+              },
+              "level": {
+                "type": "integer",
+                "description": "Administrative level (e.g., 8 for city, 7 for department)"
+              },
+              "zip_code": {
+                "type": "string",
+                "description": "ZIP code"
+              },
+              "insee": {
+                "type": "string",
+                "description": "INSEE code"
+              }
+            }
+          },
+          "coord": {
+            "$ref": "#/components/schemas/Coord",
+            "description": "Coordinates of the place"
+          },
+          "administrative_regions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Administrative region ID"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Administrative region name"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Administrative region label"
+                },
+                "coord": {
+                  "$ref": "#/components/schemas/Coord"
+                },
+                "level": {
+                  "type": "integer",
+                  "description": "Administrative level"
+                },
+                "zip_code": {
+                  "type": "string",
+                  "description": "ZIP code"
+                },
+                "insee": {
+                  "type": "string",
+                  "description": "INSEE code"
+                }
+              }
+            },
+            "description": "List of administrative regions this place belongs to"
+          },
+          "distance": {
+            "type": "integer",
+            "description": "Distance in meters (for places_nearby endpoint)"
+          }
+        }
+      },
+      "Section": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Section ID"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["public_transport", "street_network", "transfer", "waiting", "boarding", "alighting"],
+            "description": "Section type"
+          },
+          "from": {
+            "$ref": "#/components/schemas/Place"
+          },
+          "to": {
+            "$ref": "#/components/schemas/Place"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Duration in seconds"
+          },
+          "departure_date_time": {
+            "type": "string",
+            "description": "Departure date time (YYYYMMDDTHHmmss)"
+          },
+          "arrival_date_time": {
+            "type": "string",
+            "description": "Arrival date time (YYYYMMDDTHHmmss)"
+          },
+          "base_departure_date_time": {
+            "type": "string",
+            "description": "Base departure date time (YYYYMMDDTHHmmss)"
+          },
+          "base_arrival_date_time": {
+            "type": "string",
+            "description": "Base arrival date time (YYYYMMDDTHHmmss)"
+          },
+          "geojson": {
+            "type": "object",
+            "description": "GeoJSON geometry"
+          },
+          "mode": {
+            "type": "string",
+            "description": "Transport mode"
+          },
+          "transfer_type": {
+            "type": "string",
+            "description": "Transfer type"
+          },
+          "display_informations": {
+            "$ref": "#/components/schemas/DisplayInformation"
+          },
+          "vehicle_journey": {
+            "oneOf": [
+              {
+                "type": "string",
+                "description": "Vehicle journey ID as string"
+              },
+              {
+                "$ref": "#/components/schemas/VehicleJourney"
+              }
+            ],
+            "description": "Vehicle journey (can be ID string or object)"
+          },
+          "trip": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Trip ID"
+              },
+              "vehicle_journey": {
+                "oneOf": [
+                  {
+                    "type": "string",
+                    "description": "Vehicle journey ID as string"
+                  },
+                  {
+                    "$ref": "#/components/schemas/VehicleJourney"
+                  }
+                ]
+              }
+            }
+          },
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "stop_date_times": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stop_point": {
+                  "$ref": "#/components/schemas/StopPoint"
+                },
+                "stop_area": {
+                  "$ref": "#/components/schemas/StopArea"
+                },
+                "departure_date_time": {
+                  "type": "string",
+                  "description": "Departure date time (YYYYMMDDTHHmmss)"
+                },
+                "arrival_date_time": {
+                  "type": "string",
+                  "description": "Arrival date time (YYYYMMDDTHHmmss)"
+                },
+                "base_departure_date_time": {
+                  "type": "string",
+                  "description": "Base departure date time (YYYYMMDDTHHmmss)"
+                },
+                "base_arrival_date_time": {
+                  "type": "string",
+                  "description": "Base arrival date time (YYYYMMDDTHHmmss)"
+                }
+              }
+            },
+            "description": "List of stop times for this section"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "JourneyItem": {
+        "type": "object",
+        "properties": {
+          "durations": {
+            "type": "object",
+            "properties": {
+              "total": {
+                "type": "integer",
+                "description": "Total duration in seconds"
+              },
+              "walking": {
+                "type": "integer",
+                "description": "Walking duration in seconds"
+              },
+              "bike": {
+                "type": "integer",
+                "description": "Bike duration in seconds"
+              },
+              "car": {
+                "type": "integer",
+                "description": "Car duration in seconds"
+              },
+              "ridesharing": {
+                "type": "integer",
+                "description": "Ridesharing duration in seconds"
+              },
+              "taxi": {
+                "type": "integer",
+                "description": "Taxi duration in seconds"
+              }
+            }
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Total duration in seconds (deprecated, use durations.total)"
+          },
+          "nb_transfers": {
+            "type": "integer",
+            "description": "Number of transfers"
+          },
+          "departure_date_time": {
+            "type": "string",
+            "description": "Departure date time (YYYYMMDDTHHmmss)"
+          },
+          "arrival_date_time": {
+            "type": "string",
+            "description": "Arrival date time (YYYYMMDDTHHmmss)"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Section"
+            },
+            "description": "List of sections in the journey"
+          },
+          "type": {
+            "type": "string",
+            "description": "Journey type"
+          },
+          "status": {
+            "type": "string",
+            "description": "Journey status"
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Journey tags"
+          },
+          "co2_emission": {
+            "type": "object",
+            "properties": {
+              "value": {
+                "type": "number",
+                "description": "CO2 emission value"
+              },
+              "unit": {
+                "type": "string",
+                "description": "CO2 emission unit"
+              }
+            }
+          }
+        }
+      },
+      "Journey": {
+        "type": "object",
+        "properties": {
+          "journeys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JourneyItem"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "context": {
+            "type": "object",
+            "properties": {
+              "timezone": {
+                "type": "string"
+              },
+              "current_datetime": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Impact": {
+        "type": "object",
+        "properties": {
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "application_periods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "begin": {
+                  "type": "string",
+                  "description": "Begin date (YYYYMMDDTHHmmss)"
+                },
+                "end": {
+                  "type": "string",
+                  "description": "End date (YYYYMMDDTHHmmss)"
+                }
+              }
+            }
+          },
+          "pt_object": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "PT object ID"
+              },
+              "embedded_type": {
+                "type": "string",
+                "enum": ["vehicle_journey", "trip", "route", "line", "stop_point", "stop_area"],
+                "description": "Embedded object type"
+              }
+            },
+            "description": "Affected PT object"
+          },
+          "impacted_stops": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Stop ID"
+                },
+                "name": {
+                  "type": "string",
+                  "description": "Stop name"
+                },
+                "stop_point": {
+                  "$ref": "#/components/schemas/StopPoint"
+                },
+                "stop_area": {
+                  "$ref": "#/components/schemas/StopArea"
+                }
+              }
+            },
+            "description": "List of impacted stops"
+          },
+          "object": {
+            "type": "object",
+            "description": "Affected object (deprecated, use pt_object)"
+          },
+          "object_type": {
+            "type": "string",
+            "description": "Affected object type (deprecated, use pt_object.embedded_type)"
+          }
+        }
+      },
+      "Severity": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Severity name"
+          },
+          "color": {
+            "type": "string",
+            "description": "Severity color"
+          },
+          "priority": {
+            "type": "integer",
+            "description": "Severity priority"
+          },
+          "effect": {
+            "type": "string",
+            "enum": ["NO_SERVICE", "REDUCED_SERVICE", "SIGNIFICANT_DELAYS", "DETOUR", "ADDITIONAL_SERVICE", "MODIFIED_SERVICE", "OTHER_EFFECT", "UNKNOWN_EFFECT", "STOP_MOVED", "NO_EFFECT"],
+            "description": "Effect type"
+          }
+        }
+      },
+      "Disruption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Disruption ID"
+          },
+          "disruption_id": {
+            "type": "string",
+            "description": "Disruption ID"
+          },
+          "disruption_uri": {
+            "type": "string",
+            "description": "Disruption URI"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "impact_id": {
+            "type": "string",
+            "description": "Impact ID"
+          },
+          "application_periods": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "begin": {
+                  "type": "string",
+                  "description": "Begin date (YYYYMMDDTHHmmss)"
+                },
+                "end": {
+                  "type": "string",
+                  "description": "End date (YYYYMMDDTHHmmss)"
+                }
+              }
+            }
+          },
+          "messages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "description": "Message text"
+                },
+                "channel": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "types": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "impacted_objects": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Impact"
+            }
+          },
+          "cause": {
+            "type": "string",
+            "description": "Disruption cause"
+          },
+          "category": {
+            "type": "string",
+            "description": "Disruption category"
+          }
+        }
+      },
+      "StopSchedule": {
+        "type": "object",
+        "properties": {
+          "stop_point": {
+            "$ref": "#/components/schemas/StopPoint"
+          },
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "date_times": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          },
+          "display_informations": {
+            "$ref": "#/components/schemas/DisplayInformation"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "RouteSchedule": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "table": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "stop_point": {
+                  "$ref": "#/components/schemas/StopPoint"
+                },
+                "date_times": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DateTime"
+                  }
+                }
+              }
+            }
+          },
+          "display_informations": {
+            "$ref": "#/components/schemas/DisplayInformation"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "TerminusSchedule": {
+        "type": "object",
+        "properties": {
+          "route": {
+            "$ref": "#/components/schemas/Route"
+          },
+          "stop_point": {
+            "$ref": "#/components/schemas/StopPoint"
+          },
+          "date_times": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DateTime"
+            }
+          },
+          "display_informations": {
+            "$ref": "#/components/schemas/DisplayInformation"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "Contributor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Contributor ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Contributor name"
+          },
+          "license": {
+            "type": "string",
+            "description": "License"
+          },
+          "website": {
+            "type": "string",
+            "description": "Website URL"
+          }
+        }
+      },
+      "Dataset": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Dataset ID"
+          },
+          "description": {
+            "type": "string",
+            "description": "Dataset description"
+          },
+          "start_validation_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Start validation date"
+          },
+          "end_validation_date": {
+            "type": "string",
+            "format": "date",
+            "description": "End validation date"
+          },
+          "contributor": {
+            "$ref": "#/components/schemas/Contributor"
+          }
+        }
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Error ID"
+              },
+              "message": {
+                "type": "string",
+                "description": "Error message"
+              }
+            }
+          }
+        }
+      },
+      "Pagination": {
+        "type": "object",
+        "properties": {
+          "start_page": {
+            "type": "integer",
+            "description": "Start page number"
+          },
+          "items_on_page": {
+            "type": "integer",
+            "description": "Items on current page"
+          },
+          "items_per_page": {
+            "type": "integer",
+            "description": "Items per page"
+          },
+          "total_result": {
+            "type": "integer",
+            "description": "Total number of results"
+          }
+        }
+      },
+      "CoverageResponse": {
+        "type": "object",
+        "properties": {
+          "regions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Coverage"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "CommercialModesResponse": {
+        "type": "object",
+        "properties": {
+          "commercial_modes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommercialMode"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "PhysicalModesResponse": {
+        "type": "object",
+        "properties": {
+          "physical_modes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhysicalMode"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "LinesResponse": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "StopAreasResponse": {
+        "type": "object",
+        "properties": {
+          "stop_areas": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "DeparturesResponse": {
+        "type": "object",
+        "properties": {
+          "departures": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Departure"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "ArrivalsResponse": {
+        "type": "object",
+        "properties": {
+          "arrivals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Arrival"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          }
+        }
+      },
+      "JourneysResponse": {
+        "$ref": "#/components/schemas/Journey"
+      },
+      "PlacesResponse": {
+        "type": "object",
+        "properties": {
+          "places": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Place"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "StopSchedulesResponse": {
+        "type": "object",
+        "properties": {
+          "stop_schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopSchedule"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "RouteSchedulesResponse": {
+        "type": "object",
+        "properties": {
+          "route_schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RouteSchedule"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "TerminusSchedulesResponse": {
+        "type": "object",
+        "properties": {
+          "terminus_schedules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TerminusSchedule"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "VehicleJourneysResponse": {
+        "type": "object",
+        "properties": {
+          "vehicle_journeys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleJourney"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "DatasetsResponse": {
+        "type": "object",
+        "properties": {
+          "datasets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Dataset"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "ContributorsResponse": {
+        "type": "object",
+        "properties": {
+          "contributors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Contributor"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      }
     }
   },
   "security": [
@@ -74,7 +1653,24 @@
         "summary": "List all available coverage areas",
         "responses": {
           "200": {
-            "description": "List of coverage areas"
+            "description": "List of coverage areas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoverageResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -90,7 +1686,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Coverage area information"
+            "description": "Coverage area information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Coverage"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -106,7 +1719,14 @@
         ],
         "responses": {
           "200": {
-            "description": "List of commercial modes"
+            "description": "List of commercial modes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommercialModesResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -122,7 +1742,14 @@
         ],
         "responses": {
           "200": {
-            "description": "List of physical modes"
+            "description": "List of physical modes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhysicalModesResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -138,7 +1765,14 @@
         ],
         "responses": {
           "200": {
-            "description": "List of lines"
+            "description": "List of lines",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinesResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -154,7 +1788,14 @@
         ],
         "responses": {
           "200": {
-            "description": "List of stop areas"
+            "description": "List of stop areas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopAreasResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -187,7 +1828,24 @@
         ],
         "responses": {
           "200": {
-            "description": "List of departures"
+            "description": "List of departures",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeparturesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stop area not found or no departures",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -220,7 +1878,24 @@
         ],
         "responses": {
           "200": {
-            "description": "List of arrivals"
+            "description": "List of arrivals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ArrivalsResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stop area not found or no arrivals",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -262,11 +1937,67 @@
               "enum": ["departure", "arrival"]
             },
             "description": "Whether datetime represents departure or arrival"
+          },
+          {
+            "name": "data_freshness",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["base_schedule", "realtime"],
+              "default": "base_schedule"
+            },
+            "description": "Data freshness: base_schedule or realtime"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "name": "max_duration",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Maximum journey duration in seconds"
+          },
+          {
+            "name": "min_nb_journeys",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Minimum number of journeys to return"
+          },
+          {
+            "name": "timeframe_duration",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 86400
+            },
+            "description": "Timeframe duration in seconds"
           }
         ],
         "responses": {
           "200": {
-            "description": "List of journey options"
+            "description": "List of journey options",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JourneysResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Origin or destination not found, or no solution",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -274,7 +2005,8 @@
     "/coverage/{coverage}/places": {
       "get": {
         "tags": ["Places"],
-        "summary": "Search for places",
+        "summary": "Search for places (geographical autocomplete)",
+        "description": "Search for places including stop areas, stop points, addresses, POIs, and administrative regions",
         "parameters": [
           {
             "$ref": "#/components/parameters/coverage"
@@ -284,17 +2016,58 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "minLength": 2
             },
-            "description": "Search query"
+            "description": "Search query (minimum 2 characters)"
           },
           {
             "$ref": "#/components/parameters/count"
+          },
+          {
+            "name": "type[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["stop_area", "stop_point", "address", "poi", "administrative_region"]
+              }
+            },
+            "description": "Filter by place types",
+            "style": "form",
+            "explode": true
+          },
+          {
+            "name": "depth",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 1
+            },
+            "description": "Depth of detail in response"
           }
         ],
         "responses": {
           "200": {
-            "description": "List of matching places"
+            "description": "List of matching places",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g., query too short)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -303,6 +2076,7 @@
       "get": {
         "tags": ["Places"],
         "summary": "Find places nearby coordinates",
+        "description": "Find places (stop areas, stop points, addresses, POIs) within a certain distance from coordinates",
         "parameters": [
           {
             "$ref": "#/components/parameters/coverage"
@@ -312,9 +2086,20 @@
             "in": "query",
             "required": true,
             "schema": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^[+-]?\\d+\\.?\\d*;[+-]?\\d+\\.?\\d*$"
             },
             "description": "Coordinates in format 'lon;lat'"
+          },
+          {
+            "name": "distance",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 200,
+              "minimum": 0
+            },
+            "description": "Distance in meters (default: 200)"
           },
           {
             "name": "type[]",
@@ -322,15 +2107,41 @@
             "schema": {
               "type": "array",
               "items": {
-                "type": "string"
+                "type": "string",
+                "enum": ["stop_area", "stop_point", "address", "poi", "administrative_region"]
               }
             },
-            "description": "Filter by place types"
+            "description": "Filter by place types",
+            "style": "form",
+            "explode": true
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
           }
         ],
         "responses": {
           "200": {
-            "description": "List of nearby places"
+            "description": "List of nearby places",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g., invalid coordinates format)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -358,7 +2169,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Stop schedules"
+            "description": "Stop schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopSchedulesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stop not found or no schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -386,7 +2214,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Route schedules"
+            "description": "Route schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteSchedulesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Route not found or no schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -414,7 +2259,24 @@
         ],
         "responses": {
           "200": {
-            "description": "Terminus schedules"
+            "description": "Terminus schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerminusSchedulesResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Line or stop area not found, or no schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
           }
         }
       }
@@ -445,7 +2307,38 @@
         ],
         "responses": {
           "200": {
-            "description": "Isochrone data"
+            "description": "Isochrone data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "isochrones": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "geojson": {
+                            "type": "object",
+                            "description": "GeoJSON geometry"
+                          },
+                          "max_duration": {
+                            "type": "integer",
+                            "description": "Maximum duration in seconds"
+                          }
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -469,7 +2362,45 @@
         ],
         "responses": {
           "200": {
-            "description": "Line reports"
+            "description": "Line reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "line_reports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "line": {
+                            "$ref": "#/components/schemas/Line"
+                          },
+                          "pt_objects": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "disruptions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Disruption"
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -485,7 +2416,51 @@
         ],
         "responses": {
           "200": {
-            "description": "Traffic reports"
+            "description": "Traffic reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "traffic_reports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "network": {
+                            "$ref": "#/components/schemas/Network"
+                          },
+                          "lines": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/components/schemas/Line"
+                            }
+                          },
+                          "pt_objects": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "disruptions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Disruption"
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -508,7 +2483,50 @@
         ],
         "responses": {
           "200": {
-            "description": "Equipment reports"
+            "description": "Equipment reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "equipment_reports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "stop_point": {
+                            "$ref": "#/components/schemas/StopPoint"
+                          },
+                          "equipments": {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "id": {
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "embedded_type": {
+                                  "type": "string"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -524,7 +2542,14 @@
         ],
         "responses": {
           "200": {
-            "description": "List of datasets"
+            "description": "List of datasets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DatasetsResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -540,7 +2565,504 @@
         ],
         "responses": {
           "200": {
-            "description": "List of contributors"
+            "description": "List of contributors",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContributorsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/pt_objects": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "Autocomplete on Public Transport objects",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of PT objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/coord/{coord}/addresses": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "Inverted geocoding - get address from coordinates",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "coord",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[+-]?\\d+\\.?\\d*;[+-]?\\d+\\.?\\d*$"
+            },
+            "description": "Coordinates in format 'lon;lat'"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of addresses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlacesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/routes": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List all routes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of routes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "routes": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Route"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/stop_points": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List all stop points",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of stop points",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "stop_points": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/StopPoint"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/networks": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List all networks",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of networks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "networks": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Network"
+                      }
+                    },
+                    "pagination": {
+                      "$ref": "#/components/schemas/Pagination"
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/coord/{coord}/freefloatings": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "Get freefloatings nearby coordinates",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "coord",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[+-]?\\d+\\.?\\d*;[+-]?\\d+\\.?\\d*$"
+            },
+            "description": "Coordinates in format 'lon;lat'"
+          },
+          {
+            "name": "distance",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 200
+            },
+            "description": "Distance in meters"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of freefloatings",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "freefloatings": {
+                      "type": "array",
+                      "items": {
+                        "type": "object"
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/vehicle_journeys/{id}": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "Get vehicle journey details",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Vehicle journey ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Vehicle journey details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleJourneysResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Vehicle journey not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/stop_points/{id}/stop_schedules": {
+      "get": {
+        "tags": ["Schedules"],
+        "summary": "Get stop schedules for a specific stop point",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Stop point ID"
+          },
+          {
+            "name": "from_datetime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "From date and time (YYYYMMDDTHHmmss)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stop schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopSchedulesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/routes/{id}/route_schedules": {
+      "get": {
+        "tags": ["Schedules"],
+        "summary": "Get route schedules for a specific route",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Route ID"
+          },
+          {
+            "name": "from_datetime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "From date and time (YYYYMMDDTHHmmss)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Route schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RouteSchedulesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/lines/{id}/line_reports": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get line reports for a specific line",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Line ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Line reports",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "line_reports": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "line": {
+                            "$ref": "#/components/schemas/Line"
+                          },
+                          "pt_objects": {
+                            "type": "array",
+                            "items": {
+                              "type": "object"
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "disruptions": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Disruption"
+                      }
+                    },
+                    "links": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Link"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/physical_modes/{physical_mode}/lines/{line}/stop_areas/{stop_area}/terminus_schedules": {
+      "get": {
+        "tags": ["Schedules"],
+        "summary": "Get terminus schedules for a specific line and stop area",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "physical_mode",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Physical mode ID"
+          },
+          {
+            "name": "line",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Line ID"
+          },
+          {
+            "name": "stop_area",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Stop area ID"
+          },
+          {
+            "name": "from_datetime",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "From date and time (YYYYMMDDTHHmmss)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Terminus schedules",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TerminusSchedulesResponse"
+                }
+              }
+            }
           }
         }
       }

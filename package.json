@@ -29,7 +29,8 @@
     "vercel-build": "npm ci && npm run build",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "generate-client": "npx @openapitools/openapi-generator-cli generate -i public/openapi.json -g typescript-axios -o src/client --additional-properties=supportsES6=true,withInterfaces=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api"
   },
   "eslintConfig": {
     "extends": [
@@ -48,5 +49,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.25.2"
   }
 }
