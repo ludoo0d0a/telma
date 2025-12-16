@@ -15,47 +15,64 @@ const ajv = new Ajv({ allErrors: true, strict: false });
 addFormats(ajv);
 
 /**
- * Convert OpenAPI 3.0 schema reference to JSON Schema
+ * Convert OpenAPI 3.0 schema reference to a JSON Schema definition ref (without dereferencing).
  */
-function resolveSchemaRef(ref) {
-    if (!ref || !ref.startsWith('#/components/schemas/')) {
+function refToJsonSchemaRef(ref) {
+    if (!ref || typeof ref !== 'string' || !ref.startsWith('#/components/schemas/')) {
         return null;
     }
-    
     const schemaName = ref.replace('#/components/schemas/', '');
-    return openApiSpec.components.schemas[schemaName];
+    return `#/definitions/${schemaName}`;
 }
 
 /**
  * Convert OpenAPI 3.0 schema to JSON Schema format
  */
-function convertOpenApiToJsonSchema(openApiSchema) {
+function convertOpenApiToJsonSchema(openApiSchema, ctx = {}) {
     if (!openApiSchema) {
         return {};
     }
 
-    // Handle $ref
+    const seen = ctx.seen || (ctx.seen = new WeakMap());
+    if (typeof openApiSchema === 'object') {
+        const cached = seen.get(openApiSchema);
+        if (cached) return cached;
+    }
+
+    // Handle $ref (do NOT dereference to avoid infinite recursion on circular schemas)
     if (openApiSchema.$ref) {
-        const resolved = resolveSchemaRef(openApiSchema.$ref);
-        if (resolved) {
-            return convertOpenApiToJsonSchema(resolved);
-        }
+        const ref = refToJsonSchemaRef(openApiSchema.$ref);
+        if (ref) return { $ref: ref };
         return {};
     }
 
     // Handle oneOf
     if (openApiSchema.oneOf) {
-        return {
-            oneOf: openApiSchema.oneOf.map(s => convertOpenApiToJsonSchema(s))
-        };
+        const out = { oneOf: openApiSchema.oneOf.map(s => convertOpenApiToJsonSchema(s, ctx)) };
+        if (typeof openApiSchema === 'object') seen.set(openApiSchema, out);
+        return out;
+    }
+
+    // Handle anyOf / allOf
+    if (openApiSchema.anyOf) {
+        const out = { anyOf: openApiSchema.anyOf.map(s => convertOpenApiToJsonSchema(s, ctx)) };
+        if (typeof openApiSchema === 'object') seen.set(openApiSchema, out);
+        return out;
+    }
+    if (openApiSchema.allOf) {
+        const out = { allOf: openApiSchema.allOf.map(s => convertOpenApiToJsonSchema(s, ctx)) };
+        if (typeof openApiSchema === 'object') seen.set(openApiSchema, out);
+        return out;
     }
 
     // Handle arrays
     if (openApiSchema.type === 'array' || openApiSchema.items) {
-        return {
+        const out = {
             type: 'array',
-            items: openApiSchema.items ? convertOpenApiToJsonSchema(openApiSchema.items) : {}
+            items: openApiSchema.items ? convertOpenApiToJsonSchema(openApiSchema.items, ctx) : {}
         };
+        if (typeof openApiSchema === 'object') seen.set(openApiSchema, out);
+        return out;
     }
 
     // Handle objects
@@ -65,16 +82,19 @@ function convertOpenApiToJsonSchema(openApiSchema) {
             properties: {},
             required: openApiSchema.required || []
         };
+        if (typeof openApiSchema === 'object') seen.set(openApiSchema, jsonSchema);
 
         if (openApiSchema.properties) {
             for (const [key, value] of Object.entries(openApiSchema.properties)) {
-                jsonSchema.properties[key] = convertOpenApiToJsonSchema(value);
+                jsonSchema.properties[key] = convertOpenApiToJsonSchema(value, ctx);
             }
         }
 
         // Handle additionalProperties
         if (openApiSchema.additionalProperties !== undefined) {
-            jsonSchema.additionalProperties = openApiSchema.additionalProperties;
+            jsonSchema.additionalProperties = typeof openApiSchema.additionalProperties === 'object'
+                ? convertOpenApiToJsonSchema(openApiSchema.additionalProperties, ctx)
+                : openApiSchema.additionalProperties;
         } else {
             jsonSchema.additionalProperties = true; // OpenAPI default
         }
@@ -84,16 +104,19 @@ function convertOpenApiToJsonSchema(openApiSchema) {
 
     // Handle enums
     if (openApiSchema.enum) {
-        return {
+        const out = {
             type: openApiSchema.type || 'string',
             enum: openApiSchema.enum
         };
+        if (typeof openApiSchema === 'object') seen.set(openApiSchema, out);
+        return out;
     }
 
     // Handle simple types
     const jsonSchema = {
         type: openApiSchema.type || 'string' // Default to string if type not specified
     };
+    if (typeof openApiSchema === 'object') seen.set(openApiSchema, jsonSchema);
 
     if (openApiSchema.format) {
         jsonSchema.format = openApiSchema.format;
@@ -123,8 +146,33 @@ function convertOpenApiToJsonSchema(openApiSchema) {
         jsonSchema.maxLength = openApiSchema.maxLength;
     }
 
+    // OpenAPI nullable -> JSON Schema union with null
+    if (openApiSchema.nullable === true) {
+        jsonSchema.type = Array.isArray(jsonSchema.type) ? [...jsonSchema.type, 'null'] : [jsonSchema.type, 'null'];
+    }
+
     return jsonSchema;
 }
+
+let _definitionsCache = null;
+function getDefinitions() {
+    if (_definitionsCache) return _definitionsCache;
+    const schemas = openApiSpec?.components?.schemas || {};
+    const ctx = { seen: new WeakMap() };
+    const defs = {};
+    for (const [name, schema] of Object.entries(schemas)) {
+        defs[name] = convertOpenApiToJsonSchema(schema, ctx);
+    }
+    _definitionsCache = defs;
+
+    // #region agent log
+    (globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/__tests__/utils/openapi-validator.js:165',message:'openapi definitions built',data:{definitionCount:Object.keys(defs).length},timestamp:Date.now(),sessionId:'debug-session',runId:'validator',hypothesisId:'H7'})}) : Promise.resolve()).catch(()=>{});
+    // #endregion
+
+    return _definitionsCache;
+}
+
+const _validatorCache = new Map();
 
 /**
  * Get response schema for an endpoint
@@ -155,27 +203,43 @@ export function getResponseSchema(path, method = 'get', statusCode = '200') {
         return null;
     }
 
-    return convertOpenApiToJsonSchema(schema);
+    return schema; // Return OpenAPI schema; conversion happens in validateResponse with shared definitions.
 }
 
 /**
  * Validate response data against OpenAPI schema
  */
 export function validateResponse(path, method, statusCode, data) {
-    const schema = getResponseSchema(path, method, statusCode);
-    
-    if (!schema) {
+    const openApiSchema = getResponseSchema(path, method, statusCode);
+    if (!openApiSchema) {
         console.warn(`No schema found for ${method} ${path} ${statusCode}`);
         return { valid: true, errors: [] };
     }
 
-    const validate = ajv.compile(schema);
-    const valid = validate(data);
+    const cacheKey = `${method.toLowerCase()} ${path} ${statusCode}`;
+    let validate = _validatorCache.get(cacheKey);
+    if (!validate) {
+        try {
+            const ctx = { seen: new WeakMap() };
+            const converted = convertOpenApiToJsonSchema(openApiSchema, ctx);
+            const schema = { ...converted, definitions: getDefinitions() };
 
-    return {
-        valid,
-        errors: validate.errors || []
-    };
+            // #region agent log
+            (globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/__tests__/utils/openapi-validator.js:216',message:'compile validator',data:{cacheKey},timestamp:Date.now(),sessionId:'debug-session',runId:'validator',hypothesisId:'H8'})}) : Promise.resolve()).catch(()=>{});
+            // #endregion
+
+            validate = ajv.compile(schema);
+            _validatorCache.set(cacheKey, validate);
+        } catch (e) {
+            // #region agent log
+            (globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/__tests__/utils/openapi-validator.js:224',message:'validator compile failed',data:{cacheKey,errorName:e?.name||'Error',errorMessage:String(e?.message||e)},timestamp:Date.now(),sessionId:'debug-session',runId:'validator',hypothesisId:'H9'})}) : Promise.resolve()).catch(()=>{});
+            // #endregion
+            throw e;
+        }
+    }
+
+    const valid = validate(data);
+    return { valid, errors: validate.errors || [] };
 }
 
 /**

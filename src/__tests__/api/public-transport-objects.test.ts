@@ -173,8 +173,8 @@ describe('Public Transport Objects API', () => {
                 }
 
                 expect(validation.valid).toBe(true);
-                expect(response.data).toHaveProperty('places');
-                expect(Array.isArray(response.data.places)).toBe(true);
+                expect(response.data).toHaveProperty('pt_objects');
+                expect(Array.isArray(response.data.pt_objects)).toBe(true);
             } catch (error) {
                 if (error.response?.status === 401 || error.response?.status === 400) {
                     return;

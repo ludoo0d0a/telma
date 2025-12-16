@@ -120,9 +120,9 @@ describe('Departures and Arrivals API', () => {
                     const departure = response.data.departures[0];
                     
                     if (departure.stop_date_time) {
-                        // Check DateTime schema
-                        expect(departure.stop_date_time).toHaveProperty('date_time');
-                        expect(typeof departure.stop_date_time.date_time).toBe('string');
+                        // SNCF payload uses departure_date_time / arrival_date_time fields
+                        expect(departure.stop_date_time).toHaveProperty('departure_date_time');
+                        expect(typeof departure.stop_date_time.departure_date_time).toBe('string');
                     }
                 }
             } catch (error) {

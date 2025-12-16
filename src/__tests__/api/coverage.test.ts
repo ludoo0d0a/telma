@@ -93,8 +93,13 @@ describe('Coverage API', () => {
                 }
 
                 expect(validation.valid).toBe(true);
-                expect(response.data).toHaveProperty('id');
-                expect(typeof response.data.id).toBe('string');
+                // Actual payload contains regions array for the requested coverage
+                expect(response.data).toHaveProperty('regions');
+                expect(Array.isArray(response.data.regions)).toBe(true);
+                if (response.data.regions && response.data.regions.length > 0) {
+                    expect(response.data.regions[0]).toHaveProperty('id');
+                    expect(typeof response.data.regions[0].id).toBe('string');
+                }
             } catch (error) {
                 if (error.response?.status === 401 || error.response?.status === 404) {
                     return;

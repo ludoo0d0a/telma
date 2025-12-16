@@ -69,6 +69,10 @@
             "type": "string",
             "description": "Object ID"
           },
+          "href": {
+            "type": "string",
+            "description": "Link URL"
+          },
           "type": {
             "type": "string",
             "description": "Object type"
@@ -80,6 +84,112 @@
           "templated": {
             "type": "boolean",
             "description": "Whether the link is templated"
+          }
+        }
+      },
+      "FeedPublisher": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "url": { "type": "string" },
+          "license": { "type": "string" }
+        }
+      },
+      "Co2Emission": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "number", "description": "CO2 emission value" },
+          "unit": { "type": "string", "description": "CO2 emission unit" }
+        }
+      },
+      "Co2EmissionRate": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "number", "description": "CO2 emission rate value" },
+          "unit": { "type": "string", "description": "CO2 emission rate unit" }
+        }
+      },
+      "AirPollutants": {
+        "type": "object",
+        "properties": {
+          "unit": { "type": "string" },
+          "values": {
+            "type": "object",
+            "properties": {
+              "nox": { "type": "number" },
+              "pm": { "type": "number" }
+            }
+          }
+        }
+      },
+      "JourneyDistances": {
+        "type": "object",
+        "properties": {
+          "walking": { "type": "integer" },
+          "bike": { "type": "integer" },
+          "car": { "type": "integer" },
+          "ridesharing": { "type": "integer" },
+          "taxi": { "type": "integer" }
+        }
+      },
+      "FareTotal": {
+        "type": "object",
+        "properties": {
+          "value": { "type": "string" }
+        }
+      },
+      "Fare": {
+        "type": "object",
+        "properties": {
+          "found": { "type": "boolean" },
+          "total": { "$ref": "#/components/schemas/FareTotal" },
+          "links": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Link" }
+          }
+        }
+      },
+      "WeekPattern": {
+        "type": "object",
+        "properties": {
+          "monday": { "type": "boolean" },
+          "tuesday": { "type": "boolean" },
+          "wednesday": { "type": "boolean" },
+          "thursday": { "type": "boolean" },
+          "friday": { "type": "boolean" },
+          "saturday": { "type": "boolean" },
+          "sunday": { "type": "boolean" }
+        }
+      },
+      "ActivePeriod": {
+        "type": "object",
+        "properties": {
+          "begin": { "type": "string" },
+          "end": { "type": "string" }
+        }
+      },
+      "JourneyCalendar": {
+        "type": "object",
+        "properties": {
+          "week_pattern": { "$ref": "#/components/schemas/WeekPattern" },
+          "active_periods": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ActivePeriod" }
+          }
+        }
+      },
+      "Context": {
+        "type": "object",
+        "properties": {
+          "timezone": { "type": "string" },
+          "current_datetime": { "type": "string" },
+          "car_direct_path": {
+            "type": "object",
+            "properties": {
+              "co2_emission": { "$ref": "#/components/schemas/Co2Emission" },
+              "air_pollutants": { "$ref": "#/components/schemas/AirPollutants" }
+            }
           }
         }
       },
@@ -149,6 +259,9 @@
           "name": {
             "type": "string",
             "description": "Physical mode name"
+          },
+          "co2_emission_rate": {
+            "$ref": "#/components/schemas/Co2EmissionRate"
           }
         }
       },
@@ -742,7 +855,7 @@
           },
           "type": {
             "type": "string",
-            "enum": ["public_transport", "street_network", "transfer", "waiting", "boarding", "alighting"],
+            "enum": ["public_transport", "street_network", "transfer", "waiting", "boarding", "alighting", "crow_fly"],
             "description": "Section type"
           },
           "from": {
@@ -754,6 +867,9 @@
           "duration": {
             "type": "integer",
             "description": "Duration in seconds"
+          },
+          "co2_emission": {
+            "$ref": "#/components/schemas/Co2Emission"
           },
           "departure_date_time": {
             "type": "string",
@@ -770,6 +886,11 @@
           "base_arrival_date_time": {
             "type": "string",
             "description": "Base arrival date time (YYYYMMDDTHHmmss)"
+          },
+          "data_freshness": {
+            "type": "string",
+            "enum": ["base_schedule", "realtime"],
+            "description": "Data freshness"
           },
           "geojson": {
             "type": "object",
@@ -847,6 +968,14 @@
                 "base_arrival_date_time": {
                   "type": "string",
                   "description": "Base arrival date time (YYYYMMDDTHHmmss)"
+                },
+                "additional_informations": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                },
+                "links": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Link" }
                 }
               }
             },
@@ -908,6 +1037,10 @@
             "type": "string",
             "description": "Arrival date time (YYYYMMDDTHHmmss)"
           },
+          "requested_date_time": {
+            "type": "string",
+            "description": "Requested date time (YYYYMMDDTHHmmss)"
+          },
           "sections": {
             "type": "array",
             "items": {
@@ -931,16 +1064,27 @@
             "description": "Journey tags"
           },
           "co2_emission": {
-            "type": "object",
-            "properties": {
-              "value": {
-                "type": "number",
-                "description": "CO2 emission value"
-              },
-              "unit": {
-                "type": "string",
-                "description": "CO2 emission unit"
-              }
+            "$ref": "#/components/schemas/Co2Emission"
+          },
+          "air_pollutants": {
+            "$ref": "#/components/schemas/AirPollutants"
+          },
+          "distances": {
+            "$ref": "#/components/schemas/JourneyDistances"
+          },
+          "fare": {
+            "$ref": "#/components/schemas/Fare"
+          },
+          "calendars": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/JourneyCalendar"
+            }
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
             }
           }
         }
@@ -969,19 +1113,35 @@
           "feed_publishers": {
             "type": "array",
             "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "tickets": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "notes": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "exceptions": {
+            "type": "array",
+            "items": {
               "type": "object"
             }
           },
           "context": {
-            "type": "object",
-            "properties": {
-              "timezone": {
-                "type": "string"
-              },
-              "current_datetime": {
-                "type": "string"
-              }
-            }
+            "$ref": "#/components/schemas/Context"
           }
         }
       },
@@ -1344,6 +1504,9 @@
               "$ref": "#/components/schemas/Coverage"
             }
           },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
           "links": {
             "type": "array",
             "items": {
@@ -1363,6 +1526,33 @@
           },
           "pagination": {
             "$ref": "#/components/schemas/Pagination"
+          },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
           },
           "links": {
             "type": "array",
@@ -1384,6 +1574,33 @@
           "pagination": {
             "$ref": "#/components/schemas/Pagination"
           },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
           "links": {
             "type": "array",
             "items": {
@@ -1404,6 +1621,33 @@
           "pagination": {
             "$ref": "#/components/schemas/Pagination"
           },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
           "links": {
             "type": "array",
             "items": {
@@ -1423,6 +1667,33 @@
           },
           "pagination": {
             "$ref": "#/components/schemas/Pagination"
+          },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
           },
           "links": {
             "type": "array",
@@ -1446,6 +1717,35 @@
             "items": {
               "$ref": "#/components/schemas/Disruption"
             }
+          },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "notes": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "exceptions": {
+            "type": "array",
+            "items": { "type": "object" }
           },
           "links": {
             "type": "array",
@@ -1473,6 +1773,35 @@
               "$ref": "#/components/schemas/Disruption"
             }
           },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "origins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "terminus": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StopArea"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
+          },
+          "notes": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
+          "exceptions": {
+            "type": "array",
+            "items": { "type": "object" }
+          },
           "links": {
             "type": "array",
             "items": {
@@ -1498,6 +1827,21 @@
           },
           "pagination": {
             "$ref": "#/components/schemas/Pagination"
+          },
+          "feed_publishers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FeedPublisher"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          },
+          "context": {
+            "$ref": "#/components/schemas/Context"
           },
           "links": {
             "type": "array",
