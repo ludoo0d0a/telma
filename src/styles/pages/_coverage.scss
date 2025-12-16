@@ -1,0 +1,114 @@
+.coverage-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100vh - 220px);
+
+    &__content-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 90%;
+        max-width: 1200px;
+        margin-top: 5rem;
+        border-radius: 10px;
+    }
+
+    &__title {
+        text-align: center;
+        font-family: 'Roboto Mono', monospace;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        color: #009eff;
+        font-size: 2rem;
+
+        span {
+            color: #fd9a00;
+        }
+    }
+}
+
+.coverages-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+    width: 100%;
+    margin-top: 2rem;
+    padding: 1rem;
+}
+
+.coverage-card {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 1.5rem;
+    border: 2px solid #009eff;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0, 158, 255, 0.3);
+    }
+
+    &__name {
+        font-family: 'Roboto Mono', monospace;
+        color: #009eff;
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    &__status {
+        color: #ccc;
+        font-size: 0.9rem;
+    }
+}
+
+.coverage-details {
+    width: 100%;
+    margin-top: 2rem;
+
+    h2 {
+        font-family: 'Roboto Mono', monospace;
+        color: #009eff;
+        margin-bottom: 1rem;
+    }
+
+    .details-content {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        padding: 1.5rem;
+        overflow-x: auto;
+
+        pre {
+            color: #ccc;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    }
+}
+
+.back-button {
+    background: #009eff;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    font-family: 'Roboto Mono', monospace;
+    cursor: pointer;
+    margin-bottom: 1rem;
+    transition: background 0.3s ease;
+
+    &:hover {
+        background: #fd9a00;
+    }
+}
+
+@media (max-width: 768px) {
+    .coverages-list {
+        grid-template-columns: 1fr;
+    }
+}
+

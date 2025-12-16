@@ -1,0 +1,550 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Navitia API - SNCF",
+    "description": "Complete API documentation for Navitia/SNCF public transportation API. Based on https://doc.navitia.io",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Navitia API Support",
+      "url": "https://doc.navitia.io"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.sncf.com/v1",
+      "description": "SNCF Navitia API Server"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Authorization"
+      }
+    },
+    "parameters": {
+      "coverage": {
+        "name": "coverage",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "description": "Coverage area (e.g., 'sncf')"
+      },
+      "datetime": {
+        "name": "datetime",
+        "in": "query",
+        "schema": {
+          "type": "string",
+          "pattern": "^\\d{8}T\\d{6}$"
+        },
+        "description": "Date and time in format YYYYMMDDTHHmmss"
+      },
+      "count": {
+        "name": "count",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "default": 10
+        },
+        "description": "Number of results to return"
+      },
+      "depth": {
+        "name": "depth",
+        "in": "query",
+        "schema": {
+          "type": "integer",
+          "default": 1
+        },
+        "description": "Depth of detail in response"
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKeyAuth": []
+    }
+  ],
+  "paths": {
+    "/coverage": {
+      "get": {
+        "tags": ["Coverage"],
+        "summary": "List all available coverage areas",
+        "responses": {
+          "200": {
+            "description": "List of coverage areas"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}": {
+      "get": {
+        "tags": ["Coverage"],
+        "summary": "Get coverage area details",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Coverage area information"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/commercial_modes": {
+      "get": {
+        "tags": ["Transport Modes"],
+        "summary": "Get commercial transport modes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of commercial modes"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/physical_modes": {
+      "get": {
+        "tags": ["Transport Modes"],
+        "summary": "Get physical transport modes",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of physical modes"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/lines": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List all lines",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of lines"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/stop_areas": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List all stop areas",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of stop areas"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/stop_areas/{id}/departures": {
+      "get": {
+        "tags": ["Departures"],
+        "summary": "Get next departures from a stop area",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/datetime"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of departures"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/stop_areas/{id}/arrivals": {
+      "get": {
+        "tags": ["Arrivals"],
+        "summary": "Get next arrivals to a stop area",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/datetime"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of arrivals"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/journeys": {
+      "get": {
+        "tags": ["Journeys"],
+        "summary": "Plan a journey between two points",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Origin location ID"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Destination location ID"
+          },
+          {
+            "$ref": "#/components/parameters/datetime"
+          },
+          {
+            "name": "datetime_represents",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["departure", "arrival"]
+            },
+            "description": "Whether datetime represents departure or arrival"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of journey options"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/places": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "Search for places",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Search query"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matching places"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/places_nearby": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "Find places nearby coordinates",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "coord",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Coordinates in format 'lon;lat'"
+          },
+          {
+            "name": "type[]",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by place types"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of nearby places"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/stop_schedules": {
+      "get": {
+        "tags": ["Schedules"],
+        "summary": "Get stop schedules",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter (e.g., 'stop_area.id=xxx')"
+          },
+          {
+            "$ref": "#/components/parameters/datetime"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Stop schedules"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/route_schedules": {
+      "get": {
+        "tags": ["Schedules"],
+        "summary": "Get route schedules",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter (e.g., 'line.id=xxx')"
+          },
+          {
+            "$ref": "#/components/parameters/datetime"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Route schedules"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/terminus_schedules": {
+      "get": {
+        "tags": ["Schedules"],
+        "summary": "Get terminus schedules",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter"
+          },
+          {
+            "$ref": "#/components/parameters/datetime"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Terminus schedules"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/isochrones": {
+      "get": {
+        "tags": ["Isochrones"],
+        "summary": "Calculate isochrones (Beta)",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "max_duration",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Isochrone data"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/line_reports": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get line reports",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Line reports"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/traffic_reports": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get traffic reports",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Traffic reports"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/equipment_reports": {
+      "get": {
+        "tags": ["Reports"],
+        "summary": "Get equipment reports",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "filter",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Equipment reports"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/datasets": {
+      "get": {
+        "tags": ["Datasets"],
+        "summary": "Get datasets information",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of datasets"
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/contributors": {
+      "get": {
+        "tags": ["Contributors"],
+        "summary": "Get contributors information",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of contributors"
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,305 @@
+.App{
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.home {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &__content-wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+   width: 80%;
+    margin-top: 5rem;
+    border-radius: 10px;
+  }
+  &__content-title{
+    text-align: center;
+    font-family: 'Roboto Mono', monospace;
+    margin-top: 1rem;
+    color: #009eff;
+  }
+  &__link{
+    position: absolute;
+    top: 0;
+    right:0;
+    margin-top: 1rem;
+    font-weight: bold;
+    margin-right: 1rem;
+    color: black;
+    background: white;
+    text-decoration: none;
+    padding: 0.2rem;
+    border-radius: .5rem;
+    border: 3px solid #8DE8FE;
+    font-size: 1.2rem;
+
+    @media screen and (max-width: 600px) {
+        font-size: 1rem;
+        padding: .5rem;
+    }
+  }
+}
+
+.animation{
+   margin-top: -5rem !important;
+}
+
+.header{
+    height: 120px;
+    position: relative;
+
+    &__nav {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    &__nav {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+        max-width: 100%;
+    }
+
+    &__nav-link {
+        color: #009eff;
+        text-decoration: none;
+        font-family: 'Roboto Mono', monospace;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 2px solid #009eff;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        font-size: 0.85rem;
+        white-space: nowrap;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        &:hover::before {
+            left: 100%;
+        }
+
+        &:hover {
+            background: linear-gradient(135deg, #009eff 0%, #0077cc 100%);
+            color: white;
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 158, 255, 0.4);
+            border-color: #0077cc;
+        }
+
+        &--docs {
+            background: linear-gradient(135deg, #fd9a00 0%, #ff6b00 100%);
+            border-color: #fd9a00;
+            color: white;
+
+            &:hover {
+                background: linear-gradient(135deg, #009eff 0%, #0077cc 100%);
+                border-color: #009eff;
+            }
+        }
+
+        &--ter {
+            background: linear-gradient(135deg, rgba(253, 154, 0, 0.2) 0%, rgba(255, 107, 0, 0.15) 100%);
+            border-color: #fd9a00;
+            color: #fd9a00;
+
+            &:hover {
+                background: linear-gradient(135deg, #fd9a00 0%, #ff6b00 100%);
+                color: white;
+                border-color: #ff6b00;
+            }
+        }
+
+        @media screen and (max-width: 600px) {
+            font-size: 0.75rem;
+            padding: 0.4rem 0.6rem;
+        }
+    }
+}
+.QR-code{
+  position: absolute;
+  height: 80px;
+  width: 80px;
+  top: 5rem;
+  right:2rem;
+}
+.description-QR{
+    position: absolute;
+    right: 2rem;
+    font-size: 20px;
+    font-weight: bold;
+    top: 1rem;
+    color: #009eff;
+}
+.pagination{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 0.5rem;
+    width: 99%;
+}
+.pagination a{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 0.5rem;
+    color: #009eff;
+    background: black;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow:4px 4px 3px -3px grey;
+}
+.pagination a.active{
+    background: rgb(115, 115, 115);
+    color: white;
+}
+.pagination a:hover{
+    background: rgb(39, 39, 39);
+}
+
+.input-search {
+    margin-left: 1rem;
+    border-radius: 20px;
+    border: 2px solid #009eff; /* Ajout de la bordure */
+    font-size: 18px;
+    padding: 1rem;
+    font-weight: bold;
+    color: grey;
+    z-index: 2;
+    background-color: rgb(35, 35, 35);
+}
+
+.input-search:focus{
+    outline: none;
+}
+
+.footer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    bottom: 0;
+    height: 100px;
+    background: black;
+}
+.footer-links{
+    display: flex;
+    align-items: center;
+}
+.link1{
+    width: 50px;
+    height: 50px;
+    margin-left: 1rem;
+}
+.link1:hover,
+.link2:hover{
+    filter: invert(20%);
+}
+.link2{
+    width: 45px;
+    height: 45px;
+    margin-right: 1rem;
+}
+
+.footer p{
+    color: white;
+    font-family: 'Roboto Mono', monospace;
+    text-align: center;
+}
+
+.footer p{
+    color:#009eff;
+}
+.footer span{
+    font-size: 25px;
+}
+
+@media (max-width:990px){
+    .home__content-title{
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width:695px){
+    .pagination a{
+        font-size: 16px;
+        font-weight: bold;
+        margin: 0.5rem;
+        width: 30px;
+        height: 30px;
+        box-shadow:4px 4px 3px -3px grey;
+    }
+}
+
+@media (max-width:500px){
+    .QR-code{
+        height: 50px;
+        width: 50px;
+        top: 3rem;
+        left: 2rem;
+      }
+      .description-QR{
+        position: absolute;
+        left: 2rem;
+        font-size: 14px;
+        font-weight: bold;
+        top: 0.2rem;
+        color: #fd9a00;
+    }
+    .pagination{
+        width: 105%;
+    }
+    .pagination a{
+        font-size: 13px;
+        font-weight: bold;
+        margin: 0.2rem;
+        width: 20px;
+        height: 25px;
+        box-shadow:4px 4px 3px -3px grey;
+    }
+
+    .home__content-title{
+        font-size: 1.2rem;
+    }
+    .animation{
+        height: 300px !important;
+        width: 300px !important;
+        margin-top: -5rem !important;
+    }
+    .home__content-title{
+        margin-top: -3rem;
+    }
+    .footer p{
+        font-size: .8rem;
+    }
+}

@@ -1,0 +1,367 @@
+.metz-bettembourg-page {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: calc(100vh - 220px);
+    padding: 2rem 1rem;
+
+    &__content-wrapper {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        max-width: 1400px;
+        margin-top: 2rem;
+    }
+
+    &__title {
+        text-align: center;
+        font-family: 'Roboto Mono', monospace;
+        margin-top: 1rem;
+        margin-bottom: 2rem;
+        color: #009eff;
+        font-size: 2.5rem;
+        font-weight: 700;
+        text-shadow: 0 2px 10px rgba(0, 158, 255, 0.3);
+        letter-spacing: -0.5px;
+
+        span {
+            color: #fd9a00;
+            background: linear-gradient(135deg, #fd9a00 0%, #ff6b00 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+    }
+}
+
+.ter-trains-list {
+    width: 100%;
+    margin-top: 2rem;
+
+    h2 {
+        font-family: 'Roboto Mono', monospace;
+        color: #009eff;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        font-size: 1.5rem;
+    }
+}
+
+.ter-trains-table {
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    padding: 1.5rem;
+    overflow-x: auto;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ter-train-header {
+    display: grid;
+    grid-template-columns: 100px 150px 200px 200px 120px 80px;
+    gap: 1rem;
+    padding: 1.25rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 158, 255, 0.25) 0%, rgba(253, 154, 0, 0.15) 100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    font-family: 'Roboto Mono', monospace;
+    font-weight: 700;
+    color: #009eff;
+    font-size: 0.95rem;
+    box-shadow: 0 4px 15px rgba(0, 158, 255, 0.2);
+    border: 1px solid rgba(0, 158, 255, 0.3);
+
+    &__date,
+    &__train,
+    &__departure,
+    &__arrival,
+    &__delay,
+    &__duration {
+        text-align: center;
+    }
+}
+
+.ter-train-row {
+    display: grid;
+    grid-template-columns: 100px 150px 200px 200px 120px 80px;
+    gap: 1rem;
+    padding: 1.25rem 1rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    margin-bottom: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(8px) translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 158, 255, 0.3);
+        border-color: rgba(0, 158, 255, 0.5);
+    }
+
+    &:active {
+        transform: translateX(4px) translateY(-1px);
+    }
+
+    &__date {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Roboto Mono', monospace;
+        color: #ccc;
+        font-size: 0.85rem;
+    }
+
+    &__train {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .train-number {
+            font-family: 'Roboto Mono', monospace;
+            font-weight: 700;
+            color: #009eff;
+            font-size: 1.1rem;
+            text-shadow: 0 2px 8px rgba(0, 158, 255, 0.3);
+        }
+
+        .train-mode {
+            color: #fd9a00;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .train-network {
+            color: rgba(204, 204, 204, 0.8);
+            font-size: 0.8rem;
+            font-style: italic;
+        }
+    }
+
+    &__departure,
+    &__arrival {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .station-name {
+            font-weight: 700;
+            color: #009eff;
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 1px 5px rgba(0, 158, 255, 0.2);
+        }
+
+        .time-base {
+            font-family: 'Roboto Mono', monospace;
+            color: rgba(204, 204, 204, 0.9);
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .time-real {
+            font-family: 'Roboto Mono', monospace;
+            color: #ff4444;
+            font-size: 1rem;
+            font-weight: 700;
+            text-shadow: 0 2px 8px rgba(255, 68, 68, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .delay {
+            font-size: 0.85rem;
+            color: #ccc;
+
+            &--late {
+                color: #ff4444;
+                font-weight: bold;
+            }
+        }
+    }
+
+    &__delay {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &__duration {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Roboto Mono', monospace;
+        color: #ccc;
+        font-size: 0.9rem;
+    }
+}
+
+.delay-badge {
+    padding: 0.4rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Roboto Mono', monospace;
+    transition: all 0.3s ease;
+    display: inline-block;
+
+    &--on-time {
+        background: linear-gradient(135deg, rgba(0, 255, 0, 0.25) 0%, rgba(0, 200, 0, 0.15) 100%);
+        color: #00ff88;
+        border: 1px solid rgba(0, 255, 136, 0.4);
+        box-shadow: 0 2px 10px rgba(0, 255, 136, 0.2);
+    }
+
+    &--late {
+        background: linear-gradient(135deg, rgba(255, 68, 68, 0.3) 0%, rgba(200, 0, 0, 0.2) 100%);
+        color: #ff6666;
+        border: 1px solid rgba(255, 68, 68, 0.5);
+        box-shadow: 0 2px 10px rgba(255, 68, 68, 0.3);
+        animation: shake 0.5s ease-in-out;
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+    }
+}
+
+.no-results {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    margin-top: 2rem;
+    color: #ccc;
+    width: 100%;
+    max-width: 800px;
+
+    &__icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    h2 {
+        font-family: 'Roboto Mono', monospace;
+        color: #009eff;
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        font-size: 1.1rem;
+        line-height: 1.6;
+        margin: 1rem 0;
+    }
+
+    &__info {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+        text-align: left;
+
+        p {
+            margin: 0.5rem 0;
+            font-weight: bold;
+            color: #009eff;
+        }
+
+        ul {
+            list-style: disc;
+            margin: 1rem 0 1rem 2rem;
+            color: #ccc;
+
+            li {
+                margin: 0.5rem 0;
+                line-height: 1.5;
+            }
+        }
+    }
+
+    &__suggestion {
+        margin-top: 1.5rem;
+        padding: 1rem;
+        background: rgba(253, 154, 0, 0.1);
+        border-left: 4px solid #fd9a00;
+        border-radius: 5px;
+        font-style: italic;
+        color: #fd9a00;
+    }
+}
+
+.loading-details,
+.error-details {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+
+@media (max-width: 1200px) {
+    .ter-train-header,
+    .ter-train-row {
+        grid-template-columns: 80px 120px 180px 180px 100px 60px;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .ter-trains-table {
+        overflow-x: scroll;
+    }
+
+    .ter-train-header,
+    .ter-train-row {
+        grid-template-columns: 70px 100px 150px 150px 90px 50px;
+        gap: 0.5rem;
+        padding: 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .ter-train-row {
+        &__train {
+            .train-number {
+                font-size: 0.85rem;
+            }
+
+            .train-mode,
+            .train-network {
+                font-size: 0.7rem;
+            }
+        }
+
+        &__departure,
+        &__arrival {
+            .station-name {
+                font-size: 0.75rem;
+            }
+
+            .time-base,
+            .time-real {
+                font-size: 0.8rem;
+            }
+        }
+    }
+}
+

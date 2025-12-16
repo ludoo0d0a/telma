@@ -1,0 +1,318 @@
+// Modern Theme Colors
+// Primary: Indigo (#6366f1) - Modern, vibrant, professional
+// Secondary: Emerald (#10b981) - Fresh, complementary, energetic
+
+:root {
+  // Primary Color Palette
+  --primary: #6366f1;
+  --primary-dark: #4f46e5;
+  --primary-light: #818cf8;
+  --primary-lighter: #a5b4fc;
+  --primary-lightest: #c7d2fe;
+  
+  // Secondary Color Palette
+  --secondary: #10b981;
+  --secondary-dark: #059669;
+  --secondary-light: #34d399;
+  --secondary-lighter: #6ee7b7;
+  --secondary-lightest: #a7f3d0;
+  
+  // Neutral Colors
+  --background-dark: #0f172a;
+  --background-darker: #020617;
+  --background-light: #1e293b;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
+  
+  // Gradient Background
+  --gradient-start: #6366f1;
+  --gradient-end: #0f172a;
+}
+
+// Bulma color overrides using CSS custom properties
+
+// Custom Bulma overrides
+.navbar.is-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.button.is-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  border: none;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+  }
+  
+  &.is-inverted {
+    background: transparent;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+    
+    &:hover {
+      background: var(--primary);
+      color: white;
+    }
+  }
+}
+
+.button.is-secondary,
+.tag.is-secondary {
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+  color: white;
+  border: none;
+  
+  &:hover {
+    background: linear-gradient(135deg, var(--secondary-light) 0%, var(--secondary) 100%);
+  }
+}
+
+.tag.is-primary {
+  background: var(--primary);
+  color: white;
+}
+
+.tag.is-success {
+  background: var(--secondary);
+  color: white;
+}
+
+// Card styling
+.card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    border-color: var(--primary);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+    transform: translateY(-4px);
+  }
+  
+  &.has-background-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border: none;
+    
+    .title {
+      color: white;
+    }
+  }
+}
+
+// Table styling
+.table {
+  background: rgba(30, 41, 59, 0.4);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  overflow: hidden;
+  
+  thead {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    
+    th {
+      color: white;
+      font-weight: 600;
+      border: none;
+    }
+  }
+  
+  tbody {
+    tr {
+      background: rgba(30, 41, 59, 0.3);
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(99, 102, 241, 0.1);
+      }
+      
+      td {
+        color: var(--text-primary);
+        border-color: rgba(99, 102, 241, 0.1);
+      }
+    }
+  }
+  
+  &.is-striped tbody tr:nth-child(even) {
+    background: rgba(30, 41, 59, 0.2);
+  }
+}
+
+// Input styling
+.input,
+.textarea,
+.select select {
+  background: rgba(30, 41, 59, 0.6);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  
+  &:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.125em rgba(99, 102, 241, 0.25);
+    background: rgba(30, 41, 59, 0.8);
+  }
+  
+  &::placeholder {
+    color: var(--text-muted);
+  }
+  
+  &.is-large {
+    font-size: 1.25rem;
+  }
+}
+
+.input:focus,
+.textarea:focus,
+.select select:focus {
+  border-color: var(--primary);
+}
+
+// Box styling
+.box {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.37);
+  color: var(--text-primary);
+}
+
+// Notification styling
+.notification {
+  &.is-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+  }
+  
+  &.is-success {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+    color: white;
+  }
+  
+  &.is-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+  }
+}
+
+// Pagination styling
+.pagination {
+  .pagination-link.is-current {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+  }
+  
+  .pagination-link,
+  .pagination-previous,
+  .pagination-next {
+    background: rgba(30, 41, 59, 0.6);
+    border-color: rgba(99, 102, 241, 0.3);
+    color: var(--text-primary);
+    
+    &:hover:not(.is-disabled) {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: white;
+    }
+  }
+}
+
+// Footer styling
+.footer.has-background-primary {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--background-dark) 100%);
+  border-top: 2px solid var(--primary);
+  
+  .button.is-primary.is-inverted {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: white;
+    
+    &:hover {
+      background: var(--secondary);
+      border-color: var(--secondary);
+    }
+  }
+}
+
+// Navbar burger menu styling
+.navbar-burger {
+  color: white;
+  
+  span {
+    background-color: white;
+  }
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.navbar-menu {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  
+  .navbar-item {
+    color: rgba(255, 255, 255, 0.9);
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    &.has-text-secondary {
+      color: var(--secondary-light) !important;
+      
+      &:hover {
+        color: white !important;
+        background-color: rgba(16, 185, 129, 0.2);
+      }
+    }
+  }
+}
+
+// Section styling
+.section {
+  background: transparent;
+}
+
+// Title and subtitle colors
+.title,
+.subtitle {
+  color: var(--text-primary);
+  
+  &.has-text-primary {
+    color: var(--primary) !important;
+  }
+  
+  &.has-text-secondary {
+    color: var(--secondary) !important;
+  }
+}
+
+// Text colors
+.has-text-primary {
+  color: var(--primary) !important;
+}
+
+.has-text-secondary {
+  color: var(--secondary) !important;
+}
+
+.has-text-white {
+  color: var(--text-primary) !important;
+}
+
+// Background colors
+.has-background-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+}
+
+.has-background-secondary {
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%) !important;
+}
+

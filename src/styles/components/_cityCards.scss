@@ -1,0 +1,9 @@
+.city-cards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+  align-content: space-around;
+  width: 100%;
+  min-height: 80vh;
+  border-radius: 10px;
+}
