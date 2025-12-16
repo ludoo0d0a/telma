@@ -18,7 +18,7 @@ const Trajet = () => {
     const { from, to } = useParams();
     const navigate = useNavigate();
     const [terTrains, setTerTrains] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [fromId, setFromId] = useState(null);
     const [toId, setToId] = useState(null);

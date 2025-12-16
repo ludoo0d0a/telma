@@ -19,6 +19,8 @@ const LocationAutocomplete = ({
     const [favoriteIds, setFavoriteIds] = useState(new Set(getFavorites().map(f => f.id)));
     const wrapperRef = useRef(null);
     const searchTimeoutRef = useRef(null);
+    const isUserTypingRef = useRef(false);
+    const previousValueRef = useRef(value || '');
 
     // Search for default station on mount if defaultSearchTerm is provided
     useEffect(() => {
@@ -58,11 +60,25 @@ const LocationAutocomplete = ({
         }
     }, [defaultSearchTerm]);
 
-    // Update input value when value prop changes
+    // Update input value when value prop changes externally (not from user typing)
     useEffect(() => {
-        if (value) {
-            setInputValue(value);
+        // Only sync from prop if:
+        // 1. The value prop actually changed externally
+        // 2. User is not currently typing
+        // 3. The new value is different from current inputValue
+        const valueChanged = value !== previousValueRef.current;
+        if (valueChanged && !isUserTypingRef.current) {
+            // Use a function to get current inputValue to avoid stale closure
+            setInputValue(prevInputValue => {
+                // Only update if the prop value is meaningfully different
+                if (value && value !== prevInputValue) {
+                    return value;
+                }
+                return prevInputValue;
+            });
+            setSelectedStation(null); // Clear selection when value changes externally
         }
+        previousValueRef.current = value || '';
     }, [value]);
 
     // Close dropdown when clicking outside
@@ -114,6 +130,7 @@ const LocationAutocomplete = ({
 
     const handleInputChange = (e) => {
         const newValue = e.target.value;
+        isUserTypingRef.current = true;
         setInputValue(newValue);
         setSelectedStation(null);
         
@@ -130,10 +147,13 @@ const LocationAutocomplete = ({
                 setSuggestions([]);
                 setIsOpen(false);
             }
+            // Reset typing flag after debounce completes
+            isUserTypingRef.current = false;
         }, 300);
     };
 
     const handleSelectStation = (station) => {
+        isUserTypingRef.current = false; // User selected, not typing anymore
         setInputValue(station.name);
         setSelectedStation(station);
         setIsOpen(false);
