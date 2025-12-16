@@ -9,6 +9,9 @@
 # testing
 /coverage
 
+# test artifacts (HTTP request/response dumps from Vitest)
+/test-artifacts
+
 # production
 /build
 /dist

@@ -1,13 +1,6 @@
 export const parseUTCDate = (apiDate: string): Date => {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:1',message:'parseUTCDate called',data:{apiDate:apiDate,type:typeof apiDate,isUndefined:apiDate===undefined,isNull:apiDate===null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
-    
     // Handle null/undefined values
     if (!apiDate || typeof apiDate !== 'string') {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:6',message:'parseUTCDate invalid input',data:{apiDate},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-        // #endregion
         throw new Error(`parseUTCDate: Invalid date input: ${apiDate}`);
     }
     
@@ -283,10 +276,6 @@ export const getJourneyInfo = (journey: any, fromName: string | null = null, toN
     // Extract vehicle journey ID from first section
     let vehicleJourneyId: string | null = null;
     if (firstSection) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:247',message:'Extracting vehicle journey ID',data:{hasVehicleJourney:!!firstSection.vehicle_journey,vehicleJourneyType:typeof firstSection.vehicle_journey,vehicleJourneyId:firstSection.vehicle_journey?.id,hasLinks:!!firstSection.links,linksCount:firstSection.links?.length,hasTrip:!!firstSection.trip,hasTripVehicleJourney:!!firstSection.trip?.vehicle_journey},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-        // #endregion
-        
         // Try from vehicle_journey.id (ensure we get the ID string, not the object)
         if (firstSection.vehicle_journey) {
             // If vehicle_journey is a string (ID), use it directly
@@ -318,10 +307,6 @@ export const getJourneyInfo = (journey: any, fromName: string | null = null, toN
                 vehicleJourneyId = firstSection.trip.vehicle_journey.id;
             }
         }
-        
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:280',message:'Vehicle journey ID extracted',data:{vehicleJourneyId,vehicleJourneyIdType:typeof vehicleJourneyId,isString:typeof vehicleJourneyId === 'string',isObject:typeof vehicleJourneyId === 'object'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
     }
     
     return {

@@ -746,9 +746,6 @@ const Trajet = () => {
                                                                     if (typeof trainId === 'object' && trainId !== null) {
                                                                         trainId = trainId.id || trainId.href || null;
                                                                     }
-                                                                    // #region agent log
-                                                                    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:742',message:'Creating train link',data:{originalVehicleJourneyId:info.vehicleJourneyId,vehicleJourneyIdType:typeof info.vehicleJourneyId,extractedTrainId:trainId,trainIdType:typeof trainId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                                                                    // #endregion
                                                                     return trainId ? (
                                                                         <Link 
                                                                             to={`/train/${encodeURIComponent(trainId)}`}

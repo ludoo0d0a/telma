@@ -14,20 +14,12 @@ const Departures = () => {
             const response = await getDepartures(codeStation)
             console.log(response)
             const nextDeparturesApi = response.data.departures.map((departure) => {
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Departures.jsx:22',message:'Processing departure',data:{linksCount:departure.links?.length||0,links:departure.links?.map(l=>l.type),linksIds:departure.links?.map(l=>l.id)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-                // #endregion
-                
                 // Find vehicle_journey link instead of assuming it's at index 1
                 const vehicleJourneyLink = departure.links?.find(link => 
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
                 );
                 const vehicleJourneyId = vehicleJourneyLink?.id || departure.links?.[1]?.id || departure.links?.[0]?.id;
-                
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Departures.jsx:30',message:'Extracted vehicle journey ID',data:{vehicleJourneyId,foundLink:!!vehicleJourneyLink,fallbackToIndex1:!vehicleJourneyLink},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                // #endregion
-                
+
                 return {
                     id: vehicleJourneyId,
                     operator: '',

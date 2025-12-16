@@ -11,9 +11,6 @@ const Train = () => {
     const [trainData, setTrainData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:12',message:'Train component render',data:{hasId:!!id,idValue:id,loading,hasTrainData:!!trainData,hasError:!!error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-    // #endregion
     
     // Search state
     const [searchQuery, setSearchQuery] = useState('');
@@ -35,14 +32,8 @@ const Train = () => {
                 setError(null);
                 // Decode the ID if it's URL encoded
                 const decodedId = decodeURIComponent(id);
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:36',message:'Fetching train details',data:{rawId:id,decodedId:decodedId,idLength:decodedId?.length,startsWithVehicleJourney:decodedId?.startsWith('vehicle_journey')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                // #endregion
                 const response = await getVehicleJourney(decodedId, 'sncf');
                 const data = response.data;
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:40',message:'API response received',data:{hasVehicleJourneys:!!data.vehicle_journeys,vehicleJourneysCount:data.vehicle_journeys?.length||0,firstVJId:data.vehicle_journeys?.[0]?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                // #endregion
                 
                 if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
                     setTrainData(data.vehicle_journeys[0]);
@@ -127,9 +118,6 @@ const Train = () => {
 
     // Show search interface when no ID is provided
     if (!id) {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:162',message:'Rendering search view',data:{hasHeader:true,hasFooter:true},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         return (
             <>
                 <Header />
@@ -274,10 +262,6 @@ const Train = () => {
     const transportInfo = getTransportIcon(commercialMode, network);
     const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || 'N/A';
     const direction = displayInfo.direction || '';
-
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:308',message:'Rendering train detail view',data:{hasHeader:true,hasFooter:true,hasTrainData:!!trainData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-    // #endregion
     return (
         <>
             <Header />
@@ -356,11 +340,7 @@ const Train = () => {
                                                 // Use arrival for intermediate stops, departure for last stop
                                                 const baseTime = index === stopTimes.length - 1 ? baseDeparture : baseArrival;
                                                 const realTime = index === stopTimes.length - 1 ? realDeparture : realArrival;
-                                                
-                                                // #region agent log
-                                                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:393',message:'Stop time data',data:{index,hasBaseArrival:!!baseArrival,hasRealArrival:!!realArrival,hasBaseDeparture:!!baseDeparture,hasRealDeparture:!!realDeparture,baseTime:baseTime,realTime:realTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
-                                                // #endregion
-                                                
+
                                                 // Only calculate delay if both times are available
                                                 let delay = null;
                                                 if (baseTime && realTime) {
@@ -370,9 +350,6 @@ const Train = () => {
                                                             parseUTCDate(realTime)
                                                         );
                                                     } catch (err) {
-                                                        // #region agent log
-                                                        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:401',message:'Error calculating delay',data:{error:err.message,baseTime,realTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                                                        // #endregion
                                                         delay = null;
                                                     }
                                                 }
