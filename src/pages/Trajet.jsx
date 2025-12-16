@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LocationAutocomplete from '../components/LocationAutocomplete';
-import { getJourneys, formatDateTime } from '../services/sncfApi';
+import { getJourneys, formatDateTime } from '../services/navitiaApi';
 import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay, getDelayMinutes, getMaxDelay, getWagonCount, getJourneyInfo } from '../components/Utils';
 
 // Decode URL parameters and format location names
@@ -159,10 +159,11 @@ const Trajet = () => {
                 }
                 
                 const dayDatetime = formatDateTime(date);
-                const data = await getJourneys(from, to, dayDatetime, 'sncf', {
+                const response = await getJourneys(from, to, dayDatetime, 'sncf', {
                     count: 100, // Get more results
                     data_freshness: 'realtime' // Get real-time data including delays
                 });
+                const data = response.data;
                 
                 if (data.journeys) {
                     allJourneys.push(...data.journeys);

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getVehicleJourney, autocompletePT } from '../services/sncfApi';
+import { getVehicleJourney, autocompletePT } from '../services/navitiaApi';
 import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate } from '../components/Utils';
 
 const Train = () => {
@@ -38,7 +38,8 @@ const Train = () => {
                 // #region agent log
                 fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:36',message:'Fetching train details',data:{rawId:id,decodedId:decodedId,idLength:decodedId?.length,startsWithVehicleJourney:decodedId?.startsWith('vehicle_journey')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
                 // #endregion
-                const data = await getVehicleJourney(decodedId, 'sncf');
+                const response = await getVehicleJourney(decodedId, 'sncf');
+                const data = response.data;
                 // #region agent log
                 fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Train.jsx:40',message:'API response received',data:{hasVehicleJourneys:!!data.vehicle_journeys,vehicleJourneysCount:data.vehicle_journeys?.length||0,firstVJId:data.vehicle_journeys?.[0]?.id},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
                 // #endregion
@@ -82,7 +83,8 @@ const Train = () => {
 
         setSearchLoading(true);
         try {
-            const data = await autocompletePT(query, 'sncf', 20);
+            const response = await autocompletePT(query, 'sncf', 20);
+            const data = response.data;
             // Filter to only show vehicle_journeys and extract the vehicle_journey object
             const vehicleJourneys = (data.pt_objects || [])
                 .filter(obj => obj.embedded_type === 'vehicle_journey' && obj.vehicle_journey)

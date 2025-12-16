@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getJourneys, formatDateTime } from '../services/sncfApi';
+import { getJourneys, formatDateTime } from '../services/navitiaApi';
 import { parseUTCDate, getFullMinutes, cleanLocationName, formatTime } from '../components/Utils';
 
 const Journeys = () => {
@@ -24,7 +24,8 @@ const Journeys = () => {
             setLoading(true);
             setError(null);
             const searchDatetime = datetime || formatDateTime(new Date());
-            const data = await getJourneys(from, to, searchDatetime);
+            const response = await getJourneys(from, to, searchDatetime);
+            const data = response.data;
             setJourneys(data.journeys || []);
         } catch (err) {
             setError('Erreur lors de la recherche d\'itinéraires');

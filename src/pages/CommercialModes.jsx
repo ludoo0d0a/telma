@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getCommercialModes } from '../services/sncfApi';
+import { getCommercialModes } from '../services/navitiaApi';
 
 const CommercialModes = () => {
     const [modes, setModes] = useState([]);
@@ -13,7 +13,8 @@ const CommercialModes = () => {
         const fetchModes = async () => {
             try {
                 setLoading(true);
-                const data = await getCommercialModes();
+                const response = await getCommercialModes();
+                const data = response.data;
                 setModes(data.commercial_modes || []);
                 setError(null);
             } catch (err) {

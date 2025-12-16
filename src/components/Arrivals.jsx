@@ -1,6 +1,6 @@
-import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { getArrivals } from '../services/navitiaApi'
 import Origin from './Origin'
 import { calculateDelay, getFullMinutes, parseUTCDate } from './Utils'
 
@@ -10,12 +10,8 @@ const Arrivals = () => {
     const [nextArrivals, setNextArrivals] = useState([])
 
     useEffect(() => {
-        axios.get( `https://api.sncf.com/v1/coverage/sncf/stop_areas/${codeStation}/arrivals`, {
-            headers: {
-                'Authorization': `${process.env.REACT_APP_API_KEY}`
-            },
-        })
-        .then((response) => {
+        (async function () {
+            const response = await getArrivals(codeStation)
             const arrivals = response.data.arrivals.map((arrival) => {
                 // #region agent log
                 fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Arrivals.jsx:18',message:'Processing arrival',data:{linksCount:arrival.links?.length||0,links:arrival.links?.map(l=>l.type),linksIds:arrival.links?.map(l=>l.id)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
@@ -42,7 +38,7 @@ const Arrivals = () => {
                 };
             });
             setNextArrivals(arrivals)
-        })
+        })()
     }, [codeStation])
 
     const [isTimeDisplayed, setIsTimeDisplayed] = useState(true)

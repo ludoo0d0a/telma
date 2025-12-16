@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getCoverage, getCoverageDetails } from '../services/sncfApi';
+import { getCoverage, getCoverageDetails } from '../services/navitiaApi';
 
 const Coverage = () => {
     const [coverages, setCoverages] = useState([]);
@@ -14,7 +14,8 @@ const Coverage = () => {
         const fetchCoverages = async () => {
             try {
                 setLoading(true);
-                const data = await getCoverage();
+                const response = await getCoverage();
+                const data = response.data;
                 setCoverages(data.regions || []);
                 setError(null);
             } catch (err) {
@@ -31,7 +32,8 @@ const Coverage = () => {
     const handleCoverageClick = async (coverageId) => {
         try {
             setLoading(true);
-            const data = await getCoverageDetails(coverageId);
+            const response = await getCoverageDetails(coverageId);
+            const data = response.data;
             setSelectedCoverage({ id: coverageId, ...data });
             setError(null);
         } catch (err) {

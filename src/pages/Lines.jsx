@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getLines } from '../services/sncfApi';
+import { getLines } from '../services/navitiaApi';
 
 const Lines = () => {
     const [lines, setLines] = useState([]);
@@ -15,7 +15,8 @@ const Lines = () => {
         const fetchLines = async () => {
             try {
                 setLoading(true);
-                const data = await getLines('sncf', { start_page: page, count: 25 });
+                const response = await getLines('sncf', { start_page: page, count: 25 });
+                const data = response.data;
                 const newLines = data.lines || [];
                 setLines((prev) => (page === 0 ? newLines : [...prev, ...newLines]));
                 setHasMore(newLines.length === 25);

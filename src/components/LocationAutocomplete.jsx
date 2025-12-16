@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { searchPlaces } from '../services/sncfApi';
+import { searchPlaces } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
 import { cleanLocationName } from './Utils';
 
@@ -34,7 +34,8 @@ const LocationAutocomplete = ({
                 if (defaultSearchTerm.length >= 2) {
                     setLoading(true);
                     try {
-                        const results = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
+                        const response = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
+                        const results = response.data;
                         const stations = results.places?.filter(place => 
                             place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
                         ) || [];
@@ -108,7 +109,8 @@ const LocationAutocomplete = ({
 
         setLoading(true);
         try {
-            const results = await searchPlaces(searchTerm, 'sncf', { count: 20 });
+            const response = await searchPlaces(searchTerm, 'sncf', { count: 20 });
+            const results = response.data;
             const stations = results.places?.filter(place => 
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
             ) || [];

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/sncfApi';
+import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/navitiaApi';
 
 const Schedules = () => {
     const [scheduleType, setScheduleType] = useState('stop'); // 'stop', 'route', 'terminus'
@@ -23,23 +23,23 @@ const Schedules = () => {
             setLoading(true);
             setError(null);
             const searchDatetime = datetime || formatDateTime(new Date());
-            let data;
+            let response;
 
             switch (scheduleType) {
                 case 'stop':
-                    data = await getStopSchedules(filter, 'sncf', searchDatetime);
+                    response = await getStopSchedules(filter, 'sncf', searchDatetime);
                     break;
                 case 'route':
-                    data = await getRouteSchedules(filter, 'sncf', searchDatetime);
+                    response = await getRouteSchedules(filter, 'sncf', searchDatetime);
                     break;
                 case 'terminus':
-                    data = await getTerminusSchedules(filter, 'sncf', searchDatetime);
+                    response = await getTerminusSchedules(filter, 'sncf', searchDatetime);
                     break;
                 default:
                     throw new Error('Type de planning invalide');
             }
 
-            setSchedules(data);
+            setSchedules(response.data);
         } catch (err) {
             setError('Erreur lors de la récupération des horaires');
             console.error(err);
