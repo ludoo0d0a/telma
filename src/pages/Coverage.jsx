@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getCoverage, getCoverageDetails } from '../services/navitiaApi';
@@ -52,9 +51,6 @@ const Coverage = () => {
                     <h1 className='coverage-page__title'>
                         Zones de <span>couverture</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     {loading && !selectedCoverage && (
                         <div className='loading'>

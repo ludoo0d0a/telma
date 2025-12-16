@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
@@ -54,9 +53,6 @@ const Journeys = () => {
                     <h1 className='journeys__title'>
                         Recherche d'<span>itinéraires</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <form onSubmit={handleSearch} className='journeys__form'>
                         <div className='form-group'>

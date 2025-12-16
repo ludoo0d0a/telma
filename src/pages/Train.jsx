@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import TrainWaypointsMap from '../components/TrainWaypointsMap';
 import { getVehicleJourney, autocompletePT } from '../services/navitiaApi';
 import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate } from '../components/Utils';
 
@@ -243,9 +244,6 @@ const Train = () => {
                                 <Link to='/train' className='button is-primary'>
                                     Rechercher un autre train
                                 </Link>
-                                <Link to='/' className='button is-light'>
-                                    Retour à l'accueil
-                                </Link>
                             </div>
                         </div>
                     </div>
@@ -262,6 +260,30 @@ const Train = () => {
     const transportInfo = getTransportIcon(commercialMode, network);
     const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || 'N/A';
     const direction = displayInfo.direction || '';
+
+    const waypoints = (stopTimes || [])
+        .map((stop, index) => {
+            const stopPoint = stop?.stop_point || {};
+            const stopArea = stopPoint?.stop_area || {};
+            const coord = stopPoint?.coord || stopArea?.coord;
+            const lat = coord?.lat;
+            const lon = coord?.lon;
+
+            if (typeof lat !== 'number' || typeof lon !== 'number') return null;
+            if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+
+            return {
+                lat,
+                lon,
+                name: cleanLocationName(stopPoint?.name || stopArea?.name || `Arrêt ${index + 1}`),
+                isStart: index === 0,
+                isEnd: index === stopTimes.length - 1,
+            };
+        })
+        .filter(Boolean)
+        // drop consecutive duplicates (happens with some datasets)
+        .filter((w, idx, arr) => idx === 0 || w.lat !== arr[idx - 1].lat || w.lon !== arr[idx - 1].lon);
+
     return (
         <>
             <Header />
@@ -279,10 +301,6 @@ const Train = () => {
                                     <Link to='/train' className='button is-light mr-2'>
                                         <span className='icon'><i className='fas fa-search'></i></span>
                                         <span>Rechercher</span>
-                                    </Link>
-                                    <Link to='/' className='button is-light'>
-                                        <span className='icon'><i className='fas fa-arrow-left'></i></span>
-                                        <span>Accueil</span>
                                     </Link>
                                 </div>
                             </div>
@@ -314,6 +332,17 @@ const Train = () => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* Map / Waypoints */}
+                        {waypoints.length > 0 && (
+                            <div className='box'>
+                                <h3 className='title is-4 mb-4'>Parcours</h3>
+                                <TrainWaypointsMap waypoints={waypoints} />
+                                <p className='help mt-3'>
+                                    Waypoints basés sur les coordonnées (<code>lat/lon</code>) des arrêts du train.
+                                </p>
+                            </div>
+                        )}
 
                         {/* Stop Times Table */}
                         {stopTimes.length > 0 && (

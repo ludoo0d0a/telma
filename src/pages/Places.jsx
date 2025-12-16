@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
@@ -64,9 +63,6 @@ const Places = () => {
                     <h1 className='places-page__title'>
                         Recherche de <span>lieux</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <div className='search-tabs'>
                         <button

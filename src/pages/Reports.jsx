@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/navitiaApi';
@@ -56,9 +55,6 @@ const Reports = () => {
                     <h1 className='reports-page__title'>
                         Rapports et <span>informations</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <div className='report-tabs'>
                         <button

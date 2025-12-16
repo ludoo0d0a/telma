@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getIsochrones } from '../services/navitiaApi';
@@ -43,9 +42,6 @@ const Isochrones = () => {
                     <h1 className='isochrones-page__title'>
                         Isochrones <span>(Beta)</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <div className='beta-notice'>
                         <p>⚠️ Cette fonctionnalité est en version Beta</p>

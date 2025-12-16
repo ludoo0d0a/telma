@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getLines } from '../services/navitiaApi';
@@ -40,9 +39,6 @@ const Lines = () => {
                     <h1 className='lines-page__title'>
                         Lignes de <span>transport</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     {loading && lines.length === 0 && (
                         <div className='loading'>

@@ -73,9 +73,6 @@ const Trip = () => {
                                 <button onClick={() => navigate(-1)} className='button is-primary'>
                                     Retour
                                 </button>
-                                <Link to='/' className='button is-light'>
-                                    Accueil
-                                </Link>
                             </div>
                         </div>
                     </div>

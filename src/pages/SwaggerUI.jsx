@@ -1,5 +1,4 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import Footer from '../components/Footer';
@@ -14,9 +13,6 @@ const SwaggerUIPage = () => {
                     <h1 className='swagger-page__title'>
                         API <span>Documentation</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
                 </div>
                 <div className='swagger-page__content'>
                     <SwaggerUI
