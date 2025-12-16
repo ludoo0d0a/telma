@@ -6,7 +6,7 @@
 import { NavitiaClient } from '../../client/client';
 import { validateResponse, formatValidationErrors } from '../utils/openapi-validator';
 
-const API_KEY = process.env.VITE_API_KEY || process.env.API_KEY;
+const API_KEY = process.env.REACT_APP_API_KEY || process.env.API_KEY;
 const COVERAGE = 'sncf';
 
 describe('Places API', () => {
@@ -170,4 +170,5 @@ describe('Places API', () => {
         });
     });
 });
+
 
