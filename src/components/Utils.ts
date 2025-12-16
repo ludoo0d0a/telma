@@ -1,12 +1,12 @@
-export const parseUTCDate = (apiDate) => {
+export const parseUTCDate = (apiDate: string): Date => {
     // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.js:1',message:'parseUTCDate called',data:{apiDate:apiDate,type:typeof apiDate,isUndefined:apiDate===undefined,isNull:apiDate===null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:1',message:'parseUTCDate called',data:{apiDate:apiDate,type:typeof apiDate,isUndefined:apiDate===undefined,isNull:apiDate===null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
     // #endregion
     
     // Handle null/undefined values
     if (!apiDate || typeof apiDate !== 'string') {
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.js:6',message:'parseUTCDate invalid input',data:{apiDate},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:6',message:'parseUTCDate invalid input',data:{apiDate},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
         // #endregion
         throw new Error(`parseUTCDate: Invalid date input: ${apiDate}`);
     }
@@ -23,15 +23,15 @@ export const parseUTCDate = (apiDate) => {
     return new Date(isoString)
 }
 
-export const getFullMinutes = (date) => {
+export const getFullMinutes = (date: Date): string => {
     if (date.getMinutes() < 10){
         return `0${date.getMinutes()}`
     } else{
-        return date.getMinutes()
+        return String(date.getMinutes())
     }
 }
 
-export const calculateDelay = (baseDepartureTime, realDepartureTime) => {
+export const calculateDelay = (baseDepartureTime: Date, realDepartureTime: Date): string => {
     if (baseDepartureTime.getTime() !== realDepartureTime.getTime()){
         const minutesDelay = (realDepartureTime.getTime() - baseDepartureTime.getTime()) / (1000 * 60)
         if (minutesDelay >= 60) {
@@ -45,7 +45,7 @@ export const calculateDelay = (baseDepartureTime, realDepartureTime) => {
 // Clean location names by removing redundant parenthetical information
 // Example: "Thionville (Thionville)" -> "Thionville"
 // But keep: "Paris (Gare du Nord)" -> "Paris (Gare du Nord)"
-export const cleanLocationName = (name) => {
+export const cleanLocationName = (name: string | null | undefined): string | null | undefined => {
     if (!name) return name;
     
     // Match pattern like "Name (Name)" or "Name (name)" or "Name (NAME)"
@@ -70,8 +70,15 @@ export const cleanLocationName = (name) => {
     return name;
 }
 
+interface TransportIconInfo {
+    icon: string;
+    color: string;
+    tagColor: string;
+    label: string;
+}
+
 // Get transport icon, color, and label based on commercial mode and network
-export const getTransportIcon = (commercialMode, network) => {
+export const getTransportIcon = (commercialMode: string | null | undefined, network: string | null | undefined): TransportIconInfo => {
     const mode = (commercialMode || '').toLowerCase();
     const net = (network || '').toLowerCase();
     
@@ -104,7 +111,7 @@ export const getTransportIcon = (commercialMode, network) => {
 
 // Format time from Date object
 // separator: 'h' (default) or ':' for different formats
-export const formatTime = (date, separator = 'h') => {
+export const formatTime = (date: Date | null | undefined, separator: string = 'h'): string => {
     if (!date) return 'N/A';
     if (separator === ':') {
         return `${date.getHours()}:${getFullMinutes(date)}`;
@@ -114,7 +121,7 @@ export const formatTime = (date, separator = 'h') => {
 
 // Format date from Date object
 // format: 'full' (default) for full format, 'short' for abbreviated format
-export const formatDate = (date, format = 'full') => {
+export const formatDate = (date: Date | null | undefined, format: 'full' | 'short' = 'full'): string => {
     if (!date) return 'N/A';
     
     if (format === 'short') {
@@ -130,7 +137,7 @@ export const formatDate = (date, format = 'full') => {
 }
 
 // Get delay string from base and real times (API date strings)
-export const getDelay = (baseTime, realTime) => {
+export const getDelay = (baseTime: string | null | undefined, realTime: string | null | undefined): string | null => {
     if (!baseTime || !realTime) return null;
     const base = parseUTCDate(baseTime);
     const real = parseUTCDate(realTime);
@@ -144,7 +151,7 @@ export const getDelay = (baseTime, realTime) => {
 }
 
 // Get delay in minutes (numeric value)
-export const getDelayMinutes = (baseTime, realTime) => {
+export const getDelayMinutes = (baseTime: string | null | undefined, realTime: string | null | undefined): number => {
     if (!baseTime || !realTime) return 0;
     const base = parseUTCDate(baseTime);
     const real = parseUTCDate(realTime);
@@ -153,7 +160,14 @@ export const getDelayMinutes = (baseTime, realTime) => {
 }
 
 // Get the maximum delay between departure and arrival delays
-export const getMaxDelay = (depDelay, arrDelay, baseDepTime, realDepTime, baseArrTime, realArrTime) => {
+export const getMaxDelay = (
+    depDelay: string | null,
+    arrDelay: string | null,
+    baseDepTime: string | null | undefined,
+    realDepTime: string | null | undefined,
+    baseArrTime: string | null | undefined,
+    realArrTime: string | null | undefined
+): string | null => {
     const depDelayMinutes = getDelayMinutes(baseDepTime, realDepTime);
     const arrDelayMinutes = getDelayMinutes(baseArrTime, realArrTime);
     
@@ -165,7 +179,7 @@ export const getMaxDelay = (depDelay, arrDelay, baseDepTime, realDepTime, baseAr
 }
 
 // Get wagon count from a section
-export const getWagonCount = (section) => {
+export const getWagonCount = (section: any): number | string | null => {
     // Try to find wagon/car count from various possible fields
     // Check vehicle_journey, vehicle, or other fields that might contain this info
     if (!section) return null;
@@ -232,10 +246,32 @@ export const getWagonCount = (section) => {
     return null;
 }
 
+interface JourneyInfo {
+    trainNumber: string;
+    vehicleJourneyId: string | null;
+    commercialMode: string;
+    network: string;
+    transportIcon: string;
+    transportColor: string;
+    transportTagColor: string;
+    transportLabel: string;
+    wagonCount: number | string | null;
+    departureStation: string | null | undefined;
+    arrivalStation: string | null | undefined;
+    departureTime: string;
+    arrivalTime: string;
+    baseDepartureTime: string;
+    baseArrivalTime: string;
+    realDepartureTime: string;
+    realArrivalTime: string;
+    duration: number;
+    sections: any[];
+}
+
 // Get journey information from a journey object
-export const getJourneyInfo = (journey, fromName = null, toName = null) => {
-    const firstSection = journey.sections?.find(s => s.type === 'public_transport');
-    const lastSection = journey.sections?.slice().reverse().find(s => s.type === 'public_transport');
+export const getJourneyInfo = (journey: any, fromName: string | null = null, toName: string | null = null): JourneyInfo => {
+    const firstSection = journey.sections?.find((s: any) => s.type === 'public_transport');
+    const lastSection = journey.sections?.slice().reverse().find((s: any) => s.type === 'public_transport');
     
     const commercialMode = firstSection?.display_informations?.commercial_mode || '';
     const network = firstSection?.display_informations?.network || '';
@@ -245,10 +281,10 @@ export const getJourneyInfo = (journey, fromName = null, toName = null) => {
     const wagonCount = getWagonCount(firstSection);
     
     // Extract vehicle journey ID from first section
-    let vehicleJourneyId = null;
+    let vehicleJourneyId: string | null = null;
     if (firstSection) {
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.js:247',message:'Extracting vehicle journey ID',data:{hasVehicleJourney:!!firstSection.vehicle_journey,vehicleJourneyType:typeof firstSection.vehicle_journey,vehicleJourneyId:firstSection.vehicle_journey?.id,hasLinks:!!firstSection.links,linksCount:firstSection.links?.length,hasTrip:!!firstSection.trip,hasTripVehicleJourney:!!firstSection.trip?.vehicle_journey},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:247',message:'Extracting vehicle journey ID',data:{hasVehicleJourney:!!firstSection.vehicle_journey,vehicleJourneyType:typeof firstSection.vehicle_journey,vehicleJourneyId:firstSection.vehicle_journey?.id,hasLinks:!!firstSection.links,linksCount:firstSection.links?.length,hasTrip:!!firstSection.trip,hasTripVehicleJourney:!!firstSection.trip?.vehicle_journey},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
         // #endregion
         
         // Try from vehicle_journey.id (ensure we get the ID string, not the object)
@@ -264,7 +300,7 @@ export const getJourneyInfo = (journey, fromName = null, toName = null) => {
         }
         // Try from links (similar to Departures/Arrivals)
         if (!vehicleJourneyId && firstSection.links && firstSection.links.length > 0) {
-            const vehicleJourneyLink = firstSection.links.find(link => 
+            const vehicleJourneyLink = firstSection.links.find((link: any) => 
                 link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
             );
             if (vehicleJourneyLink) {
@@ -284,7 +320,7 @@ export const getJourneyInfo = (journey, fromName = null, toName = null) => {
         }
         
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.js:280',message:'Vehicle journey ID extracted',data:{vehicleJourneyId,vehicleJourneyIdType:typeof vehicleJourneyId,isString:typeof vehicleJourneyId === 'string',isObject:typeof vehicleJourneyId === 'object'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Utils.ts:280',message:'Vehicle journey ID extracted',data:{vehicleJourneyId,vehicleJourneyIdType:typeof vehicleJourneyId,isString:typeof vehicleJourneyId === 'string',isObject:typeof vehicleJourneyId === 'object'},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
         // #endregion
     }
     
@@ -320,3 +356,4 @@ export const getJourneyInfo = (journey, fromName = null, toName = null) => {
         sections: journey.sections || []
     };
 }
+

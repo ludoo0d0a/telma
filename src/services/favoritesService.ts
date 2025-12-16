@@ -1,10 +1,16 @@
 const FAVORITES_KEY = 'sncf_favorite_locations';
 
+interface FavoriteLocation {
+    id: string;
+    name: string;
+    type: string;
+    addedAt?: string;
+}
+
 /**
  * Get all favorite locations from localStorage
- * @returns {Array} Array of favorite location objects {id, name, type}
  */
-export const getFavorites = () => {
+export const getFavorites = (): FavoriteLocation[] => {
     try {
         const favorites = localStorage.getItem(FAVORITES_KEY);
         return favorites ? JSON.parse(favorites) : [];
@@ -16,11 +22,8 @@ export const getFavorites = () => {
 
 /**
  * Add a location to favorites
- * @param {string} id - Location ID
- * @param {string} name - Location name
- * @param {string} type - Location type (stop_area, stop_point, etc.)
  */
-export const addFavorite = (id, name, type) => {
+export const addFavorite = (id: string, name: string, type: string): void => {
     try {
         const favorites = getFavorites();
         // Check if already exists
@@ -35,9 +38,8 @@ export const addFavorite = (id, name, type) => {
 
 /**
  * Remove a location from favorites
- * @param {string} id - Location ID
  */
-export const removeFavorite = (id) => {
+export const removeFavorite = (id: string): void => {
     try {
         const favorites = getFavorites();
         const filtered = favorites.filter(fav => fav.id !== id);
@@ -49,20 +51,16 @@ export const removeFavorite = (id) => {
 
 /**
  * Check if a location is in favorites
- * @param {string} id - Location ID
- * @returns {boolean} True if location is favorited
  */
-export const isFavorite = (id) => {
+export const isFavorite = (id: string): boolean => {
     const favorites = getFavorites();
     return favorites.some(fav => fav.id === id);
 };
 
 /**
  * Sort suggestions to show favorites first
- * @param {Array} suggestions - Array of location suggestions
- * @returns {Array} Sorted array with favorites first
  */
-export const sortFavoritesFirst = (suggestions) => {
+export const sortFavoritesFirst = <T extends { id: string }>(suggestions: T[]): T[] => {
     const favorites = getFavorites();
     const favoriteIds = new Set(favorites.map(fav => fav.id));
     
