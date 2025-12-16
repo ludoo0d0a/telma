@@ -45,12 +45,32 @@ export interface Disruption {
      */
     'impact_id'?: string;
     'application_periods'?: Array<ImpactApplicationPeriodsInner>;
+    /**
+     * Disruption status (e.g., active, future, past)
+     */
+    'status'?: string;
+    /**
+     * Last update datetime (YYYYMMDDTHHmmss)
+     */
+    'updated_at'?: string;
+    /**
+     * Disruption URI (may duplicate disruption_uri)
+     */
+    'uri'?: string;
+    /**
+     * Contributor/source of this disruption
+     */
+    'contributor'?: string;
     'messages'?: Array<DisruptionMessagesInner>;
     'impacted_objects'?: Array<Impact>;
     /**
      * Disruption cause
      */
     'cause'?: string;
+    /**
+     * Single disruption message (legacy/alternate field)
+     */
+    'message'?: string;
     /**
      * Disruption category
      */

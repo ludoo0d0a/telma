@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Co2Emission } from './co2-emission';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { DisplayInformation } from './display-information';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -50,6 +53,7 @@ export interface Section {
      * Duration in seconds
      */
     'duration'?: number;
+    'co2_emission'?: Co2Emission;
     /**
      * Departure date time (YYYYMMDDTHHmmss)
      */
@@ -66,6 +70,10 @@ export interface Section {
      * Base arrival date time (YYYYMMDDTHHmmss)
      */
     'base_arrival_date_time'?: string;
+    /**
+     * Data freshness
+     */
+    'data_freshness'?: SectionDataFreshnessEnum;
     /**
      * GeoJSON geometry
      */
@@ -95,9 +103,16 @@ export const SectionTypeEnum = {
     Transfer: 'transfer',
     Waiting: 'waiting',
     Boarding: 'boarding',
-    Alighting: 'alighting'
+    Alighting: 'alighting',
+    CrowFly: 'crow_fly'
 } as const;
 
 export type SectionTypeEnum = typeof SectionTypeEnum[keyof typeof SectionTypeEnum];
+export const SectionDataFreshnessEnum = {
+    BaseSchedule: 'base_schedule',
+    Realtime: 'realtime'
+} as const;
+
+export type SectionDataFreshnessEnum = typeof SectionDataFreshnessEnum[keyof typeof SectionDataFreshnessEnum];
 
 

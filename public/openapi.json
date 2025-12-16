@@ -1174,6 +1174,22 @@
                 "type": "string",
                 "description": "PT object ID"
               },
+              "name": {
+                "type": "string",
+                "description": "PT object name"
+              },
+              "quality": {
+                "type": "integer",
+                "description": "PT object quality indicator"
+              },
+              "trip": {
+                "type": "object",
+                "description": "Trip summary (when embedded_type is trip)",
+                "properties": {
+                  "id": { "type": "string" },
+                  "name": { "type": "string" }
+                }
+              },
               "embedded_type": {
                 "type": "string",
                 "enum": ["vehicle_journey", "trip", "route", "line", "stop_point", "stop_area"],
@@ -1200,6 +1216,42 @@
                 },
                 "stop_area": {
                   "$ref": "#/components/schemas/StopArea"
+                },
+                "base_arrival_time": {
+                  "type": "string",
+                  "description": "Base arrival time (HHmmss)"
+                },
+                "base_departure_time": {
+                  "type": "string",
+                  "description": "Base departure time (HHmmss)"
+                },
+                "amended_arrival_time": {
+                  "type": "string",
+                  "description": "Amended arrival time (HHmmss)"
+                },
+                "amended_departure_time": {
+                  "type": "string",
+                  "description": "Amended departure time (HHmmss)"
+                },
+                "cause": {
+                  "type": "string",
+                  "description": "Cause for the stop impact"
+                },
+                "stop_time_effect": {
+                  "type": "string",
+                  "description": "Stop time effect (e.g., delayed)"
+                },
+                "departure_status": {
+                  "type": "string",
+                  "description": "Departure status (e.g., delayed, unchanged)"
+                },
+                "arrival_status": {
+                  "type": "string",
+                  "description": "Arrival status (e.g., delayed, unchanged)"
+                },
+                "is_detour": {
+                  "type": "boolean",
+                  "description": "Whether this stop is part of a detour"
                 }
               }
             },
@@ -1275,6 +1327,22 @@
               }
             }
           },
+          "status": {
+            "type": "string",
+            "description": "Disruption status (e.g., active, future, past)"
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "Last update datetime (YYYYMMDDTHHmmss)"
+          },
+          "uri": {
+            "type": "string",
+            "description": "Disruption URI (may duplicate disruption_uri)"
+          },
+          "contributor": {
+            "type": "string",
+            "description": "Contributor/source of this disruption"
+          },
           "messages": {
             "type": "array",
             "items": {
@@ -1283,6 +1351,10 @@
                 "text": {
                   "type": "string",
                   "description": "Message text"
+                },
+                "message": {
+                  "type": "string",
+                  "description": "Message text (alternate field)"
                 },
                 "channel": {
                   "type": "object",
@@ -1316,6 +1388,10 @@
           "cause": {
             "type": "string",
             "description": "Disruption cause"
+          },
+          "message": {
+            "type": "string",
+            "description": "Single disruption message (legacy/alternate field)"
           },
           "category": {
             "type": "string",

@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Co2EmissionRate } from './co2-emission-rate';
 
 export interface PhysicalMode {
     /**
@@ -23,5 +26,6 @@ export interface PhysicalMode {
      * Physical mode name
      */
     'name'?: string;
+    'co2_emission_rate'?: Co2EmissionRate;
 }
 

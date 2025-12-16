@@ -16,4 +16,3 @@
 export * from "./api";
 export * from "./configuration";
 export * from "./models";
-export { NavitiaClient } from "./client";

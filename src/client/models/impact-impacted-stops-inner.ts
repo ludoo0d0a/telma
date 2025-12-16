@@ -31,5 +31,41 @@ export interface ImpactImpactedStopsInner {
     'name'?: string;
     'stop_point'?: StopPoint;
     'stop_area'?: StopArea;
+    /**
+     * Base arrival time (HHmmss)
+     */
+    'base_arrival_time'?: string;
+    /**
+     * Base departure time (HHmmss)
+     */
+    'base_departure_time'?: string;
+    /**
+     * Amended arrival time (HHmmss)
+     */
+    'amended_arrival_time'?: string;
+    /**
+     * Amended departure time (HHmmss)
+     */
+    'amended_departure_time'?: string;
+    /**
+     * Cause for the stop impact
+     */
+    'cause'?: string;
+    /**
+     * Stop time effect (e.g., delayed)
+     */
+    'stop_time_effect'?: string;
+    /**
+     * Departure status (e.g., delayed, unchanged)
+     */
+    'departure_status'?: string;
+    /**
+     * Arrival status (e.g., delayed, unchanged)
+     */
+    'arrival_status'?: string;
+    /**
+     * Whether this stop is part of a detour
+     */
+    'is_detour'?: boolean;
 }
 

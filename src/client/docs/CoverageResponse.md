@@ -6,6 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **regions** | [**Array&lt;Coverage&gt;**](Coverage.md) |  | [optional] [default to undefined]
+**context** | [**Context**](Context.md) |  | [optional] [default to undefined]
 **links** | [**Array&lt;Link&gt;**](Link.md) |  | [optional] [default to undefined]
 
 ## Example
@@ -15,6 +16,7 @@ import { CoverageResponse } from './api';
 
 const instance: CoverageResponse = {
     regions,
+    context,
     links,
 };
 ```

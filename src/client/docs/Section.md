@@ -10,10 +10,12 @@ Name | Type | Description | Notes
 **from** | [**Place**](Place.md) |  | [optional] [default to undefined]
 **to** | [**Place**](Place.md) |  | [optional] [default to undefined]
 **duration** | **number** | Duration in seconds | [optional] [default to undefined]
+**co2_emission** | [**Co2Emission**](Co2Emission.md) |  | [optional] [default to undefined]
 **departure_date_time** | **string** | Departure date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
 **arrival_date_time** | **string** | Arrival date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
 **base_departure_date_time** | **string** | Base departure date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
 **base_arrival_date_time** | **string** | Base arrival date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
+**data_freshness** | **string** | Data freshness | [optional] [default to undefined]
 **geojson** | **object** | GeoJSON geometry | [optional] [default to undefined]
 **mode** | **string** | Transport mode | [optional] [default to undefined]
 **transfer_type** | **string** | Transfer type | [optional] [default to undefined]
@@ -35,10 +37,12 @@ const instance: Section = {
     from,
     to,
     duration,
+    co2_emission,
     departure_date_time,
     arrival_date_time,
     base_departure_date_time,
     base_arrival_date_time,
+    data_freshness,
     geojson,
     mode,
     transfer_type,

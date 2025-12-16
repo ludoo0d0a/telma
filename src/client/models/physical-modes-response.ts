@@ -15,6 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Context } from './context';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Disruption } from './disruption';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { FeedPublisher } from './feed-publisher';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -22,10 +31,18 @@ import type { Pagination } from './pagination';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { PhysicalMode } from './physical-mode';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { StopArea } from './stop-area';
 
 export interface PhysicalModesResponse {
     'physical_modes'?: Array<PhysicalMode>;
     'pagination'?: Pagination;
+    'feed_publishers'?: Array<FeedPublisher>;
+    'disruptions'?: Array<Disruption>;
+    'origins'?: Array<StopArea>;
+    'terminus'?: Array<StopArea>;
+    'context'?: Context;
     'links'?: Array<Link>;
 }
 

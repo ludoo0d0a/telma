@@ -15,6 +15,15 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Context } from './context';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Disruption } from './disruption';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { FeedPublisher } from './feed-publisher';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -26,6 +35,9 @@ import type { Place } from './place';
 export interface PlacesResponse {
     'places'?: Array<Place>;
     'pagination'?: Pagination;
+    'feed_publishers'?: Array<FeedPublisher>;
+    'disruptions'?: Array<Disruption>;
+    'context'?: Context;
     'links'?: Array<Link>;
 }
 

@@ -6,6 +6,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **text** | **string** | Message text | [optional] [default to undefined]
+**message** | **string** | Message text (alternate field) | [optional] [default to undefined]
 **channel** | [**DisruptionMessagesInnerChannel**](DisruptionMessagesInnerChannel.md) |  | [optional] [default to undefined]
 
 ## Example
@@ -15,6 +16,7 @@ import { DisruptionMessagesInner } from './api';
 
 const instance: DisruptionMessagesInner = {
     text,
+    message,
     channel,
 };
 ```

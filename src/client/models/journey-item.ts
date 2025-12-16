@@ -15,10 +15,25 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { JourneyItemCo2Emission } from './journey-item-co2-emission';
+import type { AirPollutants } from './air-pollutants';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Co2Emission } from './co2-emission';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Fare } from './fare';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { JourneyCalendar } from './journey-calendar';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { JourneyDistances } from './journey-distances';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { JourneyItemDurations } from './journey-item-durations';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Section } from './section';
@@ -42,6 +57,10 @@ export interface JourneyItem {
      */
     'arrival_date_time'?: string;
     /**
+     * Requested date time (YYYYMMDDTHHmmss)
+     */
+    'requested_date_time'?: string;
+    /**
      * List of sections in the journey
      */
     'sections'?: Array<Section>;
@@ -57,6 +76,11 @@ export interface JourneyItem {
      * Journey tags
      */
     'tags'?: Array<string>;
-    'co2_emission'?: JourneyItemCo2Emission;
+    'co2_emission'?: Co2Emission;
+    'air_pollutants'?: AirPollutants;
+    'distances'?: JourneyDistances;
+    'fare'?: Fare;
+    'calendars'?: Array<JourneyCalendar>;
+    'links'?: Array<Link>;
 }
 

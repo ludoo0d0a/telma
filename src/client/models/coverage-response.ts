@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Context } from './context';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Coverage } from './coverage';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -22,6 +25,7 @@ import type { Link } from './link';
 
 export interface CoverageResponse {
     'regions'?: Array<Coverage>;
+    'context'?: Context;
     'links'?: Array<Link>;
 }
 

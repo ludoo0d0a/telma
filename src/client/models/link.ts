@@ -20,6 +20,10 @@ export interface Link {
      */
     'id'?: string;
     /**
+     * Link URL
+     */
+    'href'?: string;
+    /**
      * Object type
      */
     'type'?: string;

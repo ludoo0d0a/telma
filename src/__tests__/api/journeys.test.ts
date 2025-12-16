@@ -13,6 +13,12 @@ const COVERAGE = 'sncf';
 const PARIS_GARE_DU_NORD = 'stop_area:SNCF:87271007';
 const PARIS_GARE_DE_LYON = 'stop_area:SNCF:87686006';
 
+const BETTEMBOURG = 'stop_area:SNCF:82006030';
+const METZ = 'stop_area:SNCF:87192039';
+
+const location_from = BETTEMBOURG;
+const location_to = METZ;
+
 describe('Journeys API', () => {
     let client;
 
@@ -35,8 +41,8 @@ describe('Journeys API', () => {
             try {
                 const response = await client.journeys.coverageCoverageJourneysGet(
                     COVERAGE,
-                    PARIS_GARE_DU_NORD,
-                    PARIS_GARE_DE_LYON
+                    location_from,
+                    location_to
                 );
                 
                 expect(response.status).toBe(200);
@@ -72,8 +78,8 @@ describe('Journeys API', () => {
             try {
                 const response = await client.journeys.coverageCoverageJourneysGet(
                     COVERAGE,
-                    PARIS_GARE_DU_NORD,
-                    PARIS_GARE_DE_LYON
+                    location_from,
+                    location_to
                 );
                 
                 expect(response.status).toBe(200);
@@ -115,8 +121,8 @@ describe('Journeys API', () => {
             try {
                 const response = await client.journeys.coverageCoverageJourneysGet(
                     COVERAGE,
-                    PARIS_GARE_DU_NORD,
-                    PARIS_GARE_DE_LYON
+                    location_from,
+                    location_to
                 );
                 
                 expect(response.status).toBe(200);

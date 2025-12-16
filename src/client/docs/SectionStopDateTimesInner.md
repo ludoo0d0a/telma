@@ -11,6 +11,8 @@ Name | Type | Description | Notes
 **arrival_date_time** | **string** | Arrival date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
 **base_departure_date_time** | **string** | Base departure date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
 **base_arrival_date_time** | **string** | Base arrival date time (YYYYMMDDTHHmmss) | [optional] [default to undefined]
+**additional_informations** | **Array&lt;string&gt;** |  | [optional] [default to undefined]
+**links** | [**Array&lt;Link&gt;**](Link.md) |  | [optional] [default to undefined]
 
 ## Example
 
@@ -24,6 +26,8 @@ const instance: SectionStopDateTimesInner = {
     arrival_date_time,
     base_departure_date_time,
     base_arrival_date_time,
+    additional_informations,
+    links,
 };
 ```
 

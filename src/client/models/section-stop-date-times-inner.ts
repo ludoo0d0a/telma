@@ -15,6 +15,9 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Link } from './link';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { StopArea } from './stop-area';
 // May contain unused imports in some cases
 // @ts-ignore
@@ -39,5 +42,7 @@ export interface SectionStopDateTimesInner {
      * Base arrival date time (YYYYMMDDTHHmmss)
      */
     'base_arrival_date_time'?: string;
+    'additional_informations'?: Array<string>;
+    'links'?: Array<Link>;
 }
 

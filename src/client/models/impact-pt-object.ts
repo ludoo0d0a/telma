@@ -13,6 +13,9 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import type { ImpactPtObjectTrip } from './impact-pt-object-trip';
 
 /**
  * Affected PT object
@@ -22,6 +25,15 @@ export interface ImpactPtObject {
      * PT object ID
      */
     'id'?: string;
+    /**
+     * PT object name
+     */
+    'name'?: string;
+    /**
+     * PT object quality indicator
+     */
+    'quality'?: number;
+    'trip'?: ImpactPtObjectTrip;
     /**
      * Embedded object type
      */

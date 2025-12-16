@@ -15,22 +15,32 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Context } from './context';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Disruption } from './disruption';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { JourneyContext } from './journey-context';
+import type { FeedPublisher } from './feed-publisher';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { JourneyItem } from './journey-item';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Link } from './link';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { StopArea } from './stop-area';
 
 export interface Journey {
     'journeys'?: Array<JourneyItem>;
     'disruptions'?: Array<Disruption>;
     'links'?: Array<Link>;
-    'feed_publishers'?: Array<object>;
-    'context'?: JourneyContext;
+    'feed_publishers'?: Array<FeedPublisher>;
+    'terminus'?: Array<StopArea>;
+    'tickets'?: Array<object>;
+    'notes'?: Array<object>;
+    'exceptions'?: Array<object>;
+    'context'?: Context;
 }
 

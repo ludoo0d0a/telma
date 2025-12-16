@@ -22,6 +22,10 @@ export interface DisruptionMessagesInner {
      * Message text
      */
     'text'?: string;
+    /**
+     * Message text (alternate field)
+     */
+    'message'?: string;
     'channel'?: DisruptionMessagesInnerChannel;
 }
 

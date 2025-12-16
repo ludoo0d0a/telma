@@ -15,20 +15,35 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
+import type { Context } from './context';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Departure } from './departure';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Disruption } from './disruption';
 // May contain unused imports in some cases
 // @ts-ignore
+import type { FeedPublisher } from './feed-publisher';
+// May contain unused imports in some cases
+// @ts-ignore
 import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Pagination } from './pagination';
+// May contain unused imports in some cases
+// @ts-ignore
+import type { StopArea } from './stop-area';
 
 export interface DeparturesResponse {
     'departures'?: Array<Departure>;
     'disruptions'?: Array<Disruption>;
+    'feed_publishers'?: Array<FeedPublisher>;
+    'origins'?: Array<StopArea>;
+    'terminus'?: Array<StopArea>;
+    'context'?: Context;
+    'notes'?: Array<object>;
+    'exceptions'?: Array<object>;
     'links'?: Array<Link>;
     'pagination'?: Pagination;
 }
