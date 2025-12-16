@@ -18,7 +18,7 @@ import { NavitiaClient } from './client/client';
 
 // Initialize the client
 const client = new NavitiaClient({
-  apiKey: process.env.REACT_APP_API_KEY || 'your-api-key',
+  apiKey: process.env.VITE_API_KEY || 'your-api-key',
   basePath: 'https://api.sncf.com/v1', // optional, defaults to this
 });
 
@@ -42,7 +42,7 @@ console.log(journeys.data.journeys);
 import { JourneysApi, Configuration } from './client';
 
 const config = new Configuration({
-  apiKey: process.env.REACT_APP_API_KEY,
+  apiKey: process.env.VITE_API_KEY,
   basePath: 'https://api.sncf.com/v1',
 });
 

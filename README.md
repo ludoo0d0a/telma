@@ -63,16 +63,16 @@ touch .env
 
 4. Add your SNCF API key to the `.env` file:
 ```env
-REACT_APP_API_KEY=your_api_key_here
+VITE_API_KEY=your_api_key_here
 ```
 
 **Note**: The API key should be prefixed with your authentication method. For example:
 ```env
-REACT_APP_API_KEY=Basic your_base64_encoded_credentials
+VITE_API_KEY=Basic your_base64_encoded_credentials
 ```
 or
 ```env
-REACT_APP_API_KEY=Bearer your_token
+VITE_API_KEY=Bearer your_token
 ```
 
 ## 🎯 Usage

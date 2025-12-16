@@ -6,7 +6,7 @@ This project includes comprehensive tests to validate that all API responses mat
 
 1. **Set your API key:**
    ```bash
-   export REACT_APP_API_KEY=your-api-key-here
+   export VITE_API_KEY=your-api-key-here
    ```
 
 2. **Run tests:**
@@ -118,7 +118,7 @@ See `src/__tests__/README.md` for detailed instructions on adding new tests.
 ## Troubleshooting
 
 **Tests skip automatically:**
-- If `REACT_APP_API_KEY` or `API_KEY` is not set
+- If `VITE_API_KEY` or `API_KEY` is not set
 - If API returns 401 (unauthorized)
 - If API returns 404 (not found)
 

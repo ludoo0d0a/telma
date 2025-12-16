@@ -19,7 +19,7 @@ npm install
 
 2. Set your API key:
 ```bash
-export REACT_APP_API_KEY=your-api-key-here
+export VITE_API_KEY=your-api-key-here
 # OR
 export API_KEY=your-api-key-here
 ```

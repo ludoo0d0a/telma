@@ -61,7 +61,7 @@ function writeJsonArtifact(dir, fileName, payload) {
 }
 
 export function installHttpArtifactsRecorder({ runId = 'api-artifacts-pre' } = {}) {
-  const apiKeyPresent = Boolean(process.env.REACT_APP_API_KEY || process.env.API_KEY || process.env.VITE_API_KEY);
+  const apiKeyPresent = Boolean(process.env.VITE_API_KEY || process.env.API_KEY || process.env.VITE_API_KEY);
   const explicit = process.env.API_TEST_RECORD;
   const enabled = explicit === '0' ? false : (explicit ? truthy(explicit) : apiKeyPresent);
   const mode = (process.env.API_TEST_RECORD_MODE || 'all').toLowerCase(); // all | fail

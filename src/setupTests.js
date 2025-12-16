@@ -17,9 +17,9 @@ try {
     if (process.env[k] === undefined) process.env[k] = v;
   }
 
-  // Bridge common naming so tests (which read API_KEY/REACT_APP_API_KEY) also work with Vite-style VITE_API_KEY.
+  // Bridge common naming so tests (which read API_KEY/VITE_API_KEY) also work with Vite-style VITE_API_KEY.
   if (!process.env.API_KEY && process.env.VITE_API_KEY) process.env.API_KEY = process.env.VITE_API_KEY;
-  if (!process.env.REACT_APP_API_KEY && process.env.VITE_API_KEY) process.env.REACT_APP_API_KEY = process.env.VITE_API_KEY;
+  if (!process.env.VITE_API_KEY && process.env.VITE_API_KEY) process.env.VITE_API_KEY = process.env.VITE_API_KEY;
 } catch (e) {
 }
 
