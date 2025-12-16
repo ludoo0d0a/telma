@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getJourneys, formatDateTime, searchPlaces } from '../services/sncfApi';
+import LocationAutocomplete from '../components/LocationAutocomplete';
+import { getJourneys, formatDateTime } from '../services/sncfApi';
 import { parseUTCDate, getFullMinutes, calculateDelay } from '../components/Utils';
 
-const MetzBettembourg = () => {
+// Decode URL parameters and format location names
+const decodeLocationName = (slug) => {
+    if (!slug) return '';
+    return decodeURIComponent(slug).replace(/-/g, ' ').split(' ').map(word => 
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+    ).join(' ');
+};
+
+const Trajet = () => {
+    const { from, to } = useParams();
+    const navigate = useNavigate();
     const [terTrains, setTerTrains] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [fromId, setFromId] = useState(null);
     const [toId, setToId] = useState(null);
+    
+    const [fromName, setFromName] = useState(() => decodeLocationName(from) || '');
+    const [toName, setToName] = useState(() => decodeLocationName(to) || '');
     
     // Default to current date/time - 1 hour
     const getDefaultDateTime = () => {
@@ -30,68 +45,65 @@ const MetzBettembourg = () => {
         return `${hours}:${minutes}`; // HH:MM format
     });
 
-    // Search for station IDs on component mount
+    // Update default search terms when URL params change
     useEffect(() => {
-        const findStations = async () => {
-            try {
-                // Search for Metz
-                const metzResults = await searchPlaces('Metz', 'sncf', { count: 20 });
-                const metzStation = metzResults.places?.find(
-                    place => {
-                        const name = place.name?.toLowerCase() || '';
-                        return (name.includes('metz') || name.includes('gare de metz')) && 
-                               (place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point')
-                    }
-                );
-                
-                // Search for Bettembourg (try multiple variations)
-                let bettembourgStation = null;
-                const searchTerms = ['Bettembourg', 'BettembourgFrontiere', 'Bettembourg Frontiere'];
-                
-                for (const term of searchTerms) {
-                    const results = await searchPlaces(term, 'sncf', { count: 20 });
-                    bettembourgStation = results.places?.find(
-                        place => {
-                            const name = place.name?.toLowerCase() || '';
-                            return (name.includes('bettembourg') || name.includes('frontiere')) && 
-                                   (place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point')
-                        }
-                    );
-                    if (bettembourgStation) {
-                        break;
-                    }
-                }
+        if (from) {
+            const decodedFrom = decodeLocationName(from);
+            setFromName(decodedFrom);
+        }
+        if (to) {
+            const decodedTo = decodeLocationName(to);
+            setToName(decodedTo);
+        }
+    }, [from, to]);
 
-                if (metzStation) {
-                    setFromId(metzStation.id);
-                }
-                if (bettembourgStation) {
-                    setToId(bettembourgStation.id);
-                }
-
-                // If we found both, fetch journeys
-                if (metzStation && bettembourgStation) {
-                    await fetchTerTrains(metzStation.id, bettembourgStation.id);
-                } else {
-                    const missing = [];
-                    if (!metzStation) missing.push('Metz');
-                    if (!bettembourgStation) missing.push('BettembourgFrontiere');
-                    setError(`Impossible de trouver les gares: ${missing.join(', ')}`);
-                    setLoading(false);
-                }
-            } catch (err) {
-                setError('Erreur lors de la recherche des gares');
-                console.error(err);
-                setLoading(false);
+    // Search for default stations on component mount
+    useEffect(() => {
+        const findDefaultStations = async () => {
+            if (fromId && toId) {
+                // Stations already set, fetch journeys
+                await fetchTerTrains(fromId, toId);
             }
         };
 
-        findStations();
-    }, []);
+        findDefaultStations();
+    }, [fromId, toId]);
+
+    const handleFromStationFound = (station) => {
+        setFromId(station.id);
+        setFromName(station.name);
+        setError(null);
+        // Update URL if toId is also set
+        if (toId && toName) {
+            const fromSlug = encodeURIComponent(station.name.toLowerCase().replace(/\s+/g, '-'));
+            const toSlug = encodeURIComponent(toName.toLowerCase().replace(/\s+/g, '-'));
+            navigate(`/${fromSlug}/${toSlug}`, { replace: true });
+        }
+    };
+
+    const handleToStationFound = (station) => {
+        setToId(station.id);
+        setToName(station.name);
+        setError(null);
+        // Update URL if fromId is also set
+        if (fromId && fromName) {
+            const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));
+            const toSlug = encodeURIComponent(station.name.toLowerCase().replace(/\s+/g, '-'));
+            navigate(`/${fromSlug}/${toSlug}`, { replace: true });
+        }
+    };
+
+    const handleSearch = () => {
+        if (fromId && toId) {
+            fetchTerTrains(fromId, toId);
+        } else {
+            setError('Veuillez sélectionner les gares de départ et d\'arrivée');
+        }
+    };
 
     const fetchTerTrains = async (from, to) => {
         // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:75',message:'fetchTerTrains called',data:{from,to},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:95',message:'fetchTerTrains started',data:{from,to,filterDate,filterTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
         // #endregion
         try {
             setLoading(true);
@@ -101,6 +113,8 @@ const MetzBettembourg = () => {
             const [hours, minutes] = filterTime.split(':');
             const filterDateTime = new Date(filterDate);
             filterDateTime.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+            
+            const searchDatetime = formatDateTime(filterDateTime);
             
             // Fetch journeys for the selected date and next 2 days
             const allJourneys = [];
@@ -120,14 +134,14 @@ const MetzBettembourg = () => {
                 
                 const dayDatetime = formatDateTime(date);
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:110',message:'Fetching journeys',data:{day,datetime:dayDatetime,from,to},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:120',message:'Fetching journeys',data:{day,datetime:dayDatetime,from,to},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
                 // #endregion
                 const data = await getJourneys(from, to, dayDatetime, 'sncf', {
                     count: 100, // Get more results
                     data_freshness: 'realtime' // Get real-time data including delays
                 });
                 // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:120',message:'Journeys received',data:{day,journeyCount:data.journeys?.length||0,hasError:!!data.error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:130',message:'Journeys received',data:{day,journeyCount:data.journeys?.length||0,hasError:!!data.error,error:data.error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
                 // #endregion
                 
                 if (data.journeys) {
@@ -143,7 +157,26 @@ const MetzBettembourg = () => {
                 return journeyDate.getTime() >= filterDateTimeMs;
             });
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:130',message:'All journeys collected and filtered',data:{totalJourneys:allJourneys.length,filteredCount:filteredJourneys.length,filterDateTime:filterDateTime.toISOString()},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:101',message:'All journeys collected',data:{totalJourneys:allJourneys.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+            // #endregion
+
+            // Log commercial modes and networks before filtering
+            const commercialModes = new Set();
+            const networks = new Set();
+            allJourneys.forEach(journey => {
+                journey.sections?.forEach(section => {
+                    if (section.type === 'public_transport' && section.display_informations) {
+                        if (section.display_informations.commercial_mode) {
+                            commercialModes.add(section.display_informations.commercial_mode);
+                        }
+                        if (section.display_informations.network) {
+                            networks.add(section.display_informations.network);
+                        }
+                    }
+                });
+            });
+            // #region agent log
+            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:115',message:'Commercial modes and networks found',data:{commercialModes:Array.from(commercialModes),networks:Array.from(networks),sampleJourney:allJourneys[0]?{sections:allJourneys[0].sections?.filter(s=>s.type==='public_transport').map(s=>({commercial_mode:s.display_informations?.commercial_mode,network:s.display_informations?.network}))}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
             // #endregion
 
             // Show all transport types (no filtering)
@@ -152,7 +185,7 @@ const MetzBettembourg = () => {
                 return journey.sections?.some(section => section.type === 'public_transport');
             });
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:115',message:'All transport types collected',data:{totalJourneys:allJourneys.length,transportCount:allTransportTypes.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:155',message:'All transport types collected',data:{totalJourneys:allJourneys.length,transportCount:allTransportTypes.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
             // #endregion
 
             // Remove duplicates and sort by departure time
@@ -181,12 +214,12 @@ const MetzBettembourg = () => {
             });
 
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:135',message:'Setting terTrains',data:{uniqueTrainsCount:uniqueTrains.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:135',message:'Setting terTrains',data:{uniqueTrainsCount:uniqueTrains.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
             // #endregion
             setTerTrains(uniqueTrains);
         } catch (err) {
             // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:138',message:'Error in fetchTerTrains',data:{error:err.message,stack:err.stack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:138',message:'Error in fetchTerTrains',data:{error:err.message,stack:err.stack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
             // #endregion
             setError('Erreur lors de la récupération des trains TER: ' + (err.message || 'Erreur inconnue'));
             console.error(err);
@@ -341,10 +374,10 @@ const MetzBettembourg = () => {
             wagonCount: wagonCount,
             departureStation: firstSection?.from?.stop_point?.name || 
                             firstSection?.from?.stop_area?.name || 
-                            'Metz',
+                            fromName || 'Départ',
             arrivalStation: lastSection?.to?.stop_point?.name || 
                            lastSection?.to?.stop_area?.name || 
-                           'Bettembourg',
+                           toName || 'Arrivée',
             departureTime: journey.departure_date_time,
             arrivalTime: journey.arrival_date_time,
             baseDepartureTime: firstSection?.base_departure_date_time || journey.departure_date_time,
@@ -358,55 +391,11 @@ const MetzBettembourg = () => {
 
     const handleRefresh = async () => {
         if (fromId && toId) {
-            // If stations are already found, just refresh the trains
             await fetchTerTrains(fromId, toId);
         } else {
-            // Otherwise, re-run the station search
-            setLoading(true);
-            setError(null);
-            try {
-                const metzResults = await searchPlaces('Metz', 'sncf', { count: 20 });
-                const metzStation = metzResults.places?.find(
-                    place => {
-                        const name = place.name?.toLowerCase() || '';
-                        return (name.includes('metz') || name.includes('gare de metz')) && 
-                               (place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point')
-                    }
-                );
-                
-                let bettembourgStation = null;
-                const searchTerms = ['Bettembourg', 'BettembourgFrontiere', 'Bettembourg Frontiere'];
-                
-                for (const term of searchTerms) {
-                    const results = await searchPlaces(term, 'sncf', { count: 20 });
-                    bettembourgStation = results.places?.find(
-                        place => {
-                            const name = place.name?.toLowerCase() || '';
-                            return (name.includes('bettembourg') || name.includes('frontiere')) && 
-                                   (place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point')
-                        }
-                    );
-                    if (bettembourgStation) break;
-                }
-
-                if (metzStation && bettembourgStation) {
-                    setFromId(metzStation.id);
-                    setToId(bettembourgStation.id);
-                    await fetchTerTrains(metzStation.id, bettembourgStation.id);
-                } else {
-                    setError('Impossible de trouver les gares');
-                    setLoading(false);
-                }
-            } catch (err) {
-                setError('Erreur lors de la recherche des gares');
-                setLoading(false);
-            }
+            setError('Veuillez sélectionner les gares de départ et d\'arrivée');
         }
     };
-
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'MetzBettembourg.jsx:194',message:'Component render',data:{loading,error:!!error,terTrainsCount:terTrains.length,fromId,toId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
-    // #endregion
 
     return (
         <>
@@ -417,7 +406,7 @@ const MetzBettembourg = () => {
                         <div className='level-left'>
                             <div className='level-item'>
                                 <h1 className='title is-2'>
-                                    Trains <span className='has-text-secondary'>Metz → Bettembourg</span>
+                                    Recherche de trains
                                 </h1>
                             </div>
                         </div>
@@ -438,53 +427,70 @@ const MetzBettembourg = () => {
                     </div>
 
                     <div className='box mb-5'>
-                        <div className='level mb-0'>
-                            <div className='level-left'>
-                                <div className='level-item'>
-                                    <div className='field'>
-                                        <label className='label'>Date</label>
-                                        <div className='control'>
-                                            <input
-                                                className='input'
-                                                type='date'
-                                                value={filterDate}
-                                                onChange={(e) => setFilterDate(e.target.value)}
-                                                disabled={loading}
-                                            />
-                                        </div>
+                        <h3 className='title is-5 mb-4'>Recherche d'itinéraire</h3>
+                        <div className='columns'>
+                            <div className='column'>
+                                <LocationAutocomplete
+                                    label='Gare de départ'
+                                    value={fromName}
+                                    onChange={setFromId}
+                                    defaultSearchTerm={fromName || 'Metz'}
+                                    onStationFound={handleFromStationFound}
+                                    disabled={loading}
+                                />
+                            </div>
+                            <div className='column'>
+                                <LocationAutocomplete
+                                    label="Gare d'arrivée"
+                                    value={toName}
+                                    onChange={setToId}
+                                    defaultSearchTerm={toName || 'Thionville'}
+                                    onStationFound={handleToStationFound}
+                                    disabled={loading}
+                                />
+                            </div>
+                        </div>
+                        <div className='columns mt-4'>
+                            <div className='column is-narrow'>
+                                <div className='field'>
+                                    <label className='label'>Date</label>
+                                    <div className='control'>
+                                        <input
+                                            className='input'
+                                            type='date'
+                                            value={filterDate}
+                                            onChange={(e) => setFilterDate(e.target.value)}
+                                            disabled={loading}
+                                        />
                                     </div>
                                 </div>
-                                <div className='level-item'>
-                                    <div className='field'>
-                                        <label className='label'>Heure</label>
-                                        <div className='control'>
-                                            <input
-                                                className='input'
-                                                type='time'
-                                                value={filterTime}
-                                                onChange={(e) => setFilterTime(e.target.value)}
-                                                disabled={loading}
-                                            />
-                                        </div>
+                            </div>
+                            <div className='column is-narrow'>
+                                <div className='field'>
+                                    <label className='label'>Heure</label>
+                                    <div className='control'>
+                                        <input
+                                            className='input'
+                                            type='time'
+                                            value={filterTime}
+                                            onChange={(e) => setFilterTime(e.target.value)}
+                                            disabled={loading}
+                                        />
                                     </div>
                                 </div>
-                                <div className='level-item'>
-                                    <div className='field'>
-                                        <label className='label'>&nbsp;</label>
-                                        <div className='control'>
-                                            <button
-                                                className='button is-primary'
-                                                onClick={() => {
-                                                    if (fromId && toId) {
-                                                        fetchTerTrains(fromId, toId);
-                                                    }
-                                                }}
-                                                disabled={loading}
-                                            >
-                                                <span className='icon'><i className='fas fa-search'></i></span>
-                                                <span>Rechercher</span>
-                                            </button>
-                                        </div>
+                            </div>
+                            <div className='column is-narrow'>
+                                <div className='field'>
+                                    <label className='label'>&nbsp;</label>
+                                    <div className='control'>
+                                        <button
+                                            className='button is-primary'
+                                            onClick={handleSearch}
+                                            disabled={loading || !fromId || !toId}
+                                        >
+                                            <span className='icon'><i className='fas fa-search'></i></span>
+                                            <span>Rechercher</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -496,7 +502,7 @@ const MetzBettembourg = () => {
                             <div className='loader-wrapper'>
                                 <div className='loader is-loading'></div>
                             </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des trains TER...</p>
+                            <p className='mt-4 subtitle is-5'>Chargement des trains...</p>
                             <p className='has-text-grey'>Recherche des gares et des horaires en cours...</p>
                         </div>
                     )}
@@ -519,7 +525,7 @@ const MetzBettembourg = () => {
                     {!loading && !error && terTrains.length > 0 && (
                         <div className='box'>
                             <h2 className='title is-4 mb-5'>
-                                Trains TER disponibles <span className='tag is-primary is-medium'>{terTrains.length}</span>
+                                Trains disponibles <span className='tag is-primary is-medium'>{terTrains.length}</span>
                             </h2>
                             <div className='table-container'>
                                 <table className='table is-fullwidth is-striped is-hoverable'>
@@ -641,9 +647,9 @@ const MetzBettembourg = () => {
                         <div className='box has-text-centered'>
                             <div className='content'>
                                 <span className='icon is-large has-text-warning mb-4' style={{fontSize: '4rem'}}>🚂</span>
-                                <h2 className='title is-4'>Aucun train TER trouvé</h2>
+                                <h2 className='title is-4'>Aucun train trouvé</h2>
                                 <p className='subtitle is-6 has-text-grey'>
-                                    Il n'y a actuellement aucun train TER disponible entre Metz et Bettembourg pour les prochains jours.
+                                    Il n'y a actuellement aucun train disponible entre {fromName || 'la gare de départ'} et {toName || 'la gare d\'arrivée'} pour les prochains jours.
                                 </p>
                                 <div className='content has-text-left mt-5'>
                                     <div className='message is-info'>
@@ -652,8 +658,8 @@ const MetzBettembourg = () => {
                                         </div>
                                         <div className='message-body'>
                                             <ul>
-                                                <li>Gare de départ: <strong>{fromId ? 'Metz (trouvée)' : 'Metz (non trouvée)'}</strong></li>
-                                                <li>Gare d'arrivée: <strong>{toId ? 'BettembourgFrontiere (trouvée)' : 'BettembourgFrontiere (non trouvée)'}</strong></li>
+                                                <li>Gare de départ: <strong>{fromId ? `${fromName} (trouvée)` : `${fromName || 'Non sélectionnée'} (non trouvée)`}</strong></li>
+                                                <li>Gare d'arrivée: <strong>{toId ? `${toName} (trouvée)` : `${toName || 'Non sélectionnée'} (non trouvée)`}</strong></li>
                                                 <li>Période recherchée: Aujourd'hui et les 2 prochains jours</li>
                                             </ul>
                                         </div>
@@ -674,5 +680,5 @@ const MetzBettembourg = () => {
     );
 };
 
-export default MetzBettembourg;
+export default Trajet;
 

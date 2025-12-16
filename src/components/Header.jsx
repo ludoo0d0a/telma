@@ -45,7 +45,7 @@ const Header = () => {
                     <Link to='/metz-bettembourg' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         🚂 Metz→Bettembourg
                     </Link>
-                    <Link to='/metz-thionville' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
+                    <Link to='/metz/thionville' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         🚂 Metz→Thionville
                     </Link>
                     <Link to='/places' className='navbar-item' onClick={() => setIsActive(false)}>
@@ -68,6 +68,10 @@ const Header = () => {
                     </Link>
                 </div>
                 <div className='navbar-end'>
+                    <Link to='/favorites' className='navbar-item has-text-warning' onClick={() => setIsActive(false)}>
+                        <span className='icon'><i className='fas fa-star'></i></span>
+                        <span>Favoris</span>
+                    </Link>
                     <Link to='/api-docs' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         📚 API Docs
                     </Link>
