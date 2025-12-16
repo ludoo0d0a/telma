@@ -1,5 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
+import { cleanLocationName } from './Utils'
 
 const Origin = ({ idArrival}) => {
 
@@ -13,7 +14,7 @@ const Origin = ({ idArrival}) => {
         })
         .then((response) => {
             const stopsApi = response.data.vehicle_journeys[0].stop_times.map(
-                (stop) => stop.stop_point.name
+                (stop) => cleanLocationName(stop.stop_point.name)
             )
             setStops(stopsApi)
         })

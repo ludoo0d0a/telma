@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useState, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import Origin from './Origin'
 import { calculateDelay, getFullMinutes, parseUTCDate } from './Utils'
 
@@ -46,7 +46,11 @@ const Arrivals = () => {
         <div key={arrival.id} className={`arrival ${index % 2 ? '' : 'arrival--light'}`}>
             <p className='arrival__operator'>{arrival.operator}</p>
             <p className='arrival__train-type'>{arrival.transportationMode}</p>
-            <p className='arrival__train-number'>{arrival.trainNumber}</p>
+            <p className='arrival__train-number'>
+                <Link to={`/train/${encodeURIComponent(arrival.id)}`} className='has-text-link'>
+                    {arrival.trainNumber}
+                </Link>
+            </p>
             <p className={`arrival__time ${isTimeDisplayed ? '' : 'arrival__time--disappear'}`}>
                 {arrival.baseArrivalTime.getHours()}h{getFullMinutes(arrival.baseArrivalTime)}
             </p>

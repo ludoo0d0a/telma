@@ -14,6 +14,7 @@ import Isochrones from './pages/Isochrones'
 import SwaggerUIPage from './pages/SwaggerUI'
 import Trajet from './pages/Trajet'
 import Favorites from './pages/Favorites'
+import Train from './pages/Train'
 import Snowfall from 'react-snowfall'
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
                 <Route path='/isochrones' element={<Isochrones />} />
                 <Route path='/api-docs' element={<SwaggerUIPage />} />
                 <Route path='/trajet/:from/:to' element={<Trajet />} />
+                <Route path='/train/:id' element={<Train />} />
                 <Route path='/favorites' element={<Favorites />} />
                 <Route path='/:city' element={<City />}>
                     <Route path=':codeStation' element={<TrainStation />} />

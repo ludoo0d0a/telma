@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import axios from 'axios'
 import { parseUTCDate, getFullMinutes, calculateDelay } from './Utils'
 import Stops from './Stops'
@@ -49,7 +49,11 @@ const Departures = () => {
                 <div key={departure.id} className={`departure ${index % 2 ? '' : 'departure--light'}`}>
                     <p className='departure__operator'>{departure.operator}</p>
                     <p className='departure__train-type'>{departure.transportationMode}</p>
-                    <p className='departure__train-number'>{departure.trainNumber}</p>
+                    <p className='departure__train-number'>
+                        <Link to={`/train/${encodeURIComponent(departure.id)}`} className='has-text-link'>
+                            {departure.trainNumber}
+                        </Link>
+                    </p>
                     <p className={`departure__time ${isTimeDisplayed ? '' : 'departure__time--disappear'}`}>
                         {departure.baseDepartureTime.getHours()}h
                         {getFullMinutes(departure.baseDepartureTime)}

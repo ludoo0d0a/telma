@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getJourneys, formatDateTime } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes } from '../components/Utils';
+import { parseUTCDate, getFullMinutes, cleanLocationName } from '../components/Utils';
 
 const Journeys = () => {
     const [from, setFrom] = useState('');
@@ -136,13 +136,13 @@ const Journeys = () => {
                                                         </div>
                                                         <div className='section-times'>
                                                             <span>
-                                                                {section.from?.stop_point?.name || 'Départ'}:{' '}
+                                                                {cleanLocationName(section.from?.stop_point?.name || 'Départ')}:{' '}
                                                                 {section.departure_date_time
                                                                     ? formatTime(parseUTCDate(section.departure_date_time))
                                                                     : 'N/A'}
                                                             </span>
                                                             <span>
-                                                                {section.to?.stop_point?.name || 'Arrivée'}:{' '}
+                                                                {cleanLocationName(section.to?.stop_point?.name || 'Arrivée')}:{' '}
                                                                 {section.arrival_date_time
                                                                     ? formatTime(parseUTCDate(section.arrival_date_time))
                                                                     : 'N/A'}

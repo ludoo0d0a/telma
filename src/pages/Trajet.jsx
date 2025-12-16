@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { getJourneys, formatDateTime } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes, calculateDelay } from '../components/Utils';
+import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName } from '../components/Utils';
 
 // Decode URL parameters and format location names
 const decodeLocationName = (slug) => {
@@ -23,6 +23,7 @@ const Trajet = () => {
     const [fromId, setFromId] = useState(null);
     const [toId, setToId] = useState(null);
     const [disruptions, setDisruptions] = useState([]);
+    const [showDisruptionsSection, setShowDisruptionsSection] = useState(false);
     
     const [fromName, setFromName] = useState(() => decodeLocationName(from) || '');
     const [toName, setToName] = useState(() => decodeLocationName(to) || '');
@@ -72,11 +73,12 @@ const Trajet = () => {
 
     const handleFromStationFound = (station) => {
         setFromId(station.id);
-        setFromName(station.name);
+        const cleanedName = cleanLocationName(station.name);
+        setFromName(cleanedName);
         setError(null);
         // Update URL if toId is also set
         if (toId && toName) {
-            const fromSlug = encodeURIComponent(station.name.toLowerCase().replace(/\s+/g, '-'));
+            const fromSlug = encodeURIComponent(cleanedName.toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent(toName.toLowerCase().replace(/\s+/g, '-'));
             navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
         }
@@ -84,12 +86,13 @@ const Trajet = () => {
 
     const handleToStationFound = (station) => {
         setToId(station.id);
-        setToName(station.name);
+        const cleanedName = cleanLocationName(station.name);
+        setToName(cleanedName);
         setError(null);
         // Update URL if fromId is also set
         if (fromId && fromName) {
             const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));
-            const toSlug = encodeURIComponent(station.name.toLowerCase().replace(/\s+/g, '-'));
+            const toSlug = encodeURIComponent(cleanedName.toLowerCase().replace(/\s+/g, '-'));
             navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
@@ -102,10 +105,30 @@ const Trajet = () => {
         }
     };
 
+    const handleInvertItinerary = () => {
+        if (!fromId || !toId) return;
+        
+        // Swap stations
+        const newFromId = toId;
+        const newFromName = toName;
+        const newToId = fromId;
+        const newToName = fromName;
+        
+        setFromId(newFromId);
+        setFromName(newFromName);
+        setToId(newToId);
+        setToName(newToName);
+        
+        // Update URL
+        const fromSlug = encodeURIComponent(newFromName.toLowerCase().replace(/\s+/g, '-'));
+        const toSlug = encodeURIComponent(newToName.toLowerCase().replace(/\s+/g, '-'));
+        navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
+        
+        // Trigger search with swapped stations
+        fetchTerTrains(newFromId, newToId);
+    };
+
     const fetchTerTrains = async (from, to) => {
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:95',message:'fetchTerTrains started',data:{from,to,filterDate,filterTime},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-        // #endregion
         try {
             setLoading(true);
             setError(null);
@@ -136,16 +159,10 @@ const Trajet = () => {
                 }
                 
                 const dayDatetime = formatDateTime(date);
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:120',message:'Fetching journeys',data:{day,datetime:dayDatetime,from,to},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                // #endregion
                 const data = await getJourneys(from, to, dayDatetime, 'sncf', {
                     count: 100, // Get more results
                     data_freshness: 'realtime' // Get real-time data including delays
                 });
-                // #region agent log
-                fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:130',message:'Journeys received',data:{day,journeyCount:data.journeys?.length||0,hasError:!!data.error,error:data.error,disruptionsCount:data.disruptions?.length||0,disruptions:data.disruptions?.slice(0,2).map(d=>({severity:d.severity,message:d.message?.substring(0,100)})),hasDisruptions:!!data.disruptions},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-                // #endregion
                 
                 if (data.journeys) {
                     allJourneys.push(...data.journeys);
@@ -154,9 +171,6 @@ const Trajet = () => {
                 // Collect disruptions from API response
                 if (data.disruptions && Array.isArray(data.disruptions)) {
                     allDisruptions.push(...data.disruptions);
-                    // #region agent log
-                    fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:150',message:'Disruption structure',data:{day,disruptionCount:data.disruptions.length,sampleDisruption:data.disruptions[0]?{severity:data.disruptions[0].severity,hasMessages:!!data.disruptions[0].messages,messagesCount:data.disruptions[0].messages?.length||0,hasImpactedObjects:!!data.disruptions[0].impacted_objects,impactedObjectsCount:data.disruptions[0].impacted_objects?.length||0,impactedStopsCount:data.disruptions[0].impacted_objects?.[0]?.impacted_stops?.length||0}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                    // #endregion
                 }
             }
             
@@ -170,37 +184,12 @@ const Trajet = () => {
                 const journeyDate = parseUTCDate(journey.departure_date_time);
                 return journeyDate.getTime() >= filterDateTimeMs;
             });
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:101',message:'All journeys collected',data:{totalJourneys:allJourneys.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-            // #endregion
-
-            // Log commercial modes and networks before filtering
-            const commercialModes = new Set();
-            const networks = new Set();
-            allJourneys.forEach(journey => {
-                journey.sections?.forEach(section => {
-                    if (section.type === 'public_transport' && section.display_informations) {
-                        if (section.display_informations.commercial_mode) {
-                            commercialModes.add(section.display_informations.commercial_mode);
-                        }
-                        if (section.display_informations.network) {
-                            networks.add(section.display_informations.network);
-                        }
-                    }
-                });
-            });
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:115',message:'Commercial modes and networks found',data:{commercialModes:Array.from(commercialModes),networks:Array.from(networks),sampleJourney:allJourneys[0]?{sections:allJourneys[0].sections?.filter(s=>s.type==='public_transport').map(s=>({commercial_mode:s.display_informations?.commercial_mode,network:s.display_informations?.network}))}:null},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
 
             // Show all transport types (no filtering)
             // Filter to only journeys with public_transport sections
             const allTransportTypes = filteredJourneys.filter(journey => {
                 return journey.sections?.some(section => section.type === 'public_transport');
             });
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:155',message:'All transport types collected',data:{totalJourneys:allJourneys.length,transportCount:allTransportTypes.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
-            // #endregion
 
             // Remove duplicates and sort by departure time
             const uniqueTrains = [];
@@ -227,14 +216,8 @@ const Trajet = () => {
                 return timeA - timeB;
             });
 
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:135',message:'Setting terTrains',data:{uniqueTrainsCount:uniqueTrains.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-            // #endregion
             setTerTrains(uniqueTrains);
         } catch (err) {
-            // #region agent log
-            fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trajet.jsx:138',message:'Error in fetchTerTrains',data:{error:err.message,stack:err.stack?.substring(0,200)},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
-            // #endregion
             setError('Erreur lors de la récupération des trains TER: ' + (err.message || 'Erreur inconnue'));
             console.error(err);
         } finally {
@@ -263,6 +246,188 @@ const Trajet = () => {
             return `+${Math.floor(delayMinutes / 60)}h${delayMinutes % 60}min`;
         }
         return `+${delayMinutes}min`;
+    };
+
+    const getDelayMinutes = (baseTime, realTime) => {
+        if (!baseTime || !realTime) return 0;
+        const base = parseUTCDate(baseTime);
+        const real = parseUTCDate(realTime);
+        const delayMs = real.getTime() - base.getTime();
+        return Math.floor(delayMs / (1000 * 60));
+    };
+
+    const getMaxDelay = (depDelay, arrDelay, baseDepTime, realDepTime, baseArrTime, realArrTime) => {
+        const depDelayMinutes = getDelayMinutes(baseDepTime, realDepTime);
+        const arrDelayMinutes = getDelayMinutes(baseArrTime, realArrTime);
+        
+        // Return the maximum delay (departure or arrival)
+        if (arrDelayMinutes > depDelayMinutes) {
+            return arrDelay;
+        }
+        return depDelay;
+    };
+
+    // Match disruptions to a specific journey
+    const getJourneyDisruptions = (journey, journeyInfo) => {
+        if (!disruptions || disruptions.length === 0) return [];
+        
+        const matchedDisruptions = [];
+        const vehicleJourneyId = journeyInfo.vehicleJourneyId;
+        const trainNumber = journeyInfo.trainNumber;
+        const departureTime = journey.departure_date_time;
+        const sections = journey.sections || [];
+        
+        disruptions.forEach(disruption => {
+            let isMatch = false;
+            
+            // Check if disruption impacts this journey through impacted_objects
+            if (disruption.impacted_objects && Array.isArray(disruption.impacted_objects)) {
+                disruption.impacted_objects.forEach(obj => {
+                    const ptObject = obj.pt_object;
+                    if (!ptObject) return;
+                    
+                    // Match by vehicle_journey ID
+                    if (vehicleJourneyId && ptObject.id && ptObject.id === vehicleJourneyId) {
+                        isMatch = true;
+                    }
+                    
+                    // Match by embedded_type and id
+                    if (ptObject.embedded_type === 'vehicle_journey' && vehicleJourneyId && ptObject.id === vehicleJourneyId) {
+                        isMatch = true;
+                    }
+                    
+                    // Match by trip ID
+                    if (ptObject.embedded_type === 'trip') {
+                        sections.forEach(section => {
+                            if (section.type === 'public_transport') {
+                                const sectionTripId = section.trip?.id || section.vehicle_journey?.trip?.id;
+                                if (sectionTripId && ptObject.id === sectionTripId) {
+                                    isMatch = true;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Match by route ID
+                    if (ptObject.embedded_type === 'route') {
+                        sections.forEach(section => {
+                            if (section.type === 'public_transport') {
+                                const sectionRouteId = section.route?.id || section.display_informations?.route_id;
+                                if (sectionRouteId && ptObject.id === sectionRouteId) {
+                                    isMatch = true;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Match by line ID
+                    if (ptObject.embedded_type === 'line') {
+                        sections.forEach(section => {
+                            if (section.type === 'public_transport') {
+                                const sectionLineId = section.route?.line?.id || section.display_informations?.line_id;
+                                if (sectionLineId && ptObject.id === sectionLineId) {
+                                    isMatch = true;
+                                }
+                            }
+                        });
+                    }
+                    
+                    // Match by impacted stops (check if journey passes through these stops)
+                    if (obj.impacted_stops && Array.isArray(obj.impacted_stops)) {
+                        obj.impacted_stops.forEach(impactedStop => {
+                            const stopId = impactedStop.id || impactedStop.stop_point?.id || impactedStop.stop_area?.id;
+                            const stopName = impactedStop.name || impactedStop.stop_point?.name || impactedStop.stop_area?.name;
+                            
+                            sections.forEach(section => {
+                                if (section.type === 'public_transport') {
+                                    // Check from/to stops
+                                    const fromStopId = section.from?.stop_point?.id || section.from?.stop_area?.id;
+                                    const toStopId = section.to?.stop_point?.id || section.to?.stop_area?.id;
+                                    const fromStopName = section.from?.stop_point?.name || section.from?.stop_area?.name;
+                                    const toStopName = section.to?.stop_point?.name || section.to?.stop_area?.name;
+                                    
+                                    // Match by stop ID
+                                    if (stopId && (stopId === fromStopId || stopId === toStopId)) {
+                                        isMatch = true;
+                                    }
+                                    
+                                    // Match by stop name (normalized comparison)
+                                    if (stopName && (fromStopName || toStopName)) {
+                                        const normalizedStopName = cleanLocationName(stopName).toLowerCase().trim();
+                                        const normalizedFromName = cleanLocationName(fromStopName || '').toLowerCase().trim();
+                                        const normalizedToName = cleanLocationName(toStopName || '').toLowerCase().trim();
+                                        if (normalizedStopName === normalizedFromName || normalizedStopName === normalizedToName) {
+                                            isMatch = true;
+                                        }
+                                    }
+                                    
+                                    // Check intermediate stops in stop_date_times
+                                    if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
+                                        section.stop_date_times.forEach(stopTime => {
+                                            const intermediateStopId = stopTime.stop_point?.id || stopTime.stop_area?.id;
+                                            const intermediateStopName = stopTime.stop_point?.name || stopTime.stop_area?.name;
+                                            
+                                            // Match by stop ID
+                                            if (stopId && intermediateStopId && stopId === intermediateStopId) {
+                                                isMatch = true;
+                                            }
+                                            
+                                            // Match by stop name
+                                            if (stopName && intermediateStopName) {
+                                                const normalizedStopName = cleanLocationName(stopName).toLowerCase().trim();
+                                                const normalizedIntermediateName = cleanLocationName(intermediateStopName).toLowerCase().trim();
+                                                if (normalizedStopName === normalizedIntermediateName) {
+                                                    isMatch = true;
+                                                }
+                                            }
+                                        });
+                                    }
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+            
+            // If no specific match found but disruption has no impacted_objects, 
+            // check if it applies by time period (general disruptions)
+            if (!isMatch && (!disruption.impacted_objects || disruption.impacted_objects.length === 0)) {
+                // Only match general disruptions if they have application periods that match
+                if (disruption.application_periods && Array.isArray(disruption.application_periods) && disruption.application_periods.length > 0) {
+                    const journeyTime = parseUTCDate(departureTime).getTime();
+                    const isInPeriod = disruption.application_periods.some(period => {
+                        if (!period.begin || !period.end) return false; // Require specific period for general disruptions
+                        const beginTime = new Date(period.begin).getTime();
+                        const endTime = new Date(period.end).getTime();
+                        // Match if journey time is within the disruption period
+                        return journeyTime >= beginTime && journeyTime <= endTime;
+                    });
+                    if (isInPeriod) {
+                        isMatch = true;
+                    }
+                }
+            }
+            
+            // Check application periods to see if disruption applies to this journey's time
+            if (isMatch && disruption.application_periods && Array.isArray(disruption.application_periods) && disruption.application_periods.length > 0) {
+                const journeyTime = parseUTCDate(departureTime).getTime();
+                const isInPeriod = disruption.application_periods.some(period => {
+                    if (!period.begin || !period.end) return true; // If no period specified, assume it applies
+                    const beginTime = new Date(period.begin).getTime();
+                    const endTime = new Date(period.end).getTime();
+                    return journeyTime >= beginTime && journeyTime <= endTime;
+                });
+                if (!isInPeriod) {
+                    isMatch = false; // Disruption doesn't apply to this journey's time
+                }
+            }
+            
+            if (isMatch) {
+                matchedDisruptions.push(disruption);
+            }
+        });
+        
+        return matchedDisruptions;
     };
 
     const getTransportIcon = (commercialMode, network) => {
@@ -375,10 +540,33 @@ const Trajet = () => {
         // Try to get wagon count
         const wagonCount = getWagonCount(firstSection);
         
+        // Extract vehicle journey ID from first section
+        let vehicleJourneyId = null;
+        if (firstSection) {
+            // Try from vehicle_journey.id
+            if (firstSection.vehicle_journey?.id) {
+                vehicleJourneyId = firstSection.vehicle_journey.id;
+            }
+            // Try from links (similar to Departures/Arrivals)
+            else if (firstSection.links && firstSection.links.length > 1) {
+                const vehicleJourneyLink = firstSection.links.find(link => 
+                    link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
+                );
+                if (vehicleJourneyLink) {
+                    vehicleJourneyId = vehicleJourneyLink.id;
+                }
+            }
+            // Try from trip.vehicle_journey
+            else if (firstSection.trip?.vehicle_journey?.id) {
+                vehicleJourneyId = firstSection.trip.vehicle_journey.id;
+            }
+        }
+        
         return {
             trainNumber: firstSection?.display_informations?.headsign || 
                          firstSection?.display_informations?.trip_short_name || 
                          'N/A',
+            vehicleJourneyId: vehicleJourneyId,
             commercialMode: commercialMode || 'Train',
             network: network,
             transportIcon: transportInfo.icon,
@@ -386,12 +574,16 @@ const Trajet = () => {
             transportTagColor: transportInfo.tagColor,
             transportLabel: transportInfo.label,
             wagonCount: wagonCount,
-            departureStation: firstSection?.from?.stop_point?.name || 
-                            firstSection?.from?.stop_area?.name || 
-                            fromName || 'Départ',
-            arrivalStation: lastSection?.to?.stop_point?.name || 
-                           lastSection?.to?.stop_area?.name || 
-                           toName || 'Arrivée',
+            departureStation: cleanLocationName(
+                firstSection?.from?.stop_point?.name || 
+                firstSection?.from?.stop_area?.name || 
+                fromName || 'Départ'
+            ),
+            arrivalStation: cleanLocationName(
+                lastSection?.to?.stop_point?.name || 
+                lastSection?.to?.stop_area?.name || 
+                toName || 'Arrivée'
+            ),
             departureTime: journey.departure_date_time,
             arrivalTime: journey.arrival_date_time,
             baseDepartureTime: firstSection?.base_departure_date_time || journey.departure_date_time,
@@ -452,6 +644,23 @@ const Trajet = () => {
                                     onStationFound={handleFromStationFound}
                                     disabled={loading}
                                 />
+                            </div>
+                            <div className='column is-narrow'>
+                                <div className='field'>
+                                    <label className='label'>&nbsp;</label>
+                                    <div className='control'>
+                                        <button
+                                            className='button is-light'
+                                            onClick={handleInvertItinerary}
+                                            disabled={loading || !fromId || !toId}
+                                            title="Inverser l'itinéraire"
+                                        >
+                                            <span className='icon'>
+                                                <i className='fas fa-exchange-alt'></i>
+                                            </span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             <div className='column'>
                                 <LocationAutocomplete
@@ -538,13 +747,20 @@ const Trajet = () => {
 
                     {!loading && disruptions.length > 0 && (
                         <div className='box mb-5'>
-                            <h3 className='title is-5 mb-4'>
+                            <h3 
+                                className='title is-5 mb-4 is-clickable' 
+                                onClick={() => setShowDisruptionsSection(!showDisruptionsSection)}
+                                style={{ cursor: 'pointer' }}
+                            >
                                 <span className='icon has-text-warning mr-2'>
                                     <i className='fas fa-exclamation-triangle'></i>
                                 </span>
                                 Perturbations ({disruptions.length})
+                                <span className='icon ml-2'>
+                                    <i className={`fas fa-chevron-${showDisruptionsSection ? 'up' : 'down'}`}></i>
+                                </span>
                             </h3>
-                            {disruptions.map((disruption, index) => {
+                            {showDisruptionsSection && disruptions.map((disruption, index) => {
                                 // Handle severity - can be string, object with name, or object with other properties
                                 let severityText = 'unknown';
                                 if (typeof disruption.severity === 'string') {
@@ -608,7 +824,7 @@ const Trajet = () => {
                                                                 <ul className='is-size-7'>
                                                                     {obj.impacted_stops.map((stop, stopIndex) => (
                                                                         <li key={stopIndex}>
-                                                                            {stop.name || stop.stop_point?.name || stop.stop_area?.name || stop.id || 'Arrêt inconnu'}
+                                                                            {cleanLocationName(stop.name || stop.stop_point?.name || stop.stop_area?.name || stop.id || 'Arrêt inconnu')}
                                                                         </li>
                                                                     ))}
                                                                 </ul>
@@ -648,6 +864,12 @@ const Trajet = () => {
                                     </div>
                                 );
                             })}
+                            {!showDisruptionsSection && (
+                                <p className='has-text-grey is-italic'>
+                                    Cliquez sur le titre pour afficher les détails des perturbations. 
+                                    Les perturbations sont également affichées dans le tableau ci-dessous.
+                                </p>
+                            )}
                         </div>
                     )}
 
@@ -665,6 +887,7 @@ const Trajet = () => {
                                             <th>Départ</th>
                                             <th>Arrivée</th>
                                             <th>Retard</th>
+                                            <th>Perturbations</th>
                                             <th>Durée</th>
                                             <th>Wagons</th>
                                         </tr>
@@ -676,11 +899,20 @@ const Trajet = () => {
                                             const arrDate = parseUTCDate(info.arrivalTime);
                                             const depDelay = getDelay(info.baseDepartureTime, info.realDepartureTime);
                                             const arrDelay = getDelay(info.baseArrivalTime, info.realArrivalTime);
+                                            const maxDelay = getMaxDelay(
+                                                depDelay, 
+                                                arrDelay, 
+                                                info.baseDepartureTime, 
+                                                info.realDepartureTime,
+                                                info.baseArrivalTime,
+                                                info.realArrivalTime
+                                            );
+                                            const journeyDisruptions = getJourneyDisruptions(journey, info);
                                             
                                             return (
                                                 <tr key={index}>
                                                     <td>
-                                                        <span className='tag is-light'>{formatDate(depDate)}</span>
+                                                        <span className='tag is-dark has-text-weight-semibold'>{formatDate(depDate)}</span>
                                                     </td>
                                                     <td>
                                                         <div>
@@ -688,7 +920,16 @@ const Trajet = () => {
                                                                 <span className={`icon ${info.transportColor} mr-2`}>
                                                                     <i className={`fas ${info.transportIcon}`}></i>
                                                                 </span>
-                                                                <strong className='has-text-primary'>{info.trainNumber}</strong>
+                                                                {info.vehicleJourneyId ? (
+                                                                    <Link 
+                                                                        to={`/train/${encodeURIComponent(info.vehicleJourneyId)}`}
+                                                                        className='has-text-primary has-text-weight-bold'
+                                                                    >
+                                                                        {info.trainNumber}
+                                                                    </Link>
+                                                                ) : (
+                                                                    <strong className='has-text-primary'>{info.trainNumber}</strong>
+                                                                )}
                                                             </div>
                                                             <span className={`tag ${info.transportTagColor} is-light`}>
                                                                 {info.transportLabel}
@@ -744,14 +985,57 @@ const Trajet = () => {
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        {depDelay && depDelay !== 'À l\'heure' ? (
-                                                            <span className='tag is-danger'>{depDelay}</span>
+                                                        {maxDelay && maxDelay !== 'À l\'heure' ? (
+                                                            <span className='tag is-danger'>{maxDelay}</span>
                                                         ) : (
                                                             <span className='tag is-success'>À l'heure</span>
                                                         )}
                                                     </td>
                                                     <td>
-                                                        <span className='tag is-light'>{Math.floor(info.duration / 60)}min</span>
+                                                        {journeyDisruptions.length > 0 ? (
+                                                            <div className='tags'>
+                                                                {journeyDisruptions.map((disruption, disIndex) => {
+                                                                    let severityText = 'unknown';
+                                                                    if (typeof disruption.severity === 'string') {
+                                                                        severityText = disruption.severity;
+                                                                    } else if (disruption.severity && typeof disruption.severity === 'object') {
+                                                                        severityText = disruption.severity.name || disruption.severity.label || 'Perturbation';
+                                                                    }
+                                                                    
+                                                                    const severityLevel = severityText.toLowerCase();
+                                                                    let tagClass = 'is-warning';
+                                                                    if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
+                                                                        tagClass = 'is-danger';
+                                                                    } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
+                                                                        tagClass = 'is-info';
+                                                                    } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
+                                                                        tagClass = 'is-warning';
+                                                                    }
+                                                                    
+                                                                    const message = disruption.messages && disruption.messages.length > 0 
+                                                                        ? disruption.messages[0].text || disruption.messages[0].message 
+                                                                        : disruption.message || severityText;
+                                                                    
+                                                                    return (
+                                                                        <span 
+                                                                            key={disIndex} 
+                                                                            className={`tag ${tagClass} is-small`}
+                                                                            title={message}
+                                                                        >
+                                                                            <span className='icon mr-1'>
+                                                                                <i className='fas fa-exclamation-triangle'></i>
+                                                                            </span>
+                                                                            {message.length > 30 ? message.substring(0, 30) + '...' : message}
+                                                                        </span>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        ) : (
+                                                            <span className='has-text-grey' style={{fontStyle: 'italic'}}>-</span>
+                                                        )}
+                                                    </td>
+                                                    <td>
+                                                        <span className='tag is-dark has-text-weight-semibold'>{Math.floor(info.duration / 60)}min</span>
                                                     </td>
                                                     <td>
                                                         {info.wagonCount ? (

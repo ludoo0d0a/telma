@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getJourneys, formatDateTime, searchPlaces } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes, calculateDelay } from '../components/Utils';
+import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName } from '../components/Utils';
 
 const MetzBettembourg = () => {
     const [terTrains, setTerTrains] = useState([]);
@@ -328,10 +329,33 @@ const MetzBettembourg = () => {
         // Try to get wagon count
         const wagonCount = getWagonCount(firstSection);
         
+        // Extract vehicle journey ID from first section
+        let vehicleJourneyId = null;
+        if (firstSection) {
+            // Try from vehicle_journey.id
+            if (firstSection.vehicle_journey?.id) {
+                vehicleJourneyId = firstSection.vehicle_journey.id;
+            }
+            // Try from links (similar to Departures/Arrivals)
+            else if (firstSection.links && firstSection.links.length > 1) {
+                const vehicleJourneyLink = firstSection.links.find(link => 
+                    link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
+                );
+                if (vehicleJourneyLink) {
+                    vehicleJourneyId = vehicleJourneyLink.id;
+                }
+            }
+            // Try from trip.vehicle_journey
+            else if (firstSection.trip?.vehicle_journey?.id) {
+                vehicleJourneyId = firstSection.trip.vehicle_journey.id;
+            }
+        }
+        
         return {
             trainNumber: firstSection?.display_informations?.headsign || 
                          firstSection?.display_informations?.trip_short_name || 
                          'N/A',
+            vehicleJourneyId: vehicleJourneyId,
             commercialMode: commercialMode || 'Train',
             network: network,
             transportIcon: transportInfo.icon,
@@ -339,12 +363,16 @@ const MetzBettembourg = () => {
             transportTagColor: transportInfo.tagColor,
             transportLabel: transportInfo.label,
             wagonCount: wagonCount,
-            departureStation: firstSection?.from?.stop_point?.name || 
-                            firstSection?.from?.stop_area?.name || 
-                            'Metz',
-            arrivalStation: lastSection?.to?.stop_point?.name || 
-                           lastSection?.to?.stop_area?.name || 
-                           'Bettembourg',
+            departureStation: cleanLocationName(
+                firstSection?.from?.stop_point?.name || 
+                firstSection?.from?.stop_area?.name || 
+                'Metz'
+            ),
+            arrivalStation: cleanLocationName(
+                lastSection?.to?.stop_point?.name || 
+                lastSection?.to?.stop_area?.name || 
+                'Bettembourg'
+            ),
             departureTime: journey.departure_date_time,
             arrivalTime: journey.arrival_date_time,
             baseDepartureTime: firstSection?.base_departure_date_time || journey.departure_date_time,
@@ -545,7 +573,7 @@ const MetzBettembourg = () => {
                                             return (
                                                 <tr key={index}>
                                                     <td>
-                                                        <span className='tag is-light'>{formatDate(depDate)}</span>
+                                                        <span className='tag is-dark has-text-weight-semibold'>{formatDate(depDate)}</span>
                                                     </td>
                                                     <td>
                                                         <div>
@@ -553,7 +581,16 @@ const MetzBettembourg = () => {
                                                                 <span className={`icon ${info.transportColor} mr-2`}>
                                                                     <i className={`fas ${info.transportIcon}`}></i>
                                                                 </span>
-                                                                <strong className='has-text-primary'>{info.trainNumber}</strong>
+                                                                {info.vehicleJourneyId ? (
+                                                                    <Link 
+                                                                        to={`/train/${encodeURIComponent(info.vehicleJourneyId)}`}
+                                                                        className='has-text-primary has-text-weight-bold'
+                                                                    >
+                                                                        {info.trainNumber}
+                                                                    </Link>
+                                                                ) : (
+                                                                    <strong className='has-text-primary'>{info.trainNumber}</strong>
+                                                                )}
                                                             </div>
                                                             <span className={`tag ${info.transportTagColor} is-light`}>
                                                                 {info.transportLabel}
@@ -616,7 +653,7 @@ const MetzBettembourg = () => {
                                                         )}
                                                     </td>
                                                     <td>
-                                                        <span className='tag is-light'>{Math.floor(info.duration / 60)}min</span>
+                                                        <span className='tag is-dark has-text-weight-semibold'>{Math.floor(info.duration / 60)}min</span>
                                                     </td>
                                                     <td>
                                                         {info.wagonCount ? (

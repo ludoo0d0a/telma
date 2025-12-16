@@ -42,8 +42,11 @@ const Header = () => {
                     <Link to='/journeys' className='navbar-item' onClick={() => setIsActive(false)}>
                         Itinéraires
                     </Link>
-                    <Link to='/trajet/metz/bettembourg' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
-                        🚂 Metz→Bettembourg
+                    <Link to='/train' className='navbar-item' onClick={() => setIsActive(false)}>
+                        🚂 Train
+                    </Link>
+                    <Link to='/trajet/bettembourg/metz' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
+                        🚂 Bettembourg→Metz
                     </Link>
                     <Link to='/trajet/metz/thionville' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         🚂 Metz→Thionville

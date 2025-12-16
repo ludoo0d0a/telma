@@ -737,3 +737,24 @@ export const getFreefloatingsNearby = async (lat, lon, coverage = DEFAULT_COVERA
     }
 };
 
+/**
+ * Get vehicle journey details
+ * @param {string} vehicleJourneyId - Vehicle journey ID (e.g., 'vehicle_journey:SNCF:123456')
+ * @param {string} coverage - Coverage area ID (default: 'sncf')
+ * @returns {Promise} API response with vehicle journey details
+ */
+export const getVehicleJourney = async (vehicleJourneyId, coverage = DEFAULT_COVERAGE) => {
+    try {
+        const response = await axios.get(
+            `${API_BASE_URL}/coverage/${coverage}/vehicle_journeys/${vehicleJourneyId}`,
+            {
+                headers: getHeaders()
+            }
+        );
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching vehicle journey:', error);
+        throw error;
+    }
+};
+
