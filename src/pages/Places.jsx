@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { searchPlaces, getPlacesNearby } from '../services/sncfApi';
+import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 
 const Places = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -22,7 +21,8 @@ const Places = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await searchPlaces(searchQuery);
+            const response = await searchPlaces(searchQuery);
+            const data = response.data;
             setPlaces(data.places || []);
         } catch (err) {
             setError('Erreur lors de la recherche');
@@ -43,7 +43,8 @@ const Places = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await getPlacesNearby(coordQuery);
+            const response = await getPlacesNearby(coordQuery);
+            const data = response.data;
             setPlaces(data.places || []);
         } catch (err) {
             setError('Erreur lors de la recherche');
@@ -62,9 +63,6 @@ const Places = () => {
                     <h1 className='places-page__title'>
                         Recherche de <span>lieux</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <div className='search-tabs'>
                         <button

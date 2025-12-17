@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getIsochrones } from '../services/sncfApi';
+import { getIsochrones } from '../services/navitiaApi';
 
 const Isochrones = () => {
     const [from, setFrom] = useState('');
@@ -21,9 +20,10 @@ const Isochrones = () => {
         try {
             setLoading(true);
             setError(null);
-            const data = await getIsochrones(from, 'sncf', {
+            const response = await getIsochrones(from, 'sncf', {
                 max_duration: parseInt(maxDuration) || 3600,
             });
+            const data = response.data;
             setIsochrones(data);
         } catch (err) {
             setError('Erreur lors du calcul des isochrones');
@@ -42,9 +42,6 @@ const Isochrones = () => {
                     <h1 className='isochrones-page__title'>
                         Isochrones <span>(Beta)</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <div className='beta-notice'>
                         <p>⚠️ Cette fonctionnalité est en version Beta</p>

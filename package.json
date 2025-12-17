@@ -2,7 +2,7 @@
   "name": "api-sncf",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://guillaumesere.github.io/api-sncf/",
+  "homepage": "https://ludooo0d0a.github.io/telma/",
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.5.0",
     "@testing-library/jest-dom": "^5.16.5",
@@ -10,26 +10,27 @@
     "@testing-library/user-event": "^13.5.0",
     "axios": "^1.2.0",
     "bulma": "^1.0.4",
-    "dotenv": "^16.0.3",
     "gh-pages": "^4.0.0",
+    "leaflet": "^1.9.4",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-leaflet": "^4.2.1",
     "react-router-dom": "^6.4.4",
-    "react-scripts": "^5.0.1",
     "react-snowfall": "^1.2.1",
     "sass": "^1.56.1",
     "swagger-ui-react": "^5.31.0",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
-    "vercel-build": "npm ci && npm run build",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "deploy": "gh-pages -d dist",
+    "test": "vitest",
+    "generate-client": "npx @openapitools/openapi-generator-cli generate -i public/openapi.json -g typescript-axios -o src/client --additional-properties=supportsES6=true,withInterfaces=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api"
   },
   "eslintConfig": {
     "extends": [
@@ -48,5 +49,17 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.25.2",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "@vitejs/plugin-react": "^4.2.0",
+    "ajv": "^8.17.1",
+    "ajv-formats": "^3.0.1",
+    "typescript": "^5.0.0",
+    "vite": "^5.0.0",
+    "vitest": "^1.0.0"
   }
 }

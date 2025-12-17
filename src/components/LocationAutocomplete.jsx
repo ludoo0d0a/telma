@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { searchPlaces } from '../services/sncfApi';
+import { searchPlaces } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
+import { cleanLocationName } from './Utils';
 
 const LocationAutocomplete = ({ 
     label, 
@@ -19,17 +20,22 @@ const LocationAutocomplete = ({
     const [favoriteIds, setFavoriteIds] = useState(new Set(getFavorites().map(f => f.id)));
     const wrapperRef = useRef(null);
     const searchTimeoutRef = useRef(null);
+    const isUserTypingRef = useRef(false);
+    const previousValueRef = useRef(value || '');
 
     // Search for default station on mount if defaultSearchTerm is provided
     useEffect(() => {
-        if (defaultSearchTerm && !selectedStation && !value && !inputValue) {
+        // Search if we have a defaultSearchTerm but haven't selected a station yet
+        // Allow search even if value/inputValue is set (from URL params) - we still need to find the station ID
+        if (defaultSearchTerm && !selectedStation) {
             setInputValue(defaultSearchTerm);
             // Auto-select first result for default search
             const performDefaultSearch = async () => {
                 if (defaultSearchTerm.length >= 2) {
                     setLoading(true);
                     try {
-                        const results = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
+                        const response = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
+                        const results = response.data;
                         const stations = results.places?.filter(place => 
                             place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
                         ) || [];
@@ -38,11 +44,12 @@ const LocationAutocomplete = ({
                             // Sort favorites first and select the first one
                             const sortedStations = sortFavoritesFirst(stations);
                             const firstStation = sortedStations[0];
-                            setInputValue(firstStation.name);
+                            const cleanedName = cleanLocationName(firstStation.name);
+                            setInputValue(cleanedName);
                             setSelectedStation(firstStation);
                             onChange(firstStation.id);
                             if (onStationFound) {
-                                onStationFound(firstStation);
+                                onStationFound({ ...firstStation, name: cleanedName });
                             }
                             // Update favoriteIds state
                             setFavoriteIds(new Set(getFavorites().map(f => f.id)));
@@ -58,11 +65,25 @@ const LocationAutocomplete = ({
         }
     }, [defaultSearchTerm]);
 
-    // Update input value when value prop changes
+    // Update input value when value prop changes externally (not from user typing)
     useEffect(() => {
-        if (value) {
-            setInputValue(value);
+        // Only sync from prop if:
+        // 1. The value prop actually changed externally
+        // 2. User is not currently typing
+        // 3. The new value is different from current inputValue
+        const valueChanged = value !== previousValueRef.current;
+        if (valueChanged && !isUserTypingRef.current) {
+            // Use a function to get current inputValue to avoid stale closure
+            setInputValue(prevInputValue => {
+                // Only update if the prop value is meaningfully different
+                if (value && value !== prevInputValue) {
+                    return value;
+                }
+                return prevInputValue;
+            });
+            setSelectedStation(null); // Clear selection when value changes externally
         }
+        previousValueRef.current = value || '';
     }, [value]);
 
     // Close dropdown when clicking outside
@@ -88,7 +109,8 @@ const LocationAutocomplete = ({
 
         setLoading(true);
         try {
-            const results = await searchPlaces(searchTerm, 'sncf', { count: 20 });
+            const response = await searchPlaces(searchTerm, 'sncf', { count: 20 });
+            const results = response.data;
             const stations = results.places?.filter(place => 
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
             ) || [];
@@ -114,6 +136,7 @@ const LocationAutocomplete = ({
 
     const handleInputChange = (e) => {
         const newValue = e.target.value;
+        isUserTypingRef.current = true;
         setInputValue(newValue);
         setSelectedStation(null);
         
@@ -130,16 +153,20 @@ const LocationAutocomplete = ({
                 setSuggestions([]);
                 setIsOpen(false);
             }
+            // Reset typing flag after debounce completes
+            isUserTypingRef.current = false;
         }, 300);
     };
 
     const handleSelectStation = (station) => {
-        setInputValue(station.name);
+        isUserTypingRef.current = false; // User selected, not typing anymore
+        const cleanedName = cleanLocationName(station.name);
+        setInputValue(cleanedName);
         setSelectedStation(station);
         setIsOpen(false);
         onChange(station.id);
         if (onStationFound) {
-            onStationFound(station);
+            onStationFound({ ...station, name: cleanedName });
         }
     };
 
@@ -206,7 +233,7 @@ const LocationAutocomplete = ({
                                         style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
                                     >
                                         <div>
-                                            <strong>{station.name}</strong>
+                                            <strong>{cleanLocationName(station.name)}</strong>
                                             {station.embedded_type && (
                                                 <span className='tag is-light is-small ml-2'>
                                                     {station.embedded_type === 'stop_area' ? 'Gare' : 'Point d\'arrêt'}

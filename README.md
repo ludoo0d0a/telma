@@ -2,15 +2,15 @@
 
 A React-based web application for viewing real-time train schedules and information from the SNCF (French National Railway Company) API. This application provides an intuitive interface to explore train stations, departures, arrivals, journeys, and various other SNCF API endpoints.
 
-![20240110111513](https://github.com/GuillaumeSere/api-sncf/assets/75996200/02b43094-0dfa-4aea-ae8a-9af003d440c4)
+![20240110111513](https://github.com/ludoo0d0a/telma/assets/75996200/02b43094-0dfa-4aea-ae8a-9af003d440c4)
 
-![20240216231216](https://github.com/GuillaumeSere/api-sncf/assets/75996200/a136cab1-de45-4f2f-9bdc-ba851845e75a)
+![20240216231216](https://github.com/ludoo0d0a/telma/assets/75996200/a136cab1-de45-4f2f-9bdc-ba851845e75a)
 
-![20240216231235](https://github.com/GuillaumeSere/api-sncf/assets/75996200/65a2739d-708a-4985-b887-8be8d811312c)
+![20240216231235](https://github.com/ludoo0d0a/telma/assets/75996200/65a2739d-708a-4985-b887-8be8d811312c)
 
 ## 🌐 Live Demo
 
-Visit the live application: [https://guillaumesere.github.io/api-sncf/](https://guillaumesere.github.io/api-sncf/)
+Visit the live application: [https://ludoo0d0a.github.io/telma/](https://ludoo0d0a.github.io/telma/)
 
 ## ✨ Features
 
@@ -47,7 +47,7 @@ Visit the live application: [https://guillaumesere.github.io/api-sncf/](https://
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/GuillaumeSere/api-sncf.git
+git clone https://github.com/ludoo0d0a/telma.git
 cd api-sncf
 ```
 
@@ -63,16 +63,16 @@ touch .env
 
 4. Add your SNCF API key to the `.env` file:
 ```env
-REACT_APP_API_KEY=your_api_key_here
+VITE_API_KEY=your_api_key_here
 ```
 
 **Note**: The API key should be prefixed with your authentication method. For example:
 ```env
-REACT_APP_API_KEY=Basic your_base64_encoded_credentials
+VITE_API_KEY=Basic your_base64_encoded_credentials
 ```
 or
 ```env
-REACT_APP_API_KEY=Bearer your_token
+VITE_API_KEY=Bearer your_token
 ```
 
 ## 🎯 Usage

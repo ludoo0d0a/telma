@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 
 const CityCard = ({ city, currentPage }) => {
     // Placeholder image path
-    const defaultImagePath = '../api-sncf/images/default.webp';
+    const defaultImagePath = '/telma/images/default.webp';
 
     return (
         <Link to={`${city}?page=${currentPage}`} className='card has-background-primary'>
@@ -11,7 +11,7 @@ const CityCard = ({ city, currentPage }) => {
                 <figure className='image is-4by3'>
                     <img
                         type='image/webp'
-                        src={`../api-sncf/images/${city}.webp`}
+                        src={`/telma/images/${city}.webp`}
                         alt={city}
                         onError={(e) => {
                             e.target.src = defaultImagePath; // Set default image if the specific image fails to load

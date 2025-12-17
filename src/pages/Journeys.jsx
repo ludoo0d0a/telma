@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getJourneys, formatDateTime } from '../services/sncfApi';
-import { parseUTCDate, getFullMinutes } from '../components/Utils';
+import { getJourneys, formatDateTime } from '../services/navitiaApi';
+import { parseUTCDate, getFullMinutes, cleanLocationName, formatTime } from '../components/Utils';
 
 const Journeys = () => {
     const [from, setFrom] = useState('');
@@ -24,7 +23,8 @@ const Journeys = () => {
             setLoading(true);
             setError(null);
             const searchDatetime = datetime || formatDateTime(new Date());
-            const data = await getJourneys(from, to, searchDatetime);
+            const response = await getJourneys(from, to, searchDatetime);
+            const data = response.data;
             setJourneys(data.journeys || []);
         } catch (err) {
             setError('Erreur lors de la recherche d\'itinéraires');
@@ -44,9 +44,6 @@ const Journeys = () => {
         return `${minutes}min`;
     };
 
-    const formatTime = (date) => {
-        return `${date.getHours()}:${getFullMinutes(date)}`;
-    };
 
     return (
         <>
@@ -56,9 +53,6 @@ const Journeys = () => {
                     <h1 className='journeys__title'>
                         Recherche d'<span>itinéraires</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <form onSubmit={handleSearch} className='journeys__form'>
                         <div className='form-group'>
@@ -136,15 +130,15 @@ const Journeys = () => {
                                                         </div>
                                                         <div className='section-times'>
                                                             <span>
-                                                                {section.from?.stop_point?.name || 'Départ'}:{' '}
+                                                                {cleanLocationName(section.from?.stop_point?.name || 'Départ')}:{' '}
                                                                 {section.departure_date_time
-                                                                    ? formatTime(parseUTCDate(section.departure_date_time))
+                                                                    ? formatTime(parseUTCDate(section.departure_date_time), ':')
                                                                     : 'N/A'}
                                                             </span>
                                                             <span>
-                                                                {section.to?.stop_point?.name || 'Arrivée'}:{' '}
+                                                                {cleanLocationName(section.to?.stop_point?.name || 'Arrivée')}:{' '}
                                                                 {section.arrival_date_time
-                                                                    ? formatTime(parseUTCDate(section.arrival_date_time))
+                                                                    ? formatTime(parseUTCDate(section.arrival_date_time), ':')
                                                                     : 'N/A'}
                                                             </span>
                                                         </div>

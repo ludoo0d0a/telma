@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
-import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/sncfApi';
+import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/navitiaApi';
 
 const Reports = () => {
     const [reportType, setReportType] = useState('traffic'); // 'line', 'traffic', 'equipment'
@@ -23,21 +22,22 @@ const Reports = () => {
             setError(null);
             let data;
 
+            let response;
             switch (reportType) {
                 case 'line':
-                    data = await getLineReports(filter);
+                    response = await getLineReports(filter);
                     break;
                 case 'traffic':
-                    data = await getTrafficReports();
+                    response = await getTrafficReports();
                     break;
                 case 'equipment':
-                    data = await getEquipmentReports('sncf', filter || null);
+                    response = await getEquipmentReports('sncf', filter || null);
                     break;
                 default:
                     throw new Error('Type de rapport invalide');
             }
 
-            setReports(data);
+            setReports(response.data);
         } catch (err) {
             setError('Erreur lors de la récupération des rapports');
             console.error(err);
@@ -55,9 +55,6 @@ const Reports = () => {
                     <h1 className='reports-page__title'>
                         Rapports et <span>informations</span>
                     </h1>
-                    <Link to='/' className='home__link'>
-                        Accueil
-                    </Link>
 
                     <div className='report-tabs'>
                         <button
