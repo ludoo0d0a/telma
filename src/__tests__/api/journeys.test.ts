@@ -151,6 +151,67 @@ describe('Journeys API', () => {
                 throw error;
             }
         });
+
+        it('should validate journey-with-disruptions.json fixture against OpenAPI schema', () => {
+            // Load the fixture file
+            const fs = require('fs');
+            const path = require('path');
+            const fixturePath = path.join(__dirname, '../../../test-artifacts/api/2025-12-15/journey-with-disruptions.json');
+            
+            if (!fs.existsSync(fixturePath)) {
+                console.warn(`Fixture not found at ${fixturePath}, skipping test`);
+                return;
+            }
+
+            const fixtureData = JSON.parse(fs.readFileSync(fixturePath, 'utf8'));
+
+            // Validate against OpenAPI schema
+            const validation = validateResponse(
+                '/coverage/{coverage}/journeys',
+                'get',
+                '200',
+                fixtureData
+            );
+
+            if (!validation.valid) {
+                console.error('Validation errors:', formatValidationErrors(validation.errors));
+                // Log first few errors in detail
+                if (validation.errors && validation.errors.length > 0) {
+                    console.error('First validation error:', JSON.stringify(validation.errors[0], null, 2));
+                }
+            }
+
+            expect(validation.valid).toBe(true);
+            
+            // Additional assertions to ensure disruptions are properly structured
+            if (fixtureData.disruptions && fixtureData.disruptions.length > 0) {
+                const disruption = fixtureData.disruptions[0];
+                
+                // Verify disruption has expected fields
+                expect(disruption).toHaveProperty('id');
+                expect(disruption).toHaveProperty('severity');
+                
+                // Verify severity is an object (not a string)
+                if (disruption.severity) {
+                    expect(typeof disruption.severity).toBe('object');
+                    expect(disruption.severity).toHaveProperty('name');
+                    expect(disruption.severity).toHaveProperty('effect');
+                }
+                
+                // Verify impacted_objects structure if present
+                if (disruption.impacted_objects && disruption.impacted_objects.length > 0) {
+                    const impact = disruption.impacted_objects[0];
+                    if (impact.pt_object) {
+                        expect(impact.pt_object).toHaveProperty('id');
+                        expect(impact.pt_object).toHaveProperty('embedded_type');
+                    }
+                    if (impact.impacted_stops && impact.impacted_stops.length > 0) {
+                        const stop = impact.impacted_stops[0];
+                        expect(stop).toHaveProperty('stop_point');
+                    }
+                }
+            }
+        });
     });
 });
 
