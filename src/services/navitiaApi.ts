@@ -38,13 +38,9 @@ let clientInstance: NavitiaClient | null = null;
 
 const getClient = (): NavitiaClient => {
     if (!clientInstance) {
-        const apiKey = import.meta.env.VITE_API_KEY;
-        if (!apiKey) {
-            console.warn('VITE_API_KEY is not set');
-        }
         clientInstance = new NavitiaClient({
-            apiKey: apiKey || '',
-            basePath: 'https://api.sncf.com/v1',
+            apiKey: '',
+            basePath: '/api',
         });
     }
     return clientInstance;
