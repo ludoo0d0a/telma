@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import GeoJSONMap from '../components/GeoJSONMap';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
 import { parseUTCDate, getFullMinutes, cleanLocationName, formatTime } from '../components/Utils';
 
@@ -42,6 +43,60 @@ const Journeys = () => {
             return `${hours}h${minutes}min`;
         }
         return `${minutes}min`;
+    };
+
+    // Helper function to get sections with geojson for a journey
+    const getJourneySectionsWithGeoJSON = (journey) => {
+        return (journey.sections || []).filter(section => section.geojson);
+    };
+
+    // Helper function to get markers for journey start/end
+    const getJourneyMarkers = (journey) => {
+        const markers = [];
+        const sections = journey.sections || [];
+        
+        // Start marker
+        if (sections.length > 0 && sections[0].from) {
+            const from = sections[0].from;
+            if (from.stop_point?.coord || from.coord) {
+                const coord = from.stop_point?.coord || from.coord;
+                markers.push({
+                    lat: coord.lat,
+                    lon: coord.lon,
+                    name: cleanLocationName(from.stop_point?.name || from.name || 'Départ'),
+                    popup: (
+                        <div>
+                            <strong>{cleanLocationName(from.stop_point?.name || from.name || 'Départ')}</strong>
+                            <div>Départ</div>
+                        </div>
+                    )
+                });
+            }
+        }
+
+        // End marker
+        if (sections.length > 0) {
+            const lastSection = sections[sections.length - 1];
+            if (lastSection.to) {
+                const to = lastSection.to;
+                if (to.stop_point?.coord || to.coord) {
+                    const coord = to.stop_point?.coord || to.coord;
+                    markers.push({
+                        lat: coord.lat,
+                        lon: coord.lon,
+                        name: cleanLocationName(to.stop_point?.name || to.name || 'Arrivée'),
+                        popup: (
+                            <div>
+                                <strong>{cleanLocationName(to.stop_point?.name || to.name || 'Arrivée')}</strong>
+                                <div>Arrivée</div>
+                            </div>
+                        )
+                    });
+                }
+            }
+        }
+
+        return markers;
     };
 
 
@@ -107,7 +162,12 @@ const Journeys = () => {
                     {!loading && journeys.length > 0 && (
                         <div className='journeys-list'>
                             <h2>Itinéraires trouvés ({journeys.length})</h2>
-                            {journeys.map((journey, index) => (
+                            {journeys.map((journey, index) => {
+                                const sectionsWithGeoJSON = getJourneySectionsWithGeoJSON(journey);
+                                const hasGeoJSON = sectionsWithGeoJSON.length > 0;
+                                const markers = getJourneyMarkers(journey);
+                                
+                                return (
                                 <div key={index} className='journey-card'>
                                     <div className='journey-card__header'>
                                         <h3>Itinéraire {index + 1}</h3>
@@ -115,6 +175,15 @@ const Journeys = () => {
                                             Durée: {formatDuration(journey.durations?.total || 0)}
                                         </span>
                                     </div>
+                                    {hasGeoJSON && (
+                                        <div className='journey-card__map' style={{ marginBottom: '1rem' }}>
+                                            <GeoJSONMap 
+                                                geojsonData={sectionsWithGeoJSON}
+                                                markers={markers}
+                                                height={350}
+                                            />
+                                        </div>
+                                    )}
                                     <div className='journey-card__sections'>
                                         {journey.sections?.map((section, sectionIndex) => (
                                             <div key={sectionIndex} className='journey-section'>
@@ -154,7 +223,8 @@ const Journeys = () => {
                                         ))}
                                     </div>
                                 </div>
-                            ))}
+                                );
+                            })}
                         </div>
                     )}
 

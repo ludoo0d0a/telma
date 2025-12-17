@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import GeoJSONMap from '../components/GeoJSONMap';
 import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay } from '../components/Utils';
 
 const Trip = () => {
@@ -110,6 +111,54 @@ const Trip = () => {
     const depDate = parseUTCDate(info.departureTime);
     const arrDate = parseUTCDate(info.arrivalTime);
 
+    // Get sections with geojson for map display
+    const sectionsWithGeoJSON = useMemo(() => {
+        return sections.filter(section => section.geojson);
+    }, [sections]);
+
+    // Get markers for start and end points
+    const journeyMarkers = useMemo(() => {
+        const markers = [];
+        if (sections.length > 0 && sections[0].from) {
+            const from = sections[0].from;
+            if (from.stop_point?.coord || from.coord) {
+                const coord = from.stop_point?.coord || from.coord;
+                markers.push({
+                    lat: coord.lat,
+                    lon: coord.lon,
+                    name: cleanLocationName(from.stop_point?.name || from.name || 'Départ'),
+                    popup: (
+                        <div>
+                            <strong>{cleanLocationName(from.stop_point?.name || from.name || 'Départ')}</strong>
+                            <div>Départ</div>
+                        </div>
+                    )
+                });
+            }
+        }
+        if (sections.length > 0) {
+            const lastSection = sections[sections.length - 1];
+            if (lastSection.to) {
+                const to = lastSection.to;
+                if (to.stop_point?.coord || to.coord) {
+                    const coord = to.stop_point?.coord || to.coord;
+                    markers.push({
+                        lat: coord.lat,
+                        lon: coord.lon,
+                        name: cleanLocationName(to.stop_point?.name || to.name || 'Arrivée'),
+                        popup: (
+                            <div>
+                                <strong>{cleanLocationName(to.stop_point?.name || to.name || 'Arrivée')}</strong>
+                                <div>Arrivée</div>
+                            </div>
+                        )
+                    });
+                }
+            }
+        }
+        return markers;
+    }, [sections]);
+
     return (
         <>
             <Header />
@@ -185,6 +234,23 @@ const Trip = () => {
                             </div>
                         </div>
                     </div>
+
+                    {/* Journey Map */}
+                    {sectionsWithGeoJSON.length > 0 && (
+                        <div className='box mb-5'>
+                            <h2 className='title is-4 mb-4'>
+                                <span className='icon mr-2'>
+                                    <i className='fas fa-map'></i>
+                                </span>
+                                Carte de l'itinéraire
+                            </h2>
+                            <GeoJSONMap 
+                                geojsonData={sectionsWithGeoJSON}
+                                markers={journeyMarkers}
+                                height={400}
+                            />
+                        </div>
+                    )}
 
                     {/* Disruptions */}
                     {disruptions && disruptions.length > 0 && (

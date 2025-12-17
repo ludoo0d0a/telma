@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
+import GeoJSONMap from '../components/GeoJSONMap';
 import { getIsochrones } from '../services/navitiaApi';
 
 const Isochrones = () => {
@@ -86,9 +87,40 @@ const Isochrones = () => {
                     {!loading && isochrones && (
                         <div className='isochrones-result'>
                             <h2>Résultats</h2>
-                            <div className='isochrones-content'>
-                                <pre>{JSON.stringify(isochrones, null, 2)}</pre>
+                            {isochrones.isochrones && isochrones.isochrones.length > 0 && (
+                                <div className='isochrones-map' style={{ marginBottom: '2rem' }}>
+                                    <GeoJSONMap 
+                                        geojsonData={isochrones.isochrones}
+                                        style={(feature) => {
+                                            const duration = feature?.properties?.max_duration || 0;
+                                            const hue = Math.max(0, 240 - (duration / 3600) * 60); // Blue to green gradient
+                                            return {
+                                                color: `hsl(${hue}, 70%, 50%)`,
+                                                weight: 2,
+                                                opacity: 0.8,
+                                                fillColor: `hsl(${hue}, 70%, 50%)`,
+                                                fillOpacity: 0.3
+                                            };
+                                        }}
+                                        height={500}
+                                    />
+                                </div>
+                            )}
+                            <div className='isochrones-info' style={{ marginBottom: '1rem' }}>
+                                {isochrones.isochrones && isochrones.isochrones.map((iso, index) => (
+                                    <div key={index} style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                                        <strong>Isochrone {index + 1}:</strong> Durée maximale: {iso.max_duration ? `${Math.floor(iso.max_duration / 60)} minutes` : 'N/A'}
+                                    </div>
+                                ))}
                             </div>
+                            <details>
+                                <summary style={{ cursor: 'pointer', marginBottom: '1rem', fontWeight: 'bold' }}>
+                                    Afficher les données JSON
+                                </summary>
+                                <div className='isochrones-content'>
+                                    <pre>{JSON.stringify(isochrones, null, 2)}</pre>
+                                </div>
+                            </details>
                         </div>
                     )}
                 </div>
