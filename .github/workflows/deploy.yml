@@ -32,6 +32,8 @@ jobs:
         run: npm run build
         env:
           PUBLIC_URL: /telma/
+          VITE_API_KEY: ${{ secrets.VITE_API_KEY }}
+          VITE_GA_TRACKING_ID: ${{ secrets.VITE_GA_TRACKING_ID }}
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
