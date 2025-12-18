@@ -248,7 +248,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                                         <div>
                                             <strong>{cleanLocationName(station.name)}</strong>
                                             {station.embedded_type && (
-                                                <span className='tag is-light is-small ml-2'>
+                                                <span className='tag is-dark is-small ml-2'>
                                                     {station.embedded_type === 'stop_area' ? 'Gare' : 'Point d\'arrêt'}
                                                 </span>
                                             )}

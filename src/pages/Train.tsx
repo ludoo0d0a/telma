@@ -264,7 +264,7 @@ const Train: React.FC = () => {
                                                                 <div style={{ flex: 1 }}>
                                                                     <div className='is-flex is-align-items-center'>
                                                                         <strong className='mr-2'>{trainNumber}</strong>
-                                                                        <span className={`tag ${transportInfo.tagColor} is-light is-small`}>
+                                                                        <span className={`tag ${transportInfo.tagColor} is-dark is-small`}>
                                                                             {transportInfo.label}
                                                                         </span>
                                                                     </div>
@@ -312,7 +312,7 @@ const Train: React.FC = () => {
                                                                 Train {parsed.number}
                                                             </p>
                                                             <p className='subtitle is-6 mb-1'>
-                                                                <span className='tag is-light mr-2'>{parsed.type}</span>
+                                                                <span className='tag is-dark mr-2'>{parsed.type}</span>
                                                                 <span className='has-text-grey'>{parsed.date}</span>
                                                             </p>
                                                             <p className='help'>
@@ -461,7 +461,7 @@ const Train: React.FC = () => {
                                             {transportInfo.label}
                                         </span>
                                         {network && network !== commercialMode && (
-                                            <span className='tag is-light is-medium'>{network}</span>
+                                            <span className='tag is-dark is-medium'>{network}</span>
                                         )}
                                     </div>
                                     {direction && (
@@ -534,10 +534,10 @@ const Train: React.FC = () => {
                                                         <td>
                                                             <strong>{stopName}</strong>
                                                             {index === 0 && (
-                                                                <span className='tag is-success is-light ml-2'>Départ</span>
+                                                                <span className='tag is-success is-dark ml-2'>Départ</span>
                                                             )}
                                                             {index === stopTimes.length - 1 && (
-                                                                <span className='tag is-danger is-light ml-2'>Arrivée</span>
+                                                                <span className='tag is-danger is-dark ml-2'>Arrivée</span>
                                                             )}
                                                         </td>
                                                         <td>{baseTime ? formatTime(parseUTCDate(baseTime)) : 'N/A'}</td>
@@ -558,7 +558,7 @@ const Train: React.FC = () => {
                                                                     <span className='tag is-success'>À l'heure</span>
                                                                 )
                                                             ) : (
-                                                                <span className='tag is-light'>N/A</span>
+                                                                <span className='tag is-dark'>N/A</span>
                                                             )}
                                                         </td>
                                                         <td>{platform}</td>

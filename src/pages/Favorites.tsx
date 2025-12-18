@@ -97,7 +97,7 @@ const Favorites: React.FC = () => {
                                                     <strong>{favorite.name}</strong>
                                                 </td>
                                                 <td>
-                                                    <span className='tag is-light'>
+                                                    <span className='tag is-dark'>
                                                         {favorite.type === 'stop_area' ? 'Gare' : 'Point d\'arrêt'}
                                                     </span>
                                                 </td>

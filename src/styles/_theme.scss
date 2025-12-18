@@ -28,6 +28,15 @@
   // Gradient Background
   --gradient-start: #6366f1;
   --gradient-end: #0f172a;
+  
+  // Bulma table variable overrides (may not be used by all Bulma versions)
+  --bulma-table-striped-row-even-background-color: rgba(51, 65, 85, 0.7);
+  --bulma-table-striped-row-odd-background-color: rgba(30, 41, 59, 0.75);
+  --table-striped-row-even-background-color: rgba(51, 65, 85, 0.7);
+  --table-striped-row-odd-background-color: rgba(30, 41, 59, 0.75);
+  
+  // Bulma background variable overrides
+  --bulma-light: rgba(30, 41, 59, 0.75);
 }
 
 // Bulma color overrides using CSS custom properties
@@ -135,10 +144,34 @@
       }
       
       td {
-        color: var(--text-primary);
+        color: #ffffff;
         border-color: rgba(99, 102, 241, 0.15);
         padding: 0.5rem 0.25rem;
         font-size: 0.85rem;
+        
+        // First column: even brighter white text
+        &:first-child {
+          color: #ffffff !important;
+          font-weight: 500;
+          
+          strong {
+            color: #ffffff !important;
+            font-weight: 600;
+          }
+        }
+        
+        // Ensure all text elements in table cells are light
+        strong {
+          color: #ffffff !important;
+        }
+        
+        a {
+          color: #ffffff !important;
+          
+          &:hover {
+            color: var(--primary-light) !important;
+          }
+        }
       }
     }
   }
@@ -146,20 +179,95 @@
   // Striped table: alternating row colors for better readability
   &.is-striped tbody tr:nth-child(odd) {
     // Odd rows: darker background
-    background: rgba(30, 41, 59, 0.75);
+    background: rgba(30, 41, 59, 0.75) !important;
     
     &:hover {
-      background: rgba(99, 102, 241, 0.25);
+      background: rgba(99, 102, 241, 0.25) !important;
     }
   }
   
   &.is-striped tbody tr:nth-child(even) {
     // Even rows: slightly lighter background for clear distinction
-    background: rgba(51, 65, 85, 0.7);
+    // Using !important to override Bulma's default white background
+    background: rgba(51, 65, 85, 0.7) !important;
+    background-color: rgba(51, 65, 85, 0.7) !important;
     
     &:hover {
-      background: rgba(99, 102, 241, 0.25);
+      background: rgba(99, 102, 241, 0.25) !important;
+      background-color: rgba(99, 102, 241, 0.25) !important;
     }
+  }
+}
+
+// Additional override for Bulma's striped table rows (higher specificity)
+.table.is-striped tbody tr:nth-child(even) {
+  background: rgba(51, 65, 85, 0.7) !important;
+  background-color: rgba(51, 65, 85, 0.7) !important;
+  
+  td {
+    color: #ffffff !important;
+    
+    &:first-child {
+      color: #ffffff !important;
+      
+      strong {
+        color: #ffffff !important;
+      }
+    }
+    
+    strong {
+      color: #ffffff !important;
+    }
+  }
+}
+
+// Ensure all table text is white/very light
+.table tbody td {
+  color: #ffffff !important;
+  
+  &:first-child {
+    color: #ffffff !important;
+    font-weight: 500;
+    
+    // Override any Bulma text color classes in first column
+    &.has-text-grey,
+    &.has-text-dark,
+    &.has-text-black {
+      color: #ffffff !important;
+    }
+    
+    strong,
+    b,
+    span,
+    p,
+    div {
+      color: #ffffff !important;
+    }
+  }
+  
+  strong,
+  b {
+    color: #ffffff !important;
+    font-weight: 600;
+  }
+  
+  span,
+  p,
+  div {
+    color: #ffffff !important;
+  }
+  
+  // Keep danger/error colors for delays but make other text white
+  .has-text-danger {
+    color: #ff6b6b !important; // Keep red for delays but make it bright
+  }
+  
+  .has-text-success {
+    color: #51cf66 !important; // Keep green bright
+  }
+  
+  .has-text-grey:not(.has-text-danger):not(.has-text-success) {
+    color: #ffffff !important;
   }
 }
 
@@ -361,5 +469,12 @@
 
 .has-background-secondary {
   background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%) !important;
+}
+
+.has-background-light {
+  background: rgba(30, 41, 59, 0.75) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text-primary) !important;
 }
 

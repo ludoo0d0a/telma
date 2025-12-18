@@ -846,7 +846,7 @@ const Trajet: React.FC = () => {
                                                                     <strong className='has-text-primary'>{info.trainNumber}</strong>
                                                                 )}
                                                             </div>
-                                                            <span className={`tag ${info.transportTagColor} is-light`}>
+                                                            <span className={`tag ${info.transportTagColor} is-dark`}>
                                                                 {info.transportLabel}
                                                             </span>
                                                             {info.network && info.network !== info.commercialMode && (
@@ -956,7 +956,7 @@ const Trajet: React.FC = () => {
                                                     </td>
                                                     <td>
                                                         {info.wagonCount ? (
-                                                            <span className='tag is-info is-light'>
+                                                            <span className='tag is-info is-dark'>
                                                                 <span className='icon mr-1'><i className='fas fa-train'></i></span>
                                                                 {info.wagonCount}
                                                             </span>

@@ -38,7 +38,7 @@ export const getTransportIcon = (commercialMode: string | null | undefined, netw
     if (mode.includes('bus') || net.includes('bus')) {
         return { icon: 'fa-bus', color: 'has-text-success', tagColor: 'is-success', label: 'Bus' };
     }
-    return { icon: 'fa-train', color: 'has-text-grey', tagColor: 'is-light', label: commercialMode || 'Train' };
+    return { icon: 'fa-train', color: 'has-text-grey', tagColor: 'is-dark', label: commercialMode || 'Train' };
 };
 
 /**

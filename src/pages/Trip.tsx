@@ -57,9 +57,25 @@ const Trip: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [vehicleJourneyId, setVehicleJourneyId] = useState<string | null>(null);
+    const loadingRef = React.useRef<boolean>(false); // Prevent concurrent loads
 
     const loadTripData = useCallback(async (forceRefresh: boolean = false): Promise<void> => {
+            // Prevent concurrent loads
+            if (loadingRef.current && !forceRefresh) {
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:62',message:'loadTripData skipped - already loading',data:{forceRefresh,tripId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'G'})}).catch(()=>{});
+                // #endregion
+                return;
+            }
+            
             try {
+                loadingRef.current = true;
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:68',message:'loadTripData called',data:{forceRefresh,tripId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:71',message:'Setting loading=true',data:{forceRefresh},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                // #endregion
                 setLoading(true);
                 setError(null);
                 
@@ -70,11 +86,27 @@ const Trip: React.FC = () => {
                     return;
                 }
                 
+                // Clear sessionStorage cache and reset state if force refresh (like page reload)
+                if (forceRefresh) {
+                    const cacheKey = `trip_${tripId}`;
+                    const hadCachedData = !!sessionStorage.getItem(cacheKey);
+                    sessionStorage.removeItem(cacheKey);
+                    // Reset state to ensure clean reload
+                    setTripData(null);
+                    setError(null);
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:78',message:'Force refresh: cleared sessionStorage and reset state',data:{cacheKey,hadCachedData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                    // #endregion
+                }
+                
                 // Skip cache if force refresh
                 if (!forceRefresh) {
                     const storedData = sessionStorage.getItem(`trip_${tripId}`);
                     if (storedData) {
                         const data = JSON.parse(storedData) as TripData;
+                        // #region agent log
+                        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:82',message:'Using cached data from sessionStorage',data:{tripId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'B'})}).catch(()=>{});
+                        // #endregion
                         setTripData(data);
                         setLoading(false);
                         return;
@@ -86,40 +118,78 @@ const Trip: React.FC = () => {
                 try {
                     // Decode the trip ID
                     const decoded = decodeTripId(tripId);
+                    // #region agent log
+                    fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:120',message:'Decoded tripId',data:{tripId,decoded,decodedLength:decoded.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+                    // #endregion
                     
                     // Check if it contains vehicle_journey ID pattern
+                    // TripId format is: vehicleJourneyId_departureDateTime
+                    // We need to split on the LAST underscore to separate ID from datetime
                     if (decoded.includes('vehicle_journey:')) {
                         // Extract vehicle journey ID from decoded string
-                        // Format might be: vehicle_journey:SNCF:2025-12-18:88769 or vehicleJourneyId_departureDateTime
-                        if (decoded.startsWith('vehicle_journey:')) {
+                        // Format: vehicle_journey:SNCF:2025-12-18:88776_20251218T123000
+                        if (decoded.startsWith('vehicle_journey:') && !decoded.includes('_', decoded.indexOf('vehicle_journey:') + 16)) {
+                            // If it's just the vehicle journey ID without datetime, use it directly
                             extractedVehicleJourneyId = decoded;
                         } else {
                             // Format: vehicleJourneyId_departureDateTime
-                            const parts = decoded.split('_');
-                            if (parts.length >= 2) {
-                                // Reconstruct vehicle journey ID (might be split by underscore)
-                                extractedVehicleJourneyId = decoded.split('_').slice(0, -1).join('_');
+                            // Split on last underscore (datetime is always at the end)
+                            const lastUnderscoreIndex = decoded.lastIndexOf('_');
+                            if (lastUnderscoreIndex > 0) {
+                                extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
+                            } else {
+                                extractedVehicleJourneyId = decoded;
                             }
                         }
                     } else if (decoded.includes('_')) {
-                        // Format: vehicleJourneyId_departureDateTime
-                        const parts = decoded.split('_');
-                        if (parts.length >= 2) {
-                            extractedVehicleJourneyId = parts.slice(0, -1).join('_');
+                        // Format: vehicleJourneyId_departureDateTime (but ID might not start with vehicle_journey:)
+                        // Split on last underscore
+                        const lastUnderscoreIndex = decoded.lastIndexOf('_');
+                        if (lastUnderscoreIndex > 0) {
+                            extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
+                        } else {
+                            extractedVehicleJourneyId = decoded;
                         }
                     } else if (tripId.includes('vehicle_journey:')) {
-                        // If tripId itself contains vehicle_journey, use it directly
+                        // If tripId itself contains vehicle_journey (shouldn't happen, but handle it)
                         extractedVehicleJourneyId = tripId;
                     }
 
                     // Store for error message
                     if (extractedVehicleJourneyId) {
+                        // #region agent log
+                        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:149',message:'Extracted vehicle journey ID',data:{extractedVehicleJourneyId,decoded},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'I'})}).catch(()=>{});
+                        // #endregion
                         setVehicleJourneyId(extractedVehicleJourneyId);
                     }
 
                     // If we found a vehicle journey ID, try to fetch it
                     if (extractedVehicleJourneyId) {
-                        const response = await getVehicleJourney(extractedVehicleJourneyId, 'sncf');
+                        // Decode the ID if it's URL-encoded (the API client will encode it again)
+                        // Remove any URL encoding that might have been applied
+                        let cleanVehicleJourneyId = extractedVehicleJourneyId;
+                        try {
+                            // If it contains % encoding, decode it first
+                            if (cleanVehicleJourneyId.includes('%')) {
+                                cleanVehicleJourneyId = decodeURIComponent(cleanVehicleJourneyId);
+                            }
+                        } catch (e) {
+                            // If decoding fails, use as-is
+                        }
+                        // #region agent log
+                        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:161',message:'Calling getVehicleJourney API',data:{originalId:extractedVehicleJourneyId,cleanId:cleanVehicleJourneyId,hasPercentEncoding:extractedVehicleJourneyId.includes('%')},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+                        // #endregion
+                        let response;
+                        try {
+                            response = await getVehicleJourney(cleanVehicleJourneyId, 'sncf');
+                        } catch (apiError: any) {
+                            // #region agent log
+                            fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:166',message:'getVehicleJourney API error',data:{cleanId:cleanVehicleJourneyId,status:apiError?.response?.status,statusText:apiError?.response?.statusText,url:apiError?.config?.url},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'H'})}).catch(()=>{});
+                            // #endregion
+                            // If 404, the vehicle journey might not exist or ID is wrong
+                            // Continue to show error message below
+                            throw apiError;
+                        }
                         const vehicleJourneyData = response.data;
                         
                         if (vehicleJourneyData.vehicle_journeys && vehicleJourneyData.vehicle_journeys.length > 0) {
@@ -202,6 +272,14 @@ const Trip: React.FC = () => {
                                     disruptions: vehicleJourney.disruptions || []
                                 };
                                 
+                                // Save to sessionStorage (even on refresh, for next time)
+                                sessionStorage.setItem(`trip_${tripId}`, JSON.stringify(tripData));
+                                // #region agent log
+                                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:207',message:'Fetched new data from API and saved to sessionStorage',data:{tripId,stopsCount:stopTimes.length,forceRefresh},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});
+                                // #endregion
+                                // #region agent log
+                                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:229',message:'Setting tripData and loading=false',data:{forceRefresh,stopsCount:stopTimes.length},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                                // #endregion
                                 setTripData(tripData);
                                 setLoading(false);
                                 return;
@@ -219,13 +297,22 @@ const Trip: React.FC = () => {
                 setError('Erreur lors du chargement des données du trajet: ' + errorMessage);
                 console.error(err);
             } finally {
+                loadingRef.current = false;
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:251',message:'Finally: setting loading=false',data:{forceRefresh,hasError:!!error},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'F'})}).catch(()=>{});
+                // #endregion
                 setLoading(false);
             }
     }, [tripId]);
 
     useEffect(() => {
+        // Only load on mount or when tripId changes, not when loadTripData changes
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:253',message:'useEffect triggered loadTripData',data:{tripId},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
+        // #endregion
         loadTripData();
-    }, [loadTripData]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [tripId]); // Only depend on tripId, not loadTripData to avoid re-runs
 
     // Compute derived data - must be called before any early returns to maintain hook order
     const sections = tripData?.journey?.sections || [];
@@ -238,7 +325,7 @@ const Trip: React.FC = () => {
             section.stop_date_times.forEach((stopTime, index) => {
                 const isFirst = index === 0;
                 const isLast = index === section.stop_date_times!.length - 1;
-                allStops.push({
+                const stop = {
                     ...(stopTime as ExtendedStopTime),
                     section,
                     isFirst,
@@ -246,7 +333,14 @@ const Trip: React.FC = () => {
                     commercialMode: section.display_informations?.commercial_mode,
                     network: section.display_informations?.network,
                     trainNumber: section.display_informations?.headsign || section.display_informations?.trip_short_name
-                });
+                };
+                allStops.push(stop);
+                // #region agent log
+                const stopPoint = stop.stop_point as { coord?: { lat?: number; lon?: number }; name?: string } | undefined;
+                const stopArea = stopPoint?.stop_area as { coord?: { lat?: number; lon?: number }; name?: string } | undefined;
+                const coord = stopPoint?.coord || stopArea?.coord;
+                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:252',message:'Stop extracted from stop_date_times',data:{index,isFirst,isLast,hasStopPoint:!!stopPoint,hasStopArea:!!stopArea,hasCoord:!!coord,lat:coord?.lat,lon:coord?.lon,stopName:stopPoint?.name||stopArea?.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'A'})}).catch(()=>{});
+                // #endregion
             });
         }
     });
@@ -256,48 +350,51 @@ const Trip: React.FC = () => {
         return sections.filter((section: Section) => section.geojson);
     }, [sections]);
 
-    // Get markers for start and end points
+    // Get markers for all waypoints (stops) from stop_date_times
     const journeyMarkers = useMemo<JourneyMarker[]>(() => {
         const markers: JourneyMarker[] = [];
-        if (sections.length > 0 && sections[0].from) {
-            const from = sections[0].from;
-            const coord: Coord | undefined = from.stop_point?.coord || from.coord;
-            if (coord && coord.lat !== undefined && coord.lon !== undefined) {
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:260',message:'journeyMarkers computation started',data:{sectionsCount:sections.length,allStopsCount:allStops.length},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
+        
+        // Convert all stops from stop_date_times to markers
+        allStops.forEach((stop, index) => {
+            const stopPoint = stop.stop_point as { coord?: { lat?: number; lon?: number }; name?: string | null } | undefined;
+            const stopArea = stopPoint?.stop_area as { coord?: { lat?: number; lon?: number }; name?: string | null } | undefined;
+            const coord = stopPoint?.coord || stopArea?.coord;
+            
+            if (coord && typeof coord.lat === 'number' && typeof coord.lon === 'number' && 
+                Number.isFinite(coord.lat) && Number.isFinite(coord.lon)) {
+                const stopName = cleanLocationName(
+                    stopPoint?.name || stopArea?.name || `Arrêt ${index + 1}`
+                );
+                const isFirst = stop.isFirst;
+                const isLast = stop.isLast;
+                
                 markers.push({
                     lat: coord.lat,
                     lon: coord.lon,
-                    name: cleanLocationName(from.stop_point?.name || from.name || 'Départ'),
+                    name: stopName,
                     popup: (
                         <div>
-                            <strong>{cleanLocationName(from.stop_point?.name || from.name || 'Départ')}</strong>
-                            <div>Départ</div>
+                            <strong>{stopName}</strong>
+                            {isFirst && <div>Départ</div>}
+                            {isLast && <div>Arrivée</div>}
+                            {!isFirst && !isLast && <div>Arrêt intermédiaire</div>}
                         </div>
                     )
                 });
+                // #region agent log
+                fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:285',message:'Waypoint marker added',data:{index,lat:coord.lat,lon:coord.lon,name:stopName,isFirst,isLast},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+                // #endregion
             }
-        }
-        if (sections.length > 0) {
-            const lastSection = sections[sections.length - 1];
-            if (lastSection.to) {
-                const to = lastSection.to;
-                const coord: Coord | undefined = to.stop_point?.coord || to.coord;
-                if (coord && coord.lat !== undefined && coord.lon !== undefined) {
-                    markers.push({
-                        lat: coord.lat,
-                        lon: coord.lon,
-                        name: cleanLocationName(to.stop_point?.name || to.name || 'Arrivée'),
-                        popup: (
-                            <div>
-                                <strong>{cleanLocationName(to.stop_point?.name || to.name || 'Arrivée')}</strong>
-                                <div>Arrivée</div>
-                            </div>
-                        )
-                    });
-                }
-            }
-        }
+        });
+        
+        // #region agent log
+        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:299',message:'journeyMarkers computation completed',data:{markersCount:markers.length,markers:markers.map(m=>({lat:m.lat,lon:m.lon,name:m.name}))},timestamp:Date.now(),sessionId:'debug-session',runId:'post-fix',hypothesisId:'B'})}).catch(()=>{});
+        // #endregion
         return markers;
-    }, [sections]);
+    }, [allStops]);
 
     if (loading) {
         return (
@@ -373,7 +470,12 @@ const Trip: React.FC = () => {
                             <div className='level-item'>
                                 <button 
                                     className='button is-light' 
-                                    onClick={() => loadTripData(true)}
+                                    onClick={() => {
+                                        // #region agent log
+                                        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:386',message:'Refresh button clicked',data:{tripId,currentTripData:!!tripData},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
+                                        // #endregion
+                                        loadTripData(true);
+                                    }}
                                     disabled={loading}
                                 >
                                     <span className='icon'>
@@ -402,7 +504,7 @@ const Trip: React.FC = () => {
                                             {transportInfo.label}
                                         </span>
                                         {info.network && info.network !== info.commercialMode && (
-                                            <span className='tag is-light ml-2'>{info.network}</span>
+                                            <span className='tag is-dark ml-2'>{info.network}</span>
                                         )}
                                     </div>
                                 </div>
@@ -451,6 +553,9 @@ const Trip: React.FC = () => {
                                 markers={journeyMarkers}
                                 height={400}
                             />
+                            {/* #region agent log */}
+                            {(()=>{fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Trip.tsx:452',message:'GeoJSONMap rendered with markers',data:{markersCount:journeyMarkers.length,allStopsCount:allStops.length,markers:journeyMarkers.map(m=>({lat:m.lat,lon:m.lon,name:m.name}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'C'})}).catch(()=>{});return null;})()}
+                            {/* #endregion */}
                         </div>
                     )}
 
