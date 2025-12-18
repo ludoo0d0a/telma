@@ -327,40 +327,73 @@
 }
 
 @media (max-width: 768px) {
+    .metz-bettembourg-page {
+        padding: 1rem 0.5rem;
+        min-height: calc(100vh - 180px);
+        
+        &__content-wrapper {
+            margin-top: 0.5rem;
+            padding: 0 0.5rem;
+        }
+        
+        &__title {
+            font-size: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1rem;
+        }
+    }
+    
     .ter-trains-table {
         overflow-x: scroll;
+        padding: 0.75rem;
+        margin: 0 -0.5rem;
     }
 
     .ter-train-header,
     .ter-train-row {
-        grid-template-columns: 70px 100px 150px 150px 90px 50px;
-        gap: 0.5rem;
-        padding: 0.75rem;
-        font-size: 0.75rem;
+        grid-template-columns: 60px 90px 130px 130px 80px 45px;
+        gap: 0.4rem;
+        padding: 0.5rem;
+        font-size: 0.7rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .ter-train-header {
+        padding: 0.6rem 0.5rem;
+        margin-bottom: 0.75rem;
     }
 
     .ter-train-row {
         &__train {
             .train-number {
-                font-size: 0.85rem;
+                font-size: 0.8rem;
             }
 
             .train-mode,
             .train-network {
-                font-size: 0.7rem;
+                font-size: 0.65rem;
             }
         }
 
         &__departure,
         &__arrival {
             .station-name {
-                font-size: 0.75rem;
+                font-size: 0.7rem;
+                margin-bottom: 0.25rem;
             }
 
             .time-base,
             .time-real {
-                font-size: 0.8rem;
+                font-size: 0.75rem;
             }
+        }
+        
+        &__date {
+            font-size: 0.7rem;
+        }
+        
+        &__duration {
+            font-size: 0.7rem;
         }
     }
 }

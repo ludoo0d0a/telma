@@ -18,6 +18,12 @@
    width: 80%;
     margin-top: 5rem;
     border-radius: 10px;
+    
+    @media screen and (max-width: 768px) {
+        width: 95%;
+        margin-top: 1rem;
+        padding: 0 0.5rem;
+    }
   }
   &__content-title{
     text-align: center;

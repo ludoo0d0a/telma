@@ -129,6 +129,27 @@ li {
     }
 }
 
+// Mobile form optimizations
+@media (max-width: 768px) {
+    .form-group {
+        gap: 0.3rem;
+        
+        label {
+            font-size: 0.8rem;
+        }
+    }
+    
+    .form-input {
+        font-size: 14px;
+        padding: 0.5rem;
+    }
+    
+    .form-button {
+        font-size: 16px;
+        padding: 0.75rem;
+    }
+}
+
 // Shared status styles
 .loading,
 .error,
