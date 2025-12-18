@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { getDepartures } from '../services/navitiaApi'
 import { extractVehicleJourneyId } from '../services/vehicleJourneyService'
 import { parseUTCDate, getFullMinutes } from './Utils'
+import { encodeVehicleJourneyId } from '../utils/uriUtils'
 import { calculateDelay } from '../services/delayService'
 import { matchDisruptionsForDepartureArrival } from '../services/disruptionService'
 import Stops from './Stops'
@@ -146,7 +147,7 @@ const Departures: React.FC = () => {
                     <p className='departure__train-type'>{departure.transportationMode}</p>
                     <p className='departure__train-number'>
                         {departure.id && (
-                            <Link to={`/train/${encodeURIComponent(departure.id)}`} className='has-text-link'>
+                            <Link to={`/train/${encodeVehicleJourneyId(departure.id)}`} className='has-text-link'>
                                 {departure.trainNumber}
                             </Link>
                         )}

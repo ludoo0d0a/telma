@@ -7,11 +7,15 @@ import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
 import { cleanLocationName } from '../services/locationService';
 import { getTransportIcon } from '../services/transportService';
 import { getDelay } from '../services/delayService';
+import { getVehicleJourney } from '../services/vehicleJourneyService';
+import { getJourneyInfo } from '../services/journeyService';
+import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId } from '../utils/uriUtils';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { JourneyInfo } from '../services/journeyService';
 import type { Disruption } from '../client/models/disruption';
 import type { Section } from '../client/models/section';
 import type { Coord } from '../client/models/coord';
+import type { VehicleJourney } from '../client/models/vehicle-journey';
 
 interface TripData {
     journey: JourneyItem;
@@ -52,9 +56,10 @@ const Trip: React.FC = () => {
     const [tripData, setTripData] = useState<TripData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [vehicleJourneyId, setVehicleJourneyId] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadTripData = (): void => {
+        const loadTripData = async (): Promise<void> => {
             try {
                 setLoading(true);
                 setError(null);
@@ -67,14 +72,146 @@ const Trip: React.FC = () => {
                 }
                 
                 const storedData = sessionStorage.getItem(`trip_${tripId}`);
-                if (!storedData) {
-                    setError('Données du trajet non trouvées. Veuillez revenir à la recherche.');
+                if (storedData) {
+                    const data = JSON.parse(storedData) as TripData;
+                    setTripData(data);
                     setLoading(false);
                     return;
                 }
 
-                const data = JSON.parse(storedData) as TripData;
-                setTripData(data);
+                // If not in sessionStorage, try to decode tripId and fetch from API
+                let extractedVehicleJourneyId: string | null = null;
+                try {
+                    // Decode the trip ID
+                    const decoded = decodeTripId(tripId);
+                    
+                    // Check if it contains vehicle_journey ID pattern
+                    if (decoded.includes('vehicle_journey:')) {
+                        // Extract vehicle journey ID from decoded string
+                        // Format might be: vehicle_journey:SNCF:2025-12-18:88769 or vehicleJourneyId_departureDateTime
+                        if (decoded.startsWith('vehicle_journey:')) {
+                            extractedVehicleJourneyId = decoded;
+                        } else {
+                            // Format: vehicleJourneyId_departureDateTime
+                            const parts = decoded.split('_');
+                            if (parts.length >= 2) {
+                                // Reconstruct vehicle journey ID (might be split by underscore)
+                                extractedVehicleJourneyId = decoded.split('_').slice(0, -1).join('_');
+                            }
+                        }
+                    } else if (decoded.includes('_')) {
+                        // Format: vehicleJourneyId_departureDateTime
+                        const parts = decoded.split('_');
+                        if (parts.length >= 2) {
+                            extractedVehicleJourneyId = parts.slice(0, -1).join('_');
+                        }
+                    } else if (tripId.includes('vehicle_journey:')) {
+                        // If tripId itself contains vehicle_journey, use it directly
+                        extractedVehicleJourneyId = tripId;
+                    }
+
+                    // Store for error message
+                    if (extractedVehicleJourneyId) {
+                        setVehicleJourneyId(extractedVehicleJourneyId);
+                    }
+
+                    // If we found a vehicle journey ID, try to fetch it
+                    if (extractedVehicleJourneyId) {
+                        const response = await getVehicleJourney(vehicleJourneyId, 'sncf');
+                        const vehicleJourneyData = response.data;
+                        
+                        if (vehicleJourneyData.vehicle_journeys && vehicleJourneyData.vehicle_journeys.length > 0) {
+                            const vehicleJourney = vehicleJourneyData.vehicle_journeys[0] as VehicleJourney & {
+                                display_informations?: any;
+                                stop_times?: Array<{
+                                    base_arrival_date_time?: string;
+                                    arrival_date_time?: string;
+                                    base_departure_date_time?: string;
+                                    departure_date_time?: string;
+                                    utc_arrival_time?: string;
+                                    utc_departure_time?: string;
+                                    stop_point?: any;
+                                }>;
+                            };
+                            
+                            // Try to reconstruct journey data from vehicle journey
+                            // This is a fallback - we'll create minimal journey structure
+                            const stopTimes = vehicleJourney.stop_times || [];
+                            if (stopTimes.length > 0) {
+                                const firstStop = stopTimes[0];
+                                const lastStop = stopTimes[stopTimes.length - 1];
+                                
+                                // Use extended fields if available, otherwise fall back to utc_* fields
+                                const firstDeparture = firstStop.departure_date_time || firstStop.base_departure_date_time || firstStop.utc_departure_time || '';
+                                const lastArrival = lastStop.arrival_date_time || lastStop.base_arrival_date_time || lastStop.utc_arrival_time || '';
+                                
+                                // Create a minimal section from vehicle journey
+                                const section: Section = {
+                                    type: 'public_transport',
+                                    from: {
+                                        stop_point: firstStop.stop_point,
+                                        stop_area: firstStop.stop_point?.stop_area,
+                                        coord: firstStop.stop_point?.coord
+                                    },
+                                    to: {
+                                        stop_point: lastStop.stop_point,
+                                        stop_area: lastStop.stop_point?.stop_area,
+                                        coord: lastStop.stop_point?.coord
+                                    },
+                                    display_informations: vehicleJourney.display_informations || {
+                                        commercial_mode: vehicleJourney.journey_pattern?.commercial_mode || 'Train',
+                                        network: vehicleJourney.journey_pattern?.route?.line?.network?.name || 'SNCF',
+                                        headsign: vehicleJourney.headsign || '',
+                                        trip_short_name: vehicleJourney.name || ''
+                                    },
+                                    vehicle_journey: vehicleJourney.id || extractedVehicleJourneyId,
+                                    stop_date_times: stopTimes.map((st: any) => ({
+                                        base_arrival_date_time: st.base_arrival_date_time || st.utc_arrival_time,
+                                        arrival_date_time: st.arrival_date_time || st.utc_arrival_time,
+                                        base_departure_date_time: st.base_departure_date_time || st.utc_departure_time,
+                                        departure_date_time: st.departure_date_time || st.utc_departure_time,
+                                        stop_point: st.stop_point,
+                                        stop_area: st.stop_point?.stop_area
+                                    })),
+                                    base_departure_date_time: firstStop.base_departure_date_time || firstStop.utc_departure_time,
+                                    departure_date_time: firstStop.departure_date_time || firstStop.utc_departure_time,
+                                    base_arrival_date_time: lastStop.base_arrival_date_time || lastStop.utc_arrival_time,
+                                    arrival_date_time: lastStop.arrival_date_time || lastStop.utc_arrival_time
+                                };
+                                
+                                const journey: JourneyItem = {
+                                    departure_date_time: firstDeparture,
+                                    arrival_date_time: lastArrival,
+                                    sections: [section],
+                                    durations: {
+                                        total: stopTimes.length > 0 && firstDeparture && lastArrival ? 
+                                            (new Date(lastArrival).getTime() - new Date(firstDeparture).getTime()) / 1000 : 0
+                                    }
+                                };
+                                
+                                const info = getJourneyInfo(journey, 
+                                    cleanLocationName(firstStop.stop_point?.name || firstStop.stop_point?.stop_area?.name),
+                                    cleanLocationName(lastStop.stop_point?.name || lastStop.stop_point?.stop_area?.name)
+                                );
+                                
+                                const tripData: TripData = {
+                                    journey,
+                                    info,
+                                    disruptions: vehicleJourney.disruptions || []
+                                };
+                                
+                                setTripData(tripData);
+                                setLoading(false);
+                                return;
+                            }
+                        }
+                    }
+                } catch (apiErr) {
+                    console.error('Error fetching vehicle journey:', apiErr);
+                }
+
+                // If we couldn't load from API either, show error with helpful links
+                setError('Données du trajet non trouvées. Veuillez revenir à la recherche.');
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
                 setError('Erreur lors du chargement des données du trajet: ' + errorMessage);
@@ -122,6 +259,19 @@ const Trip: React.FC = () => {
                                 <button onClick={() => navigate(-1)} className='button is-primary'>
                                     Retour
                                 </button>
+                                {vehicleJourneyId && (
+                                    <Link 
+                                        to={`/train/${encodeVehicleJourneyId(vehicleJourneyId)}`}
+                                        className='button is-link'
+                                    >
+                                        <span className='icon'><i className='fas fa-train'></i></span>
+                                        <span>Voir les détails du train</span>
+                                    </Link>
+                                )}
+                                <Link to='/journeys' className='button is-light'>
+                                    <span className='icon'><i className='fas fa-search'></i></span>
+                                    <span>Nouvelle recherche</span>
+                                </Link>
                             </div>
                         </div>
                     </div>
@@ -260,7 +410,7 @@ const Trip: React.FC = () => {
                                     }
                                     return trainId ? (
                                         <Link 
-                                            to={`/train/${encodeURIComponent(trainId)}`}
+                                            to={`/train/${encodeVehicleJourneyId(trainId)}`}
                                             className='button is-small is-link'
                                         >
                                             <span className='icon'><i className='fas fa-train'></i></span>

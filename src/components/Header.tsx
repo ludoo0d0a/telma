@@ -17,6 +17,9 @@ const Header: React.FC = () => {
                         style={{ height: '100px', width: '120px' }}
                     />
                 </div>
+                <Link to='/' className='navbar-item'>
+                    <span className='title is-4 has-text-white'>Telma</span>
+                </Link>
                 <a
                     role='button'
                     className={`navbar-burger ${isActive ? 'is-active' : ''}`}

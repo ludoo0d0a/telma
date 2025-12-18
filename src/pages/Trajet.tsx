@@ -9,6 +9,7 @@ import { cleanLocationName } from '../services/locationService';
 import { getDelay, getMaxDelay } from '../services/delayService';
 import { getJourneyInfo, type JourneyInfo } from '../services/journeyService';
 import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '../services/disruptionService';
+import { encodeTripId, encodeVehicleJourneyId } from '../utils/uriUtils';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { Disruption } from '../client/models/disruption';
 import type { Section } from '../client/models/section';
@@ -245,11 +246,11 @@ const Trajet: React.FC = () => {
         // Use vehicle journey ID + departure datetime if available
         if (journeyInfo.vehicleJourneyId && journey.departure_date_time) {
             const tripKey = `${journeyInfo.vehicleJourneyId}_${journey.departure_date_time}`;
-            return btoa(tripKey).replace(/[+/=]/g, '').substring(0, 50);
+            return encodeTripId(tripKey);
         }
         // Fallback: create hash from journey data
         const tripKey = `${journey.departure_date_time}_${journeyInfo.departureStation}_${journeyInfo.arrivalStation}_${journeyInfo.trainNumber}`;
-        return btoa(tripKey).replace(/[+/=]/g, '').substring(0, 50);
+        return encodeTripId(tripKey);
     };
 
     // Match disruptions to a specific journey
@@ -833,7 +834,7 @@ const Trajet: React.FC = () => {
                                                                     }
                                                                     return trainId ? (
                                                                         <Link 
-                                                                            to={`/train/${encodeURIComponent(trainId)}`}
+                                                                            to={`/train/${encodeVehicleJourneyId(trainId)}`}
                                                                             className='has-text-primary has-text-weight-bold'
                                                                         >
                                                                             {info.trainNumber}

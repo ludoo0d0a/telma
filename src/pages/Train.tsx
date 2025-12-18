@@ -5,6 +5,7 @@ import Header from '../components/Header';
 import TrainWaypointsMap from '../components/TrainWaypointsMap';
 import { autocompletePT } from '../services/navitiaApi';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
+import { encodeVehicleJourneyId, decodeVehicleJourneyId } from '../utils/uriUtils';
 import { parseUTCDate, formatTime } from '../components/Utils';
 import { calculateDelay } from '../services/delayService';
 import { cleanLocationName } from '../services/locationService';
@@ -70,8 +71,8 @@ const Train: React.FC = () => {
                 setLoading(true);
             }
             setError(null);
-            // Decode the ID if it's URL encoded
-            const decodedId = decodeURIComponent(id);
+            // Decode the ID
+            const decodedId = decodeVehicleJourneyId(id);
             const response = await getVehicleJourney(decodedId, 'sncf');
             const data = response.data;
             
@@ -165,7 +166,7 @@ const Train: React.FC = () => {
 
     const handleSelectTrain = (train: ExtendedVehicleJourney): void => {
         if (train.id) {
-            navigate(`/train/${encodeURIComponent(train.id)}`);
+            navigate(`/train/${encodeVehicleJourneyId(train.id)}`);
         }
     };
 
