@@ -485,8 +485,8 @@ const Train: React.FC = () => {
                                     {stopTimes.length > 0 && (
                                         <>
                                             <li><strong>Nombre d'arrêts:</strong> {stopTimes.length}</li>
-                                            <li><strong>Gare de départ:</strong> {cleanLocationName((stopTimes[0] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.name || (stopTimes[0] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.stop_area?.name || 'N/A')}</li>
-                                            <li><strong>Gare d'arrivée:</strong> {cleanLocationName((stopTimes[stopTimes.length - 1] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.name || (stopTimes[stopTimes.length - 1] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.stop_area?.name || 'N/A')}</li>
+                                            <li><strong>Gare de départ:</strong> {cleanLocationName((stopTimes[0] as NonNullable<ExtendedVehicleJourney['stop_times']>[0])?.stop_point?.name || (stopTimes[0] as NonNullable<ExtendedVehicleJourney['stop_times']>[0])?.stop_point?.stop_area?.name || 'N/A')}</li>
+                                            <li><strong>Gare d'arrivée:</strong> {cleanLocationName((stopTimes[stopTimes.length - 1] as NonNullable<ExtendedVehicleJourney['stop_times']>[0])?.stop_point?.name || (stopTimes[stopTimes.length - 1] as NonNullable<ExtendedVehicleJourney['stop_times']>[0])?.stop_point?.stop_area?.name || 'N/A')}</li>
                                         </>
                                     )}
                                 </ul>

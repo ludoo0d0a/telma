@@ -1,11 +1,8 @@
-import { defineConfig } from 'vite';
+/// <reference types="vitest" />
+import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
-
-// #region agent log
-(globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'vite.config.ts:5',message:'vite/vitest config evaluated',data:{hasGlobalFetch:typeof globalThis.fetch==='function'},timestamp:Date.now(),sessionId:'debug-session',runId:'pre-fix',hypothesisId:'H2'})}) : Promise.resolve()).catch(()=>{});
-// #endregion
 
 // https://vitejs.dev/config/
 export default defineConfig({
