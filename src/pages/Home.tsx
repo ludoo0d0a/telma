@@ -1,5 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
 import CityCards from '../components/CityCards';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -7,17 +6,16 @@ import stations from '../gares.json';
 
 const Home: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState<string>('');
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const cardsPerPage: number = 12; // Nombre de cartes par page
-    const maxPageNumbers: number = 8; // Nombre maximal de numéros de page à afficher
+    const [itemsToShow, setItemsToShow] = useState<number>(12); // Nombre initial de cartes à afficher
+    const itemsPerLoad: number = 12; // Nombre de cartes à charger à chaque clic sur "Load More"
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchTerm(e.target.value);
-        setCurrentPage(1); // Réinitialiser la page lors de la recherche
+        setItemsToShow(itemsPerLoad); // Réinitialiser le nombre d'éléments affichés lors de la recherche
     };
 
-    const handlePageChange = (pageNumber: number): void => {
-        setCurrentPage(pageNumber);
+    const handleLoadMore = (): void => {
+        setItemsToShow((prev) => prev + itemsPerLoad);
     };
 
     const cities: string[] = Object.keys(stations as Record<string, unknown>);
@@ -25,42 +23,7 @@ const Home: React.FC = () => {
         city.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const totalPageCount: number = Math.ceil(filteredCities.length / cardsPerPage);
-
-    useEffect(() => {
-        // Assurez-vous que la page actuelle est valide
-        if (currentPage < 1) setCurrentPage(1);
-        if (currentPage > totalPageCount && totalPageCount > 0) setCurrentPage(totalPageCount);
-    }, [currentPage, totalPageCount]);
-
-    // Calculer les numéros de page à afficher dynamiquement
-    const calculatePageNumbersToDisplay = (): number[] => {
-        if (totalPageCount <= maxPageNumbers) {
-            // Si le nombre total de pages est inférieur ou égal à maxPageNumbers,
-            // afficher toutes les pages.
-            return Array.from({ length: totalPageCount }, (_, index) => index + 1);
-        } else {
-            // Sinon, déterminez quels numéros de page afficher en fonction de la position actuelle
-            if (currentPage <= maxPageNumbers - Math.floor(maxPageNumbers / 2)) {
-                // Afficher les premières maxPageNumbers pages
-                return Array.from({ length: maxPageNumbers }, (_, index) => index + 1);
-            } else if (currentPage >= totalPageCount - Math.floor(maxPageNumbers / 2)) {
-                // Afficher les dernières maxPageNumbers pages
-                return Array.from(
-                    { length: maxPageNumbers },
-                    (_, index) => totalPageCount - maxPageNumbers + index + 1
-                );
-            } else {
-                // Afficher les pages autour de la page actuelle
-                return Array.from(
-                    { length: maxPageNumbers },
-                    (_, index) => currentPage - Math.floor(maxPageNumbers / 2) + index
-                );
-            }
-        }
-    };
-
-    const pageNumbersToDisplay: number[] = calculatePageNumbersToDisplay();
+    const hasMoreItems: boolean = itemsToShow < filteredCities.length;
 
     return (
         <>
@@ -87,44 +50,18 @@ const Home: React.FC = () => {
                     </div>
                     <CityCards
                         searchTerm={searchTerm}
-                        currentPage={currentPage}
-                        cardsPerPage={cardsPerPage}
+                        itemsToShow={itemsToShow}
                     />
-                    <nav className='pagination is-centered mt-5' role='navigation' aria-label='pagination'>
-                        <Link
-                            to={`?page=${currentPage - 1}`}
-                            className={`pagination-previous ${currentPage === 1 ? 'is-disabled' : ''}`}
-                            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                                if (currentPage === 1) e.preventDefault();
-                                else handlePageChange(currentPage - 1);
-                            }}
-                        >
-                            Précédent
-                        </Link>
-                        <Link
-                            to={`?page=${currentPage + 1}`}
-                            className={`pagination-next ${currentPage === totalPageCount ? 'is-disabled' : ''}`}
-                            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-                                if (currentPage === totalPageCount) e.preventDefault();
-                                else handlePageChange(currentPage + 1);
-                            }}
-                        >
-                            Suivant
-                        </Link>
-                        <ul className='pagination-list'>
-                            {pageNumbersToDisplay.map((pageNumber: number) => (
-                                <li key={pageNumber}>
-                                    <Link
-                                        to={`?page=${pageNumber}`}
-                                        className={`pagination-link ${currentPage === pageNumber ? 'is-current' : ''}`}
-                                        onClick={() => handlePageChange(pageNumber)}
-                                    >
-                                        {pageNumber}
-                                    </Link>
-                                </li>
-                            ))}
-                        </ul>
-                    </nav>
+                    {hasMoreItems && (
+                        <div className='has-text-centered mt-5'>
+                            <button
+                                className='button is-primary is-large'
+                                onClick={handleLoadMore}
+                            >
+                                Charger plus
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
             <Footer />

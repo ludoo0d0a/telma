@@ -3,19 +3,17 @@ import { Link } from 'react-router-dom';
 
 interface CityCardProps {
     city: string;
-    currentPage: number;
 }
 
-const CityCard: React.FC<CityCardProps> = ({ city, currentPage }) => {
+const CityCard: React.FC<CityCardProps> = ({ city }) => {
     // Placeholder image path
     const defaultImagePath = '/telma/images/default.webp';
 
     return (
-        <Link to={`${city}?page=${currentPage}`} className='card has-background-primary'>
+        <Link to={city} className='card has-background-primary'>
             <div className='card-image'>
                 <figure className='image is-4by3'>
                     <img
-                        type='image/webp'
                         src={`/telma/images/${city}.webp`}
                         alt={city}
                         onError={(e) => {
