@@ -7,14 +7,14 @@ interface CityCardProps {
 
 const CityCard: React.FC<CityCardProps> = ({ city }) => {
     // Placeholder image path
-    const defaultImagePath = '/telma/images/default.webp';
+    const defaultImagePath = '/images/default.webp';
 
     return (
         <Link to={city} className='card has-background-primary'>
             <div className='card-image'>
                 <figure className='image is-4by3'>
                     <img
-                        src={`/telma/images/${city}.webp`}
+                        src={`/images/${city}.webp`}
                         alt={city}
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;

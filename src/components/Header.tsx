@@ -1,7 +1,5 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Player } from '@lottiefiles/react-lottie-player';
-import animation from '../95504-bullet-train.json';
 
 const Header: React.FC = () => {
     const [isActive, setIsActive] = useState<boolean>(false);
@@ -13,10 +11,9 @@ const Header: React.FC = () => {
 
                 </div>
                 <div className='navbar-item'>
-            <Player
-                autoplay
-                loop
-                src={animation}
+                    <img 
+                        src="/favicons/favicon.svg" 
+                        alt="Logo" 
                         style={{ height: '100px', width: '120px' }}
                     />
                 </div>
