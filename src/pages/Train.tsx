@@ -42,6 +42,34 @@ interface Waypoint {
     isEnd: boolean;
 }
 
+interface ParsedVehicleJourneyId {
+    date: string;
+    number: string;
+    unknownId: string;
+    type: string;
+}
+
+/**
+ * Parse vehicle journey ID format: vehicle_journey:SNCF:$date:$number:$unknownId:$type
+ */
+const parseVehicleJourneyId = (id: string): ParsedVehicleJourneyId | null => {
+    if (!id || !id.startsWith('vehicle_journey:SNCF:')) {
+        return null;
+    }
+    
+    const parts = id.split(':');
+    if (parts.length !== 6) {
+        return null;
+    }
+    
+    return {
+        date: parts[2],
+        number: parts[3],
+        unknownId: parts[4],
+        type: parts[5],
+    };
+};
+
 const Train: React.FC = () => {
     const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
@@ -260,17 +288,42 @@ const Train: React.FC = () => {
                             {/* Samples Section */}
                             <div className='mt-6'>
                                 <h3 className='title is-4 mb-4'>Exemples</h3>
-                                <div className='tags are-medium'>
-                                    <Link 
-                                        to={`/train/${encodeVehicleJourneyId('vehicle_journey:SNCF:2025-12-18:88776:1187:Train')}`}
-                                        className='tag is-link is-light'
-                                        style={{ cursor: 'pointer' }}
-                                    >
-                                        <span className='icon mr-1'>
-                                            <i className='fas fa-train'></i>
-                                        </span>
-                                        Train 88776
-                                    </Link>
+                                <div className='columns is-multiline'>
+                                    {[
+                                        'vehicle_journey:SNCF:2025-12-18:88776:1187:Train',
+                                        'vehicle_journey:SNCF:2025-12-18:88778:1187:Train'
+                                    ].map((sampleId) => {
+                                        const parsed = parseVehicleJourneyId(sampleId);
+                                        if (!parsed) return null;
+                                        
+                                        return (
+                                            <div key={sampleId} className='column is-half'>
+                                                <Link 
+                                                    to={`/train/${encodeVehicleJourneyId(sampleId)}`}
+                                                    className='box is-clickable'
+                                                    style={{ textDecoration: 'none' }}
+                                                >
+                                                    <div className='is-flex is-align-items-center'>
+                                                        <span className='icon is-large has-text-primary mr-3'>
+                                                            <i className='fas fa-train fa-2x'></i>
+                                                        </span>
+                                                        <div>
+                                                            <p className='title is-5 mb-1'>
+                                                                Train {parsed.number}
+                                                            </p>
+                                                            <p className='subtitle is-6 mb-1'>
+                                                                <span className='tag is-light mr-2'>{parsed.type}</span>
+                                                                <span className='has-text-grey'>{parsed.date}</span>
+                                                            </p>
+                                                            <p className='help'>
+                                                                ID: {parsed.unknownId}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </Link>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
                                 <p className='help mt-2 has-text-grey'>
                                     Cliquez sur un exemple pour voir les détails du train
@@ -368,6 +421,9 @@ const Train: React.FC = () => {
                             <div className='level-left'>
                                 <div className='level-item'>
                                     <h1 className='title is-2'>Détails du train</h1>
+                                    {trainNumber && trainNumber !== 'N/A' && (
+                                        <span className='ml-3 tag is-primary is-large'>{trainNumber}</span>
+                                    )}
                                 </div>
                             </div>
                             <div className='level-right'>

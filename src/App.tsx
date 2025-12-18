@@ -4,7 +4,6 @@ import TrainStation from './components/TrainStation'
 import City from './pages/City'
 import Home from './pages/Home'
 import CommercialModes from './pages/CommercialModes'
-import Journeys from './pages/Journeys'
 import Coverage from './pages/Coverage'
 import Places from './pages/Places'
 import Schedules from './pages/Schedules'
@@ -39,7 +38,6 @@ const App: React.FC = () => {
             <Routes>
                 <Route path='/' element={<Home />} />
                 <Route path='/commercial-modes' element={<CommercialModes />} />
-                <Route path='/journeys' element={<Journeys />} />
                 <Route path='/coverage' element={<Coverage />} />
                 <Route path='/places' element={<Places />} />
                 <Route path='/schedules' element={<Schedules />} />

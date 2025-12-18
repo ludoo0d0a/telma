@@ -38,9 +38,6 @@ const Header: React.FC = () => {
                     <Link to='/' className='navbar-item' onClick={() => setIsActive(false)}>
                         Accueil
                     </Link>
-                    <Link to='/journeys' className='navbar-item' onClick={() => setIsActive(false)}>
-                        Itinéraires
-                    </Link>
                     <Link to='/train' className='navbar-item' onClick={() => setIsActive(false)}>
                         🚂 Train
                     </Link>

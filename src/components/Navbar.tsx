@@ -39,9 +39,6 @@ const Navbar: React.FC = () => {
                     <Link to='/' className='navbar-item' onClick={() => setIsActive(false)}>
                         Accueil
                     </Link>
-                    <Link to='/journeys' className='navbar-item' onClick={() => setIsActive(false)}>
-                        Itinéraires
-                    </Link>
                     <Link to='/metz-bettembourg' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
                         🚂 Metz→Bettembourg
                     </Link>

@@ -339,10 +339,6 @@ const Trip: React.FC = () => {
                                         <span>Voir les détails du train</span>
                                     </Link>
                                 )}
-                                <Link to='/journeys' className='button is-light'>
-                                    <span className='icon'><i className='fas fa-search'></i></span>
-                                    <span>Nouvelle recherche</span>
-                                </Link>
                             </div>
                         </div>
                     </div>
