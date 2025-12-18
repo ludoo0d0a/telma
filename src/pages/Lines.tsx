@@ -2,16 +2,17 @@ import React, { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getLines } from '../services/navitiaApi';
+import type { Line } from '../client/models/line';
 
-const Lines = () => {
-    const [lines, setLines] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [page, setPage] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
+const Lines: React.FC = () => {
+    const [lines, setLines] = useState<Line[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+    const [page, setPage] = useState<number>(0);
+    const [hasMore, setHasMore] = useState<boolean>(true);
 
     useEffect(() => {
-        const fetchLines = async () => {
+        const fetchLines = async (): Promise<void> => {
             try {
                 setLoading(true);
                 const response = await getLines('sncf', { start_page: page, count: 25 });
@@ -60,14 +61,14 @@ const Lines = () => {
                                         {line.name || line.code || 'Sans nom'}
                                     </h3>
                                     <p className='line-card__id'>ID: {line.id}</p>
-                                    {line.commercial_mode && (
+                                    {line.commercial_mode && typeof line.commercial_mode === 'object' && 'name' in line.commercial_mode && (
                                         <p className='line-card__mode'>
-                                            Mode: {line.commercial_mode.name}
+                                            Mode: {(line.commercial_mode as { name?: string }).name}
                                         </p>
                                     )}
-                                    {line.network && (
+                                    {line.network && typeof line.network === 'object' && 'name' in line.network && (
                                         <p className='line-card__network'>
-                                            Réseau: {line.network.name}
+                                            Réseau: {(line.network as { name?: string }).name}
                                         </p>
                                     )}
                                 </div>

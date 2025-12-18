@@ -4,43 +4,48 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
-import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay, getDelayMinutes, getMaxDelay, getWagonCount, getJourneyInfo } from '../components/Utils';
+import { parseUTCDate, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay, getMaxDelay, getJourneyInfo, type JourneyInfo } from '../components/Utils';
+import type { JourneyItem } from '../client/models/journey-item';
+import type { Disruption } from '../client/models/disruption';
+import type { Section } from '../client/models/section';
+import type { Place } from '../client/models/place';
+import type { ImpactApplicationPeriodsInner } from '../client/models/impact-application-periods-inner';
 
 // Decode URL parameters and format location names
-const decodeLocationName = (slug) => {
+const decodeLocationName = (slug: string | undefined): string => {
     if (!slug) return '';
     return decodeURIComponent(slug).replace(/-/g, ' ').split(' ').map(word => 
         word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
     ).join(' ');
 };
 
-const Trajet = () => {
-    const { from, to } = useParams();
+const Trajet: React.FC = () => {
+    const { from, to } = useParams<{ from?: string; to?: string }>();
     const navigate = useNavigate();
-    const [terTrains, setTerTrains] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [fromId, setFromId] = useState(null);
-    const [toId, setToId] = useState(null);
-    const [disruptions, setDisruptions] = useState([]);
-    const [showDisruptionsSection, setShowDisruptionsSection] = useState(false);
+    const [terTrains, setTerTrains] = useState<JourneyItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [fromId, setFromId] = useState<string | undefined>(undefined);
+    const [toId, setToId] = useState<string | undefined>(undefined);
+    const [disruptions, setDisruptions] = useState<Disruption[]>([]);
+    const [showDisruptionsSection, setShowDisruptionsSection] = useState<boolean>(false);
     
-    const [fromName, setFromName] = useState(() => decodeLocationName(from) || '');
-    const [toName, setToName] = useState(() => decodeLocationName(to) || '');
+    const [fromName, setFromName] = useState<string>(() => decodeLocationName(from) || '');
+    const [toName, setToName] = useState<string>(() => decodeLocationName(to) || '');
     
     // Default to current date/time - 1 hour
-    const getDefaultDateTime = () => {
+    const getDefaultDateTime = (): Date => {
         const now = new Date();
         now.setHours(now.getHours() - 1);
         return now;
     };
     
-    const [filterDate, setFilterDate] = useState(() => {
+    const [filterDate, setFilterDate] = useState<string>(() => {
         const defaultDate = getDefaultDateTime();
         return defaultDate.toISOString().split('T')[0]; // YYYY-MM-DD format
     });
     
-    const [filterTime, setFilterTime] = useState(() => {
+    const [filterTime, setFilterTime] = useState<string>(() => {
         const defaultDate = getDefaultDateTime();
         const hours = String(defaultDate.getHours()).padStart(2, '0');
         const minutes = String(defaultDate.getMinutes()).padStart(2, '0');
@@ -61,7 +66,7 @@ const Trajet = () => {
 
     // Search for default stations on component mount
     useEffect(() => {
-        const findDefaultStations = async () => {
+        const findDefaultStations = async (): Promise<void> => {
             if (fromId && toId) {
                 // Stations already set, fetch journeys
                 await fetchTerTrains(fromId, toId);
@@ -71,33 +76,35 @@ const Trajet = () => {
         findDefaultStations();
     }, [fromId, toId]);
 
-    const handleFromStationFound = (station) => {
+    const handleFromStationFound = (station: Place & { name?: string | null }): void => {
+        if (!station.id) return;
         setFromId(station.id);
         const cleanedName = cleanLocationName(station.name);
-        setFromName(cleanedName);
+        setFromName(cleanedName || '');
         setError(null);
         // Update URL if toId is also set
         if (toId && toName) {
-            const fromSlug = encodeURIComponent(cleanedName.toLowerCase().replace(/\s+/g, '-'));
+            const fromSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent(toName.toLowerCase().replace(/\s+/g, '-'));
             navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
 
-    const handleToStationFound = (station) => {
+    const handleToStationFound = (station: Place & { name?: string | null }): void => {
+        if (!station.id) return;
         setToId(station.id);
         const cleanedName = cleanLocationName(station.name);
-        setToName(cleanedName);
+        setToName(cleanedName || '');
         setError(null);
         // Update URL if fromId is also set
         if (fromId && fromName) {
             const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));
-            const toSlug = encodeURIComponent(cleanedName.toLowerCase().replace(/\s+/g, '-'));
+            const toSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
             navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
 
-    const handleSearch = () => {
+    const handleSearch = (): void => {
         if (fromId && toId) {
             fetchTerTrains(fromId, toId);
         } else {
@@ -105,7 +112,7 @@ const Trajet = () => {
         }
     };
 
-    const handleInvertItinerary = () => {
+    const handleInvertItinerary = (): void => {
         if (!fromId || !toId) return;
         
         // Swap stations
@@ -128,7 +135,7 @@ const Trajet = () => {
         fetchTerTrains(newFromId, newToId);
     };
 
-    const fetchTerTrains = async (from, to) => {
+    const fetchTerTrains = async (from: string, to: string): Promise<void> => {
         try {
             setLoading(true);
             setError(null);
@@ -142,8 +149,8 @@ const Trajet = () => {
             const searchDatetime = formatDateTime(filterDateTime);
             
             // Fetch journeys for the selected date and next 2 days
-            const allJourneys = [];
-            const allDisruptions = [];
+            const allJourneys: JourneyItem[] = [];
+            const allDisruptions: Disruption[] = [];
             const filterDateObj = new Date(filterDate);
             
             // Fetch for selected date and next 2 days
@@ -180,7 +187,7 @@ const Trajet = () => {
             
             // Filter journeys to only show those after the filter datetime
             const filterDateTimeMs = filterDateTime.getTime();
-            const filteredJourneys = allJourneys.filter(journey => {
+            const filteredJourneys = allJourneys.filter((journey: JourneyItem) => {
                 if (!journey.departure_date_time) return false;
                 const journeyDate = parseUTCDate(journey.departure_date_time);
                 return journeyDate.getTime() >= filterDateTimeMs;
@@ -188,20 +195,20 @@ const Trajet = () => {
 
             // Show all transport types (no filtering)
             // Filter to only journeys with public_transport sections
-            const allTransportTypes = filteredJourneys.filter(journey => {
-                return journey.sections?.some(section => section.type === 'public_transport');
+            const allTransportTypes = filteredJourneys.filter((journey: JourneyItem) => {
+                return journey.sections?.some((section: Section) => section.type === 'public_transport');
             });
 
             // Remove duplicates and sort by departure time
-            const uniqueTrains = [];
-            const seenIds = new Set();
+            const uniqueTrains: JourneyItem[] = [];
+            const seenIds = new Set<string>();
             
-            allTransportTypes.forEach(journey => {
-                const firstSection = journey.sections?.find(s => s.type === 'public_transport');
+            allTransportTypes.forEach((journey: JourneyItem) => {
+                const firstSection = journey.sections?.find((s: Section) => s.type === 'public_transport');
                 if (firstSection) {
                     const trainId = firstSection.display_informations?.headsign || 
                                    firstSection.display_informations?.trip_short_name ||
-                                   journey.departure_date_time;
+                                   journey.departure_date_time || '';
                     
                     if (!seenIds.has(trainId)) {
                         seenIds.add(trainId);
@@ -211,7 +218,7 @@ const Trajet = () => {
             });
 
             // Sort by departure time
-            uniqueTrains.sort((a, b) => {
+            uniqueTrains.sort((a: JourneyItem, b: JourneyItem) => {
                 const timeA = a.departure_date_time ? parseUTCDate(a.departure_date_time).getTime() : 0;
                 const timeB = b.departure_date_time ? parseUTCDate(b.departure_date_time).getTime() : 0;
                 return timeA - timeB;
@@ -219,7 +226,8 @@ const Trajet = () => {
 
             setTerTrains(uniqueTrains);
         } catch (err) {
-            setError('Erreur lors de la récupération des trains TER: ' + (err.message || 'Erreur inconnue'));
+            const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError('Erreur lors de la récupération des trains TER: ' + errorMessage);
             console.error(err);
         } finally {
             setLoading(false);
@@ -229,7 +237,7 @@ const Trajet = () => {
 
 
     // Generate a unique trip ID from journey data
-    const generateTripId = (journey, journeyInfo) => {
+    const generateTripId = (journey: JourneyItem, journeyInfo: JourneyInfo): string => {
         // Use vehicle journey ID + departure datetime if available
         if (journeyInfo.vehicleJourneyId && journey.departure_date_time) {
             const tripKey = `${journeyInfo.vehicleJourneyId}_${journey.departure_date_time}`;
@@ -241,21 +249,66 @@ const Trajet = () => {
     };
 
     // Match disruptions to a specific journey
-    const getJourneyDisruptions = (journey, journeyInfo) => {
+    const getJourneyDisruptions = (journey: JourneyItem, journeyInfo: JourneyInfo): Disruption[] => {
         if (!disruptions || disruptions.length === 0) return [];
         
-        const matchedDisruptions = [];
+        const matchedDisruptions: Disruption[] = [];
         const vehicleJourneyId = journeyInfo.vehicleJourneyId;
-        const trainNumber = journeyInfo.trainNumber;
         const departureTime = journey.departure_date_time;
         const sections = journey.sections || [];
         
-        disruptions.forEach(disruption => {
+        // First, check for disruption links in sections (primary method using disruption_id)
+        const disruptionLinkIds = new Set<string>();
+        sections.forEach((section: Section) => {
+            if (section.type === 'public_transport') {
+                // Check section links for disruptions
+                const sectionLinks = section.links?.filter((link) => 
+                    link.type === 'disruption'
+                ) || [];
+                sectionLinks.forEach((link) => {
+                    if (link.id) {
+                        disruptionLinkIds.add(link.id);
+                    }
+                });
+            }
+        });
+        
+        // Match disruptions using disruption_id from links
+        const matchedByLink: Disruption[] = [];
+        if (disruptionLinkIds.size > 0) {
+            disruptions.forEach((disruption: Disruption) => {
+                const disruptionId = disruption.disruption_uri || disruption.id || disruption.disruption_id;
+                if (disruptionId && disruptionLinkIds.has(disruptionId)) {
+                    matchedByLink.push(disruption);
+                }
+            });
+        }
+        
+        // If we found disruptions via links, return them (and check application periods)
+        if (matchedByLink.length > 0) {
+            return matchedByLink.filter((disruption: Disruption) => {
+                // Check application periods to see if disruption applies to this journey's time
+                if (disruption.application_periods && Array.isArray(disruption.application_periods) && disruption.application_periods.length > 0) {
+                    if (!departureTime) return false;
+                    const journeyTime = parseUTCDate(departureTime).getTime();
+                    return disruption.application_periods.some((period: ImpactApplicationPeriodsInner) => {
+                        if (!period.begin || !period.end) return true; // If no period specified, assume it applies
+                        const beginTime = new Date(period.begin).getTime();
+                        const endTime = new Date(period.end).getTime();
+                        return journeyTime >= beginTime && journeyTime <= endTime;
+                    });
+                }
+                return true; // No application periods, assume it applies
+            });
+        }
+        
+        // Fallback: Use existing impacted_objects matching method
+        disruptions.forEach((disruption: Disruption) => {
             let isMatch = false;
             
             // Check if disruption impacts this journey through impacted_objects
             if (disruption.impacted_objects && Array.isArray(disruption.impacted_objects)) {
-                disruption.impacted_objects.forEach(obj => {
+                disruption.impacted_objects.forEach((obj) => {
                     const ptObject = obj.pt_object;
                     if (!ptObject) return;
                     
@@ -271,9 +324,9 @@ const Trajet = () => {
                     
                     // Match by trip ID
                     if (ptObject.embedded_type === 'trip') {
-                        sections.forEach(section => {
+                        sections.forEach((section: Section) => {
                             if (section.type === 'public_transport') {
-                                const sectionTripId = section.trip?.id || section.vehicle_journey?.trip?.id;
+                                const sectionTripId = section.trip?.id || (section.vehicle_journey && typeof section.vehicle_journey === 'object' && 'trip' in section.vehicle_journey ? (section.vehicle_journey as { trip?: { id?: string } }).trip?.id : undefined);
                                 if (sectionTripId && ptObject.id === sectionTripId) {
                                     isMatch = true;
                                 }
@@ -283,7 +336,7 @@ const Trajet = () => {
                     
                     // Match by route ID
                     if (ptObject.embedded_type === 'route') {
-                        sections.forEach(section => {
+                        sections.forEach((section: Section) => {
                             if (section.type === 'public_transport') {
                                 const sectionRouteId = section.route?.id || section.display_informations?.route_id;
                                 if (sectionRouteId && ptObject.id === sectionRouteId) {
@@ -295,7 +348,7 @@ const Trajet = () => {
                     
                     // Match by line ID
                     if (ptObject.embedded_type === 'line') {
-                        sections.forEach(section => {
+                        sections.forEach((section: Section) => {
                             if (section.type === 'public_transport') {
                                 const sectionLineId = section.route?.line?.id || section.display_informations?.line_id;
                                 if (sectionLineId && ptObject.id === sectionLineId) {
@@ -307,11 +360,11 @@ const Trajet = () => {
                     
                     // Match by impacted stops (check if journey passes through these stops)
                     if (obj.impacted_stops && Array.isArray(obj.impacted_stops)) {
-                        obj.impacted_stops.forEach(impactedStop => {
+                        obj.impacted_stops.forEach((impactedStop) => {
                             const stopId = impactedStop.id || impactedStop.stop_point?.id || impactedStop.stop_area?.id;
                             const stopName = impactedStop.name || impactedStop.stop_point?.name || impactedStop.stop_area?.name;
                             
-                            sections.forEach(section => {
+                            sections.forEach((section: Section) => {
                                 if (section.type === 'public_transport') {
                                     // Check from/to stops
                                     const fromStopId = section.from?.stop_point?.id || section.from?.stop_area?.id;
@@ -326,9 +379,9 @@ const Trajet = () => {
                                     
                                     // Match by stop name (normalized comparison)
                                     if (stopName && (fromStopName || toStopName)) {
-                                        const normalizedStopName = cleanLocationName(stopName).toLowerCase().trim();
-                                        const normalizedFromName = cleanLocationName(fromStopName || '').toLowerCase().trim();
-                                        const normalizedToName = cleanLocationName(toStopName || '').toLowerCase().trim();
+                                        const normalizedStopName = cleanLocationName(stopName)?.toLowerCase().trim() || '';
+                                        const normalizedFromName = cleanLocationName(fromStopName || '')?.toLowerCase().trim() || '';
+                                        const normalizedToName = cleanLocationName(toStopName || '')?.toLowerCase().trim() || '';
                                         if (normalizedStopName === normalizedFromName || normalizedStopName === normalizedToName) {
                                             isMatch = true;
                                         }
@@ -336,7 +389,7 @@ const Trajet = () => {
                                     
                                     // Check intermediate stops in stop_date_times
                                     if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
-                                        section.stop_date_times.forEach(stopTime => {
+                                        section.stop_date_times.forEach((stopTime) => {
                                             const intermediateStopId = stopTime.stop_point?.id || stopTime.stop_area?.id;
                                             const intermediateStopName = stopTime.stop_point?.name || stopTime.stop_area?.name;
                                             
@@ -347,8 +400,8 @@ const Trajet = () => {
                                             
                                             // Match by stop name
                                             if (stopName && intermediateStopName) {
-                                                const normalizedStopName = cleanLocationName(stopName).toLowerCase().trim();
-                                                const normalizedIntermediateName = cleanLocationName(intermediateStopName).toLowerCase().trim();
+                                                const normalizedStopName = cleanLocationName(stopName)?.toLowerCase().trim() || '';
+                                                const normalizedIntermediateName = cleanLocationName(intermediateStopName)?.toLowerCase().trim() || '';
                                                 if (normalizedStopName === normalizedIntermediateName) {
                                                     isMatch = true;
                                                 }
@@ -367,8 +420,9 @@ const Trajet = () => {
             if (!isMatch && (!disruption.impacted_objects || disruption.impacted_objects.length === 0)) {
                 // Only match general disruptions if they have application periods that match
                 if (disruption.application_periods && Array.isArray(disruption.application_periods) && disruption.application_periods.length > 0) {
+                    if (!departureTime) return;
                     const journeyTime = parseUTCDate(departureTime).getTime();
-                    const isInPeriod = disruption.application_periods.some(period => {
+                    const isInPeriod = disruption.application_periods.some((period: ImpactApplicationPeriodsInner) => {
                         if (!period.begin || !period.end) return false; // Require specific period for general disruptions
                         const beginTime = new Date(period.begin).getTime();
                         const endTime = new Date(period.end).getTime();
@@ -383,15 +437,19 @@ const Trajet = () => {
             
             // Check application periods to see if disruption applies to this journey's time
             if (isMatch && disruption.application_periods && Array.isArray(disruption.application_periods) && disruption.application_periods.length > 0) {
-                const journeyTime = parseUTCDate(departureTime).getTime();
-                const isInPeriod = disruption.application_periods.some(period => {
-                    if (!period.begin || !period.end) return true; // If no period specified, assume it applies
-                    const beginTime = new Date(period.begin).getTime();
-                    const endTime = new Date(period.end).getTime();
-                    return journeyTime >= beginTime && journeyTime <= endTime;
-                });
-                if (!isInPeriod) {
-                    isMatch = false; // Disruption doesn't apply to this journey's time
+                if (!departureTime) {
+                    isMatch = false;
+                } else {
+                    const journeyTime = parseUTCDate(departureTime).getTime();
+                    const isInPeriod = disruption.application_periods.some((period: ImpactApplicationPeriodsInner) => {
+                        if (!period.begin || !period.end) return true; // If no period specified, assume it applies
+                        const beginTime = new Date(period.begin).getTime();
+                        const endTime = new Date(period.end).getTime();
+                        return journeyTime >= beginTime && journeyTime <= endTime;
+                    });
+                    if (!isInPeriod) {
+                        isMatch = false; // Disruption doesn't apply to this journey's time
+                    }
                 }
             }
             
@@ -404,7 +462,7 @@ const Trajet = () => {
     };
 
 
-    const handleRefresh = async () => {
+    const handleRefresh = async (): Promise<void> => {
         if (fromId && toId) {
             await fetchTerTrains(fromId, toId);
         } else {
@@ -448,7 +506,7 @@ const Trajet = () => {
                                 <LocationAutocomplete
                                     label='Gare de départ'
                                     value={fromName}
-                                    onChange={setFromId}
+                                    onChange={(id: string | undefined) => setFromId(id)}
                                     defaultSearchTerm={fromName || 'Metz'}
                                     onStationFound={handleFromStationFound}
                                     disabled={loading}
@@ -475,7 +533,7 @@ const Trajet = () => {
                                 <LocationAutocomplete
                                     label="Gare d'arrivée"
                                     value={toName}
-                                    onChange={setToId}
+                                    onChange={(id: string | undefined) => setToId(id)}
                                     defaultSearchTerm={toName || 'Thionville'}
                                     onStationFound={handleToStationFound}
                                     disabled={loading}
@@ -491,7 +549,7 @@ const Trajet = () => {
                                             className='input'
                                             type='date'
                                             value={filterDate}
-                                            onChange={(e) => setFilterDate(e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilterDate(e.target.value)}
                                             disabled={loading}
                                         />
                                     </div>
@@ -505,7 +563,7 @@ const Trajet = () => {
                                             className='input'
                                             type='time'
                                             value={filterTime}
-                                            onChange={(e) => setFilterTime(e.target.value)}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilterTime(e.target.value)}
                                             disabled={loading}
                                         />
                                     </div>
@@ -575,7 +633,9 @@ const Trajet = () => {
                                 if (typeof disruption.severity === 'string') {
                                     severityText = disruption.severity;
                                 } else if (disruption.severity && typeof disruption.severity === 'object') {
-                                    severityText = disruption.severity.name || disruption.severity.label || JSON.stringify(disruption.severity);
+                                    severityText = (disruption.severity as { name?: string; label?: string }).name || 
+                                                  (disruption.severity as { name?: string; label?: string }).label || 
+                                                  JSON.stringify(disruption.severity);
                                 }
                                 
                                 const severityLevel = severityText.toLowerCase();
@@ -609,7 +669,7 @@ const Trajet = () => {
                                             <div className='content mb-2'>
                                                 {disruption.messages.map((msg, msgIndex) => (
                                                     <p key={msgIndex} className='mb-2'>
-                                                        {msg.text || msg.message || JSON.stringify(msg)}
+                                                        {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
                                                     </p>
                                                 ))}
                                             </div>
@@ -721,7 +781,7 @@ const Trajet = () => {
                                             const tripId = generateTripId(journey, info);
                                             
                                             // Store journey data in sessionStorage for the Trip page
-                                            const handleDetailClick = () => {
+                                            const handleDetailClick = (): void => {
                                                 sessionStorage.setItem(`trip_${tripId}`, JSON.stringify({
                                                     journey,
                                                     info,
@@ -744,7 +804,7 @@ const Trajet = () => {
                                                                     // Ensure we have a string ID, not an object
                                                                     let trainId = info.vehicleJourneyId;
                                                                     if (typeof trainId === 'object' && trainId !== null) {
-                                                                        trainId = trainId.id || trainId.href || null;
+                                                                        trainId = (trainId as { id?: string; href?: string }).id || (trainId as { id?: string; href?: string }).href || null;
                                                                     }
                                                                     return trainId ? (
                                                                         <Link 
@@ -828,7 +888,9 @@ const Trajet = () => {
                                                                     if (typeof disruption.severity === 'string') {
                                                                         severityText = disruption.severity;
                                                                     } else if (disruption.severity && typeof disruption.severity === 'object') {
-                                                                        severityText = disruption.severity.name || disruption.severity.label || 'Perturbation';
+                                                                        severityText = (disruption.severity as { name?: string; label?: string }).name || 
+                                                                                      (disruption.severity as { name?: string; label?: string }).label || 
+                                                                                      'Perturbation';
                                                                     }
                                                                     
                                                                     const severityLevel = severityText.toLowerCase();
@@ -842,7 +904,7 @@ const Trajet = () => {
                                                                     }
                                                                     
                                                                     const message = disruption.messages && disruption.messages.length > 0 
-                                                                        ? disruption.messages[0].text || disruption.messages[0].message 
+                                                                        ? disruption.messages[0].text || (disruption.messages[0] as { message?: string }).message 
                                                                         : disruption.message || severityText;
                                                                     
                                                                     return (

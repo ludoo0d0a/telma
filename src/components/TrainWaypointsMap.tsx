@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo } from 'react';
-import PropTypes from 'prop-types';
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -9,14 +8,18 @@ import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 
-delete L.Icon.Default.prototype._getIconUrl;
+delete (L.Icon.Default.prototype as { _getIconUrl?: unknown })._getIconUrl;
 L.Icon.Default.mergeOptions({
     iconRetinaUrl: markerIcon2x,
     iconUrl: markerIcon,
     shadowUrl: markerShadow,
 });
 
-const FitBounds = ({ bounds }) => {
+interface FitBoundsProps {
+    bounds: L.LatLngBounds | null;
+}
+
+const FitBounds: React.FC<FitBoundsProps> = ({ bounds }) => {
     const map = useMap();
     useEffect(() => {
         if (!bounds || !bounds.isValid()) return;
@@ -25,23 +28,31 @@ const FitBounds = ({ bounds }) => {
     return null;
 };
 
-FitBounds.propTypes = {
-    bounds: PropTypes.object,
-};
+interface Waypoint {
+    lat: number;
+    lon: number;
+    name?: string;
+    isStart?: boolean;
+    isEnd?: boolean;
+}
 
-const TrainWaypointsMap = ({ waypoints }) => {
-    const positions = useMemo(
+interface TrainWaypointsMapProps {
+    waypoints?: Waypoint[];
+}
+
+const TrainWaypointsMap: React.FC<TrainWaypointsMapProps> = ({ waypoints }) => {
+    const positions = useMemo<[number, number][]>(
         () => (waypoints || []).map((w) => [w.lat, w.lon]),
         [waypoints]
     );
 
-    const bounds = useMemo(() => {
+    const bounds = useMemo<L.LatLngBounds | null>(() => {
         if (!positions.length) return null;
         return L.latLngBounds(positions);
     }, [positions]);
 
-    const center = positions[0] || [48.8566, 2.3522]; // Paris fallback
-    const zoom = positions.length <= 1 ? 12 : 8;
+    const center: [number, number] = positions[0] || [48.8566, 2.3522]; // Paris fallback
+    const zoom: number = positions.length <= 1 ? 12 : 8;
 
     if (!positions.length) return null;
 
@@ -72,18 +83,5 @@ const TrainWaypointsMap = ({ waypoints }) => {
     );
 };
 
-TrainWaypointsMap.propTypes = {
-    waypoints: PropTypes.arrayOf(
-        PropTypes.shape({
-            lat: PropTypes.number.isRequired,
-            lon: PropTypes.number.isRequired,
-            name: PropTypes.string,
-            isStart: PropTypes.bool,
-            isEnd: PropTypes.bool,
-        })
-    ),
-};
-
 export default TrainWaypointsMap;
-
 

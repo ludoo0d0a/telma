@@ -2,9 +2,8 @@ import React, { useState } from 'react'
 import Arrivals from './Arrivals'
 import Departures from './Departures'
 
-const TrainStation = () => {
-
-    const [departureMode, setDepartureMode] = useState(true)
+const TrainStation: React.FC = () => {
+    const [departureMode, setDepartureMode] = useState<boolean>(true)
 
     return (
         <div className='train-station'>
@@ -33,3 +32,4 @@ const TrainStation = () => {
 }
 
 export default TrainStation
+

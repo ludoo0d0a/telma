@@ -4,25 +4,56 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TrainWaypointsMap from '../components/TrainWaypointsMap';
 import { getVehicleJourney, autocompletePT } from '../services/navitiaApi';
-import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate } from '../components/Utils';
+import { parseUTCDate, calculateDelay, cleanLocationName, getTransportIcon, formatTime } from '../components/Utils';
+import type { VehicleJourney } from '../client/models/vehicle-journey';
+import type { DisplayInformation } from '../client/models/display-information';
+import type { StopTime } from '../client/models/stop-time';
+import type { Place } from '../client/models/place';
 
-const Train = () => {
-    const { id } = useParams();
+interface ExtendedVehicleJourney extends VehicleJourney {
+    display_informations?: DisplayInformation;
+    stop_times?: Array<StopTime & {
+        base_arrival_date_time?: string;
+        arrival_date_time?: string;
+        base_departure_date_time?: string;
+        departure_date_time?: string;
+        stop_point?: {
+            name?: string | null;
+            label?: string | null;
+            coord?: { lat?: number; lon?: number };
+            stop_area?: {
+                name?: string | null;
+                coord?: { lat?: number; lon?: number };
+            };
+        };
+    }>;
+}
+
+interface Waypoint {
+    lat: number;
+    lon: number;
+    name: string | null | undefined;
+    isStart: boolean;
+    isEnd: boolean;
+}
+
+const Train: React.FC = () => {
+    const { id } = useParams<{ id?: string }>();
     const navigate = useNavigate();
-    const [trainData, setTrainData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [trainData, setTrainData] = useState<ExtendedVehicleJourney | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
     
     // Search state
-    const [searchQuery, setSearchQuery] = useState('');
-    const [suggestions, setSuggestions] = useState([]);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
-    const [searchLoading, setSearchLoading] = useState(false);
-    const searchTimeoutRef = useRef(null);
-    const wrapperRef = useRef(null);
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [suggestions, setSuggestions] = useState<ExtendedVehicleJourney[]>([]);
+    const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
+    const [searchLoading, setSearchLoading] = useState<boolean>(false);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const wrapperRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        const fetchTrainDetails = async () => {
+        const fetchTrainDetails = async (): Promise<void> => {
             if (!id) {
                 setLoading(false);
                 return;
@@ -37,12 +68,13 @@ const Train = () => {
                 const data = response.data;
                 
                 if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
-                    setTrainData(data.vehicle_journeys[0]);
+                    setTrainData(data.vehicle_journeys[0] as ExtendedVehicleJourney);
                 } else {
                     setError('Train non trouvé');
                 }
             } catch (err) {
-                setError('Erreur lors de la récupération des détails du train: ' + (err.message || 'Erreur inconnue'));
+                const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+                setError('Erreur lors de la récupération des détails du train: ' + errorMessage);
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -54,8 +86,8 @@ const Train = () => {
 
     // Close dropdown when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        const handleClickOutside = (event: MouseEvent): void => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsSearchOpen(false);
             }
         };
@@ -66,7 +98,7 @@ const Train = () => {
         };
     }, []);
 
-    const searchTrains = async (query) => {
+    const searchTrains = async (query: string): Promise<void> => {
         if (!query || query.length < 2) {
             setSuggestions([]);
             setIsSearchOpen(false);
@@ -79,8 +111,10 @@ const Train = () => {
             const data = response.data;
             // Filter to only show vehicle_journeys and extract the vehicle_journey object
             const vehicleJourneys = (data.pt_objects || [])
-                .filter(obj => obj.embedded_type === 'vehicle_journey' && obj.vehicle_journey)
-                .map(obj => obj.vehicle_journey);
+                .filter((obj: { embedded_type?: string; vehicle_journey?: unknown }) => 
+                    obj.embedded_type === 'vehicle_journey' && obj.vehicle_journey
+                )
+                .map((obj: { vehicle_journey?: unknown }) => obj.vehicle_journey as ExtendedVehicleJourney);
             setSuggestions(vehicleJourneys);
             setIsSearchOpen(vehicleJourneys.length > 0);
         } catch (err) {
@@ -92,7 +126,7 @@ const Train = () => {
         }
     };
 
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const value = e.target.value;
         setSearchQuery(value);
         
@@ -112,8 +146,10 @@ const Train = () => {
         }, 300);
     };
 
-    const handleSelectTrain = (train) => {
-        navigate(`/train/${encodeURIComponent(train.id)}`);
+    const handleSelectTrain = (train: ExtendedVehicleJourney): void => {
+        if (train.id) {
+            navigate(`/train/${encodeURIComponent(train.id)}`);
+        }
     };
 
 
@@ -162,7 +198,7 @@ const Train = () => {
                                             <div className='dropdown-content' style={{ maxHeight: '400px', overflowY: 'auto' }}>
                                                 {suggestions.map((train, index) => {
                                                     const displayInfo = train.display_informations || {};
-                                                    const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || train.id;
+                                                    const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || train.id || '';
                                                     const commercialMode = displayInfo.commercial_mode || '';
                                                     const network = displayInfo.network || '';
                                                     const direction = displayInfo.direction || '';
@@ -261,11 +297,11 @@ const Train = () => {
     const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || 'N/A';
     const direction = displayInfo.direction || '';
 
-    const waypoints = (stopTimes || [])
+    const waypoints: Waypoint[] = (stopTimes || [])
         .map((stop, index) => {
             const stopPoint = stop?.stop_point || {};
-            const stopArea = stopPoint?.stop_area || {};
-            const coord = stopPoint?.coord || stopArea?.coord;
+            const stopArea = (stopPoint as { stop_area?: { name?: string | null; coord?: { lat?: number; lon?: number } } }).stop_area || {};
+            const coord = (stopPoint as { coord?: { lat?: number; lon?: number } }).coord || stopArea?.coord;
             const lat = coord?.lat;
             const lon = coord?.lon;
 
@@ -275,12 +311,12 @@ const Train = () => {
             return {
                 lat,
                 lon,
-                name: cleanLocationName(stopPoint?.name || stopArea?.name || `Arrêt ${index + 1}`),
+                name: cleanLocationName((stopPoint as { name?: string | null }).name || stopArea?.name || `Arrêt ${index + 1}`),
                 isStart: index === 0,
                 isEnd: index === stopTimes.length - 1,
             };
         })
-        .filter(Boolean)
+        .filter((w): w is Waypoint => w !== null)
         // drop consecutive duplicates (happens with some datasets)
         .filter((w, idx, arr) => idx === 0 || w.lat !== arr[idx - 1].lat || w.lon !== arr[idx - 1].lon);
 
@@ -361,17 +397,18 @@ const Train = () => {
                                         </thead>
                                         <tbody>
                                             {stopTimes.map((stop, index) => {
-                                                const baseArrival = stop.base_arrival_date_time;
-                                                const realArrival = stop.arrival_date_time;
-                                                const baseDeparture = stop.base_departure_date_time;
-                                                const realDeparture = stop.departure_date_time;
+                                                const extendedStop = stop as ExtendedVehicleJourney['stop_times']?.[0];
+                                                const baseArrival = extendedStop?.base_arrival_date_time;
+                                                const realArrival = extendedStop?.arrival_date_time;
+                                                const baseDeparture = extendedStop?.base_departure_date_time;
+                                                const realDeparture = extendedStop?.departure_date_time;
                                                 
                                                 // Use arrival for intermediate stops, departure for last stop
                                                 const baseTime = index === stopTimes.length - 1 ? baseDeparture : baseArrival;
                                                 const realTime = index === stopTimes.length - 1 ? realDeparture : realArrival;
 
                                                 // Only calculate delay if both times are available
-                                                let delay = null;
+                                                let delay: string | null = null;
                                                 if (baseTime && realTime) {
                                                     try {
                                                         delay = calculateDelay(
@@ -383,10 +420,10 @@ const Train = () => {
                                                     }
                                                 }
 
-                                                const stopPoint = stop.stop_point || {};
-                                                const stopArea = stopPoint.stop_area || {};
-                                                const stopName = stopPoint.name || stopArea.name || 'Gare inconnue';
-                                                const platform = stopPoint.label || 'N/A';
+                                                const stopPoint = extendedStop?.stop_point || {};
+                                                const stopArea = (stopPoint as { stop_area?: { name?: string | null } }).stop_area || {};
+                                                const stopName = (stopPoint as { name?: string | null }).name || stopArea?.name || 'Gare inconnue';
+                                                const platform = (stopPoint as { label?: string | null }).label || 'N/A';
 
                                                 return (
                                                     <tr key={index}>
@@ -448,8 +485,8 @@ const Train = () => {
                                     {stopTimes.length > 0 && (
                                         <>
                                             <li><strong>Nombre d'arrêts:</strong> {stopTimes.length}</li>
-                                            <li><strong>Gare de départ:</strong> {cleanLocationName(stopTimes[0]?.stop_point?.name || stopTimes[0]?.stop_point?.stop_area?.name || 'N/A')}</li>
-                                            <li><strong>Gare d'arrivée:</strong> {cleanLocationName(stopTimes[stopTimes.length - 1]?.stop_point?.name || stopTimes[stopTimes.length - 1]?.stop_point?.stop_area?.name || 'N/A')}</li>
+                                            <li><strong>Gare de départ:</strong> {cleanLocationName((stopTimes[0] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.name || (stopTimes[0] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.stop_area?.name || 'N/A')}</li>
+                                            <li><strong>Gare d'arrivée:</strong> {cleanLocationName((stopTimes[stopTimes.length - 1] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.name || (stopTimes[stopTimes.length - 1] as ExtendedVehicleJourney['stop_times']?.[0])?.stop_point?.stop_area?.name || 'N/A')}</li>
                                         </>
                                     )}
                                 </ul>

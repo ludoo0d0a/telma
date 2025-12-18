@@ -1,19 +1,29 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import GeoJSONMap from '../components/GeoJSONMap';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
-import { parseUTCDate, getFullMinutes, cleanLocationName, formatTime } from '../components/Utils';
+import { parseUTCDate, cleanLocationName, formatTime } from '../components/Utils';
+import type { JourneyItem } from '../client/models/journey-item';
+import type { Section } from '../client/models/section';
+import type { Coord } from '../client/models/coord';
 
-const Journeys = () => {
-    const [from, setFrom] = useState('');
-    const [to, setTo] = useState('');
-    const [datetime, setDatetime] = useState('');
-    const [journeys, setJourneys] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+interface JourneyMarker {
+    lat: number;
+    lon: number;
+    name: string | null | undefined;
+    popup: React.ReactNode;
+}
 
-    const handleSearch = async (e) => {
+const Journeys: React.FC = () => {
+    const [from, setFrom] = useState<string>('');
+    const [to, setTo] = useState<string>('');
+    const [datetime, setDatetime] = useState<string>('');
+    const [journeys, setJourneys] = useState<JourneyItem[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (!from || !to) {
             setError('Veuillez remplir les champs de départ et d\'arrivée');
@@ -36,9 +46,10 @@ const Journeys = () => {
         }
     };
 
-    const formatDuration = (seconds) => {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
+    const formatDuration = (seconds: number | undefined): string => {
+        const sec = seconds || 0;
+        const hours = Math.floor(sec / 3600);
+        const minutes = Math.floor((sec % 3600) / 60);
         if (hours > 0) {
             return `${hours}h${minutes}min`;
         }
@@ -46,20 +57,20 @@ const Journeys = () => {
     };
 
     // Helper function to get sections with geojson for a journey
-    const getJourneySectionsWithGeoJSON = (journey) => {
-        return (journey.sections || []).filter(section => section.geojson);
+    const getJourneySectionsWithGeoJSON = (journey: JourneyItem): Section[] => {
+        return (journey.sections || []).filter((section: Section) => section.geojson);
     };
 
     // Helper function to get markers for journey start/end
-    const getJourneyMarkers = (journey) => {
-        const markers = [];
+    const getJourneyMarkers = (journey: JourneyItem): JourneyMarker[] => {
+        const markers: JourneyMarker[] = [];
         const sections = journey.sections || [];
         
         // Start marker
         if (sections.length > 0 && sections[0].from) {
             const from = sections[0].from;
-            if (from.stop_point?.coord || from.coord) {
-                const coord = from.stop_point?.coord || from.coord;
+            const coord: Coord | undefined = from.stop_point?.coord || from.coord;
+            if (coord && coord.lat !== undefined && coord.lon !== undefined) {
                 markers.push({
                     lat: coord.lat,
                     lon: coord.lon,
@@ -79,8 +90,8 @@ const Journeys = () => {
             const lastSection = sections[sections.length - 1];
             if (lastSection.to) {
                 const to = lastSection.to;
-                if (to.stop_point?.coord || to.coord) {
-                    const coord = to.stop_point?.coord || to.coord;
+                const coord: Coord | undefined = to.stop_point?.coord || to.coord;
+                if (coord && coord.lat !== undefined && coord.lon !== undefined) {
                     markers.push({
                         lat: coord.lat,
                         lon: coord.lon,
@@ -116,7 +127,7 @@ const Journeys = () => {
                                 id='from'
                                 type='text'
                                 value={from}
-                                onChange={(e) => setFrom(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFrom(e.target.value)}
                                 placeholder='admin:fr:75056'
                                 className='form-input'
                             />
@@ -128,7 +139,7 @@ const Journeys = () => {
                                 id='to'
                                 type='text'
                                 value={to}
-                                onChange={(e) => setTo(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTo(e.target.value)}
                                 placeholder='admin:fr:69123'
                                 className='form-input'
                             />
@@ -142,7 +153,7 @@ const Journeys = () => {
                                 id='datetime'
                                 type='text'
                                 value={datetime}
-                                onChange={(e) => setDatetime(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDatetime(e.target.value)}
                                 placeholder='20250113T152944'
                                 className='form-input'
                             />
@@ -172,7 +183,7 @@ const Journeys = () => {
                                     <div className='journey-card__header'>
                                         <h3>Itinéraire {index + 1}</h3>
                                         <span className='journey-card__duration'>
-                                            Durée: {formatDuration(journey.durations?.total || 0)}
+                                            Durée: {formatDuration(journey.durations?.total)}
                                         </span>
                                     </div>
                                     {hasGeoJSON && (
@@ -216,7 +227,7 @@ const Journeys = () => {
                                                 {section.type === 'transfer' && (
                                                     <div className='section-transfer'>
                                                         <span>Correspondance</span>
-                                                        <span>Durée: {formatDuration(section.duration || 0)}</span>
+                                                        <span>Durée: {formatDuration(section.duration)}</span>
                                                     </div>
                                                 )}
                                             </div>

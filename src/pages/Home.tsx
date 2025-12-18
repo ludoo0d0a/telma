@@ -5,36 +5,36 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import stations from '../gares.json';
 
-const Home = () => {
-    const [searchTerm, setSearchTerm] = useState('');
-    const [currentPage, setCurrentPage] = useState(1);
-    const cardsPerPage = 12; // Nombre de cartes par page
-    const maxPageNumbers = 8; // Nombre maximal de numéros de page à afficher
+const Home: React.FC = () => {
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const cardsPerPage: number = 12; // Nombre de cartes par page
+    const maxPageNumbers: number = 8; // Nombre maximal de numéros de page à afficher
 
-    const handleSearchChange = (e) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         setSearchTerm(e.target.value);
         setCurrentPage(1); // Réinitialiser la page lors de la recherche
     };
 
-    const handlePageChange = (pageNumber) => {
+    const handlePageChange = (pageNumber: number): void => {
         setCurrentPage(pageNumber);
     };
 
-    const cities = Object.keys(stations);
-    const filteredCities = cities.filter((city) =>
+    const cities: string[] = Object.keys(stations as Record<string, unknown>);
+    const filteredCities: string[] = cities.filter((city: string) =>
         city.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
-    const totalPageCount = Math.ceil(filteredCities.length / cardsPerPage);
+    const totalPageCount: number = Math.ceil(filteredCities.length / cardsPerPage);
 
     useEffect(() => {
         // Assurez-vous que la page actuelle est valide
         if (currentPage < 1) setCurrentPage(1);
-        if (currentPage > totalPageCount) setCurrentPage(totalPageCount);
+        if (currentPage > totalPageCount && totalPageCount > 0) setCurrentPage(totalPageCount);
     }, [currentPage, totalPageCount]);
 
     // Calculer les numéros de page à afficher dynamiquement
-    const calculatePageNumbersToDisplay = () => {
+    const calculatePageNumbersToDisplay = (): number[] => {
         if (totalPageCount <= maxPageNumbers) {
             // Si le nombre total de pages est inférieur ou égal à maxPageNumbers,
             // afficher toutes les pages.
@@ -60,7 +60,7 @@ const Home = () => {
         }
     };
 
-    const pageNumbersToDisplay = calculatePageNumbersToDisplay();
+    const pageNumbersToDisplay: number[] = calculatePageNumbersToDisplay();
 
     return (
         <>
@@ -94,7 +94,7 @@ const Home = () => {
                         <Link
                             to={`?page=${currentPage - 1}`}
                             className={`pagination-previous ${currentPage === 1 ? 'is-disabled' : ''}`}
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                                 if (currentPage === 1) e.preventDefault();
                                 else handlePageChange(currentPage - 1);
                             }}
@@ -104,7 +104,7 @@ const Home = () => {
                         <Link
                             to={`?page=${currentPage + 1}`}
                             className={`pagination-next ${currentPage === totalPageCount ? 'is-disabled' : ''}`}
-                            onClick={(e) => {
+                            onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
                                 if (currentPage === totalPageCount) e.preventDefault();
                                 else handlePageChange(currentPage + 1);
                             }}
@@ -112,7 +112,7 @@ const Home = () => {
                             Suivant
                         </Link>
                         <ul className='pagination-list'>
-                            {pageNumbersToDisplay.map((pageNumber) => (
+                            {pageNumbersToDisplay.map((pageNumber: number) => (
                                 <li key={pageNumber}>
                                     <Link
                                         to={`?page=${pageNumber}`}
@@ -133,8 +133,4 @@ const Home = () => {
 };
 
 export default Home;
-
-
-
-
 

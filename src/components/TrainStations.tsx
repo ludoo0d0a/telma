@@ -1,7 +1,11 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
 
-function TrainStations ({ stations }){
+interface TrainStationsProps {
+    stations: Record<string, string> | null | undefined;
+}
+
+const TrainStations: React.FC<TrainStationsProps> = ({ stations }) => {
     // Handle case where stations is undefined, null, or not an object
     if (!stations || typeof stations !== 'object') {
         return (
@@ -11,7 +15,7 @@ function TrainStations ({ stations }){
         )
     }
 
-    const stationKeys = Object.keys(stations)
+    const stationKeys: string[] = Object.keys(stations)
     
     if (stationKeys.length === 0) {
         return (
@@ -23,9 +27,9 @@ function TrainStations ({ stations }){
 
     return (
         <div className='train-stations'>
-            {stationKeys.map((stationName) => (
+            {stationKeys.map((stationName: string) => (
                 <NavLink
-                    className={({ isActive }) => `train-stations__link ${isActive ? 'train-stations__link--active' : ''}`}
+                    className={({ isActive }: { isActive: boolean }) => `train-stations__link ${isActive ? 'train-stations__link--active' : ''}`}
                     key={stationName}
                     to={`${stations[stationName]}`}
                 >
@@ -37,3 +41,4 @@ function TrainStations ({ stations }){
 }
 
 export default TrainStations
+

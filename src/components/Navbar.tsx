@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { Player } from '@lottiefiles/react-lottie-player';
 import animation from '../95504-bullet-train.json';
 
-const Navbar = () => {
-    const [isActive, setIsActive] = useState(false);
-    const [isDropdownActive, setDropdownActive] = useState(false);
+const Navbar: React.FC = () => {
+    const [isActive, setIsActive] = useState<boolean>(false);
+    const [isDropdownActive, setDropdownActive] = useState<boolean>(false);
 
-    const toggleDropdown = () => {
+    const toggleDropdown = (): void => {
         setDropdownActive(!isDropdownActive);
     }
 
@@ -89,3 +89,4 @@ const Navbar = () => {
 }
 
 export default Navbar;
+

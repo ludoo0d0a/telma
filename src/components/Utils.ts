@@ -1,3 +1,6 @@
+import type { Section } from '../client/models/section';
+import type { JourneyItem } from '../client/models/journey-item';
+
 export const parseUTCDate = (apiDate: string): Date => {
     // Handle null/undefined values
     if (!apiDate || typeof apiDate !== 'string') {
@@ -172,7 +175,7 @@ export const getMaxDelay = (
 }
 
 // Get wagon count from a section
-export const getWagonCount = (section: any): number | string | null => {
+export const getWagonCount = (section: Section | null | undefined): number | string | null => {
     // Try to find wagon/car count from various possible fields
     // Check vehicle_journey, vehicle, or other fields that might contain this info
     if (!section) return null;
@@ -262,7 +265,7 @@ interface JourneyInfo {
 }
 
 // Get journey information from a journey object
-export const getJourneyInfo = (journey: any, fromName: string | null = null, toName: string | null = null): JourneyInfo => {
+export const getJourneyInfo = (journey: JourneyItem, fromName: string | null = null, toName: string | null = null): JourneyInfo => {
     const firstSection = journey.sections?.find((s: any) => s.type === 'public_transport');
     const lastSection = journey.sections?.slice().reverse().find((s: any) => s.type === 'public_transport');
     

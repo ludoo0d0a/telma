@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/navitiaApi';
+import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '../client/models';
 
-const Schedules = () => {
-    const [scheduleType, setScheduleType] = useState('stop'); // 'stop', 'route', 'terminus'
-    const [filter, setFilter] = useState('');
-    const [datetime, setDatetime] = useState('');
-    const [schedules, setSchedules] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+const Schedules: React.FC = () => {
+    const [scheduleType, setScheduleType] = useState<'stop' | 'route' | 'terminus'>('stop'); // 'stop', 'route', 'terminus'
+    const [filter, setFilter] = useState<string>('');
+    const [datetime, setDatetime] = useState<string>('');
+    const [schedules, setSchedules] = useState<StopSchedulesResponse | RouteSchedulesResponse | TerminusSchedulesResponse | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSearch = async (e) => {
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (!filter.trim()) {
             setError('Veuillez entrer un filtre');
@@ -99,7 +100,7 @@ const Schedules = () => {
                                 id='filter'
                                 type='text'
                                 value={filter}
-                                onChange={(e) => setFilter(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
                                 placeholder='stop_area.id=stop_area:SNCF:87391003'
                                 className='form-input'
                             />
@@ -113,7 +114,7 @@ const Schedules = () => {
                                 id='datetime'
                                 type='text'
                                 value={datetime}
-                                onChange={(e) => setDatetime(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDatetime(e.target.value)}
                                 placeholder='20250113T152944'
                                 className='form-input'
                             />

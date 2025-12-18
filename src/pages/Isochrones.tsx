@@ -1,17 +1,23 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import GeoJSONMap from '../components/GeoJSONMap';
 import { getIsochrones } from '../services/navitiaApi';
+import type { CoverageCoverageIsochronesGet200Response } from '../client/models';
 
-const Isochrones = () => {
-    const [from, setFrom] = useState('');
-    const [maxDuration, setMaxDuration] = useState('3600');
-    const [isochrones, setIsochrones] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+interface IsochroneFeature {
+    max_duration?: number;
+    [key: string]: unknown;
+}
 
-    const handleSearch = async (e) => {
+const Isochrones: React.FC = () => {
+    const [from, setFrom] = useState<string>('');
+    const [maxDuration, setMaxDuration] = useState<string>('3600');
+    const [isochrones, setIsochrones] = useState<CoverageCoverageIsochronesGet200Response | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (!from.trim()) {
             setError('Veuillez entrer un point de départ');
@@ -21,7 +27,7 @@ const Isochrones = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await getIsochrones(from, 'sncf', {
+            const response = await getIsochrones(from, null, 'sncf', {
                 max_duration: parseInt(maxDuration) || 3600,
             });
             const data = response.data;
@@ -55,7 +61,7 @@ const Isochrones = () => {
                                 id='from'
                                 type='text'
                                 value={from}
-                                onChange={(e) => setFrom(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFrom(e.target.value)}
                                 placeholder='admin:fr:75056 ou 2.3522;48.8566'
                                 className='form-input'
                             />
@@ -67,7 +73,7 @@ const Isochrones = () => {
                                 id='maxDuration'
                                 type='number'
                                 value={maxDuration}
-                                onChange={(e) => setMaxDuration(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxDuration(e.target.value)}
                                 placeholder='3600'
                                 className='form-input'
                             />
@@ -91,8 +97,9 @@ const Isochrones = () => {
                                 <div className='isochrones-map' style={{ marginBottom: '2rem' }}>
                                     <GeoJSONMap 
                                         geojsonData={isochrones.isochrones}
-                                        style={(feature) => {
-                                            const duration = feature?.properties?.max_duration || 0;
+                                        style={(feature: unknown) => {
+                                            const props = (feature as { properties?: IsochroneFeature })?.properties;
+                                            const duration = props?.max_duration || 0;
                                             const hue = Math.max(0, 240 - (duration / 3600) * 60); // Blue to green gradient
                                             return {
                                                 color: `hsl(${hue}, 70%, 50%)`,

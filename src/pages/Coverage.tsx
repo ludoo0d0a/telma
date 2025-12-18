@@ -2,16 +2,25 @@ import React, { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getCoverage, getCoverageDetails } from '../services/navitiaApi';
+import type { CoverageResponse, Coverage } from '../client/models';
+import type { Link } from '../client/models/link';
+import type { Context } from '../client/models/context';
 
-const Coverage = () => {
-    const [coverages, setCoverages] = useState([]);
-    const [coverageResponse, setCoverageResponse] = useState(null);
-    const [selectedCoverage, setSelectedCoverage] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+interface SelectedCoverage extends Coverage {
+    id: string;
+    context?: Context;
+    links?: Link[];
+}
+
+const CoveragePage: React.FC = () => {
+    const [coverages, setCoverages] = useState<Coverage[]>([]);
+    const [coverageResponse, setCoverageResponse] = useState<CoverageResponse | null>(null);
+    const [selectedCoverage, setSelectedCoverage] = useState<SelectedCoverage | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchCoverages = async () => {
+        const fetchCoverages = async (): Promise<void> => {
             try {
                 setLoading(true);
                 const response = await getCoverage();
@@ -30,12 +39,14 @@ const Coverage = () => {
         fetchCoverages();
     }, []);
 
-    const handleCoverageClick = async (coverageId) => {
+    const handleCoverageClick = async (coverageId: string | undefined): Promise<void> => {
+        if (!coverageId) return;
+        
         try {
             setLoading(true);
             const response = await getCoverageDetails(coverageId);
             const data = response.data;
-            setSelectedCoverage({ id: coverageId, ...data });
+            setSelectedCoverage({ id: coverageId, ...data } as SelectedCoverage);
             setError(null);
         } catch (err) {
             setError('Erreur lors du chargement des détails');
@@ -45,8 +56,8 @@ const Coverage = () => {
         }
     };
 
-    const formatDate = (dateString) => {
-        if (!dateString || dateString.length !== 8) return dateString;
+    const formatDate = (dateString: string | undefined): string => {
+        if (!dateString || dateString.length !== 8) return dateString || '';
         // Format YYYYMMDD to DD/MM/YYYY
         const year = dateString.substring(0, 4);
         const month = dateString.substring(4, 6);
@@ -54,7 +65,7 @@ const Coverage = () => {
         return `${day}/${month}/${year}`;
     };
 
-    const formatDateTime = (dateTimeString) => {
+    const formatDateTime = (dateTimeString: string | undefined): string => {
         if (!dateTimeString) return 'N/A';
         try {
             // Format YYYYMMDDTHHmmss to readable format
@@ -70,7 +81,7 @@ const Coverage = () => {
         }
     };
 
-    const getStatusBadge = (status) => {
+    const getStatusBadge = (status: string | undefined): React.ReactNode => {
         if (status === 'running') {
             return <span className='coverage-status-badge coverage-status-badge--running'>En cours</span>;
         } else if (status === 'closed') {
@@ -311,5 +322,5 @@ const Coverage = () => {
     );
 };
 
-export default Coverage;
+export default CoveragePage;
 

@@ -1,29 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import { getFavorites, removeFavorite } from '../services/favoritesService';
+import { getFavorites, removeFavorite, type FavoriteLocation } from '../services/favoritesService';
 
-const Favorites = () => {
-    const [favorites, setFavorites] = useState([]);
-    const [loading, setLoading] = useState(true);
+const Favorites: React.FC = () => {
+    const [favorites, setFavorites] = useState<FavoriteLocation[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
         loadFavorites();
     }, []);
 
-    const loadFavorites = () => {
+    const loadFavorites = (): void => {
         setLoading(true);
         const favs = getFavorites();
         setFavorites(favs);
         setLoading(false);
     };
 
-    const handleRemoveFavorite = (id) => {
+    const handleRemoveFavorite = (id: string): void => {
         removeFavorite(id);
         loadFavorites();
     };
 
-    const formatDate = (dateString) => {
+    const formatDate = (dateString: string | undefined): string => {
         if (!dateString) return 'Date inconnue';
         try {
             const date = new Date(dateString);

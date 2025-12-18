@@ -18,7 +18,7 @@ import Train from './pages/Train'
 import Trip from './pages/Trip'
 import Snowfall from 'react-snowfall'
 
-function App() {
+const App: React.FC = () => {
     return (
         <div className='App'>
               { /*  <Snowfall
@@ -53,3 +53,4 @@ function App() {
 }
 
 export default App
+

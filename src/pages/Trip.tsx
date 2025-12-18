@@ -3,22 +3,66 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import GeoJSONMap from '../components/GeoJSONMap';
-import { parseUTCDate, getFullMinutes, calculateDelay, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay } from '../components/Utils';
+import { parseUTCDate, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay } from '../components/Utils';
+import type { JourneyItem } from '../client/models/journey-item';
+import type { JourneyInfo } from '../components/Utils';
+import type { Disruption } from '../client/models/disruption';
+import type { Section } from '../client/models/section';
+import type { Coord } from '../client/models/coord';
 
-const Trip = () => {
-    const { tripId } = useParams();
+interface TripData {
+    journey: JourneyItem;
+    info: JourneyInfo;
+    disruptions: Disruption[];
+}
+
+interface JourneyMarker {
+    lat: number;
+    lon: number;
+    name: string | null | undefined;
+    popup: React.ReactNode;
+}
+
+interface ExtendedStopTime {
+    base_arrival_date_time?: string;
+    arrival_date_time?: string;
+    base_departure_date_time?: string;
+    departure_date_time?: string;
+    stop_point?: {
+        name?: string | null;
+        label?: string | null;
+    };
+    stop_area?: {
+        name?: string | null;
+    };
+    section?: Section;
+    isFirst: boolean;
+    isLast: boolean;
+    commercialMode?: string;
+    network?: string;
+    trainNumber?: string;
+}
+
+const Trip: React.FC = () => {
+    const { tripId } = useParams<{ tripId?: string }>();
     const navigate = useNavigate();
-    const [tripData, setTripData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+    const [tripData, setTripData] = useState<TripData | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const loadTripData = () => {
+        const loadTripData = (): void => {
             try {
                 setLoading(true);
                 setError(null);
                 
                 // Retrieve journey data from sessionStorage
+                if (!tripId) {
+                    setError('ID de trajet manquant');
+                    setLoading(false);
+                    return;
+                }
+                
                 const storedData = sessionStorage.getItem(`trip_${tripId}`);
                 if (!storedData) {
                     setError('Données du trajet non trouvées. Veuillez revenir à la recherche.');
@@ -26,10 +70,11 @@ const Trip = () => {
                     return;
                 }
 
-                const data = JSON.parse(storedData);
+                const data = JSON.parse(storedData) as TripData;
                 setTripData(data);
             } catch (err) {
-                setError('Erreur lors du chargement des données du trajet: ' + (err.message || 'Erreur inconnue'));
+                const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+                setError('Erreur lors du chargement des données du trajet: ' + errorMessage);
                 console.error(err);
             } finally {
                 setLoading(false);
@@ -85,17 +130,17 @@ const Trip = () => {
 
     const { journey, info, disruptions } = tripData;
     const sections = journey.sections || [];
-    const publicTransportSections = sections.filter(s => s.type === 'public_transport');
+    const publicTransportSections = sections.filter((s: Section) => s.type === 'public_transport');
     
     // Get all stops from all sections
-    const allStops = [];
-    publicTransportSections.forEach(section => {
+    const allStops: ExtendedStopTime[] = [];
+    publicTransportSections.forEach((section: Section) => {
         if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
             section.stop_date_times.forEach((stopTime, index) => {
                 const isFirst = index === 0;
-                const isLast = index === section.stop_date_times.length - 1;
+                const isLast = index === section.stop_date_times!.length - 1;
                 allStops.push({
-                    ...stopTime,
+                    ...(stopTime as ExtendedStopTime),
                     section,
                     isFirst,
                     isLast,
@@ -112,17 +157,17 @@ const Trip = () => {
     const arrDate = parseUTCDate(info.arrivalTime);
 
     // Get sections with geojson for map display
-    const sectionsWithGeoJSON = useMemo(() => {
-        return sections.filter(section => section.geojson);
+    const sectionsWithGeoJSON = useMemo<Section[]>(() => {
+        return sections.filter((section: Section) => section.geojson);
     }, [sections]);
 
     // Get markers for start and end points
-    const journeyMarkers = useMemo(() => {
-        const markers = [];
+    const journeyMarkers = useMemo<JourneyMarker[]>(() => {
+        const markers: JourneyMarker[] = [];
         if (sections.length > 0 && sections[0].from) {
             const from = sections[0].from;
-            if (from.stop_point?.coord || from.coord) {
-                const coord = from.stop_point?.coord || from.coord;
+            const coord: Coord | undefined = from.stop_point?.coord || from.coord;
+            if (coord && coord.lat !== undefined && coord.lon !== undefined) {
                 markers.push({
                     lat: coord.lat,
                     lon: coord.lon,
@@ -140,8 +185,8 @@ const Trip = () => {
             const lastSection = sections[sections.length - 1];
             if (lastSection.to) {
                 const to = lastSection.to;
-                if (to.stop_point?.coord || to.coord) {
-                    const coord = to.stop_point?.coord || to.coord;
+                const coord: Coord | undefined = to.stop_point?.coord || to.coord;
+                if (coord && coord.lat !== undefined && coord.lon !== undefined) {
                     markers.push({
                         lat: coord.lat,
                         lon: coord.lon,
@@ -208,7 +253,7 @@ const Trip = () => {
                                     // Ensure we have a string ID, not an object
                                     let trainId = info.vehicleJourneyId;
                                     if (typeof trainId === 'object' && trainId !== null) {
-                                        trainId = trainId.id || trainId.href || null;
+                                        trainId = (trainId as { id?: string; href?: string }).id || (trainId as { id?: string; href?: string }).href || null;
                                     }
                                     return trainId ? (
                                         <Link 
@@ -266,7 +311,9 @@ const Trip = () => {
                                 if (typeof disruption.severity === 'string') {
                                     severityText = disruption.severity;
                                 } else if (disruption.severity && typeof disruption.severity === 'object') {
-                                    severityText = disruption.severity.name || disruption.severity.label || 'Perturbation';
+                                    severityText = (disruption.severity as { name?: string; label?: string }).name || 
+                                                  (disruption.severity as { name?: string; label?: string }).label || 
+                                                  'Perturbation';
                                 }
                                 
                                 const severityLevel = severityText.toLowerCase();
@@ -295,7 +342,7 @@ const Trip = () => {
                                             <div className='content mb-2'>
                                                 {disruption.messages.map((msg, msgIndex) => (
                                                     <p key={msgIndex} className='mb-2'>
-                                                        {msg.text || msg.message || JSON.stringify(msg)}
+                                                        {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
                                                     </p>
                                                 ))}
                                             </div>

@@ -1,7 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
-const CityCard = ({ city, currentPage }) => {
+interface CityCardProps {
+    city: string;
+    currentPage: number;
+}
+
+const CityCard: React.FC<CityCardProps> = ({ city, currentPage }) => {
     // Placeholder image path
     const defaultImagePath = '/telma/images/default.webp';
 
@@ -14,7 +19,8 @@ const CityCard = ({ city, currentPage }) => {
                         src={`/telma/images/${city}.webp`}
                         alt={city}
                         onError={(e) => {
-                            e.target.src = defaultImagePath; // Set default image if the specific image fails to load
+                            const target = e.target as HTMLImageElement;
+                            target.src = defaultImagePath; // Set default image if the specific image fails to load
                         }}
                     />
                 </figure>
@@ -27,6 +33,4 @@ const CityCard = ({ city, currentPage }) => {
 };
 
 export default CityCard;
-
-
 

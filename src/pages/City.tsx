@@ -5,16 +5,15 @@ import Footer from '../components/Footer'
 import TrainStations from '../components/TrainStations'
 import stations from '../gares.json'
 
-const City = () => {
-
-    const {city} = useParams()
+const City: React.FC = () => {
+    const { city } = useParams<{ city?: string }>()
 
   return (
     <>
     <Header />
     <div className='city'>
       <h2 className='city__name'>{city}</h2>
-      <TrainStations stations={stations[city]} />
+      <TrainStations stations={stations[city as keyof typeof stations] as Record<string, string> | undefined} />
       <Outlet />
     </div>
     <Footer />
@@ -23,3 +22,4 @@ const City = () => {
 }
 
 export default City
+

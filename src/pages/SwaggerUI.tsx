@@ -4,7 +4,7 @@ import 'swagger-ui-react/swagger-ui.css';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 
-const SwaggerUIPage = () => {
+const SwaggerUIPage: React.FC = () => {
     return (
         <>
             <Header />
@@ -21,9 +21,12 @@ const SwaggerUIPage = () => {
                         defaultModelsExpandDepth={1}
                         defaultModelExpandDepth={1}
                         persistAuthorization={true}
-                        requestInterceptor={(request) => {
+                        requestInterceptor={(request: { headers?: Record<string, string> }) => {
                             // Add API key to all requests
                             if (import.meta.env.VITE_API_KEY) {
+                                if (!request.headers) {
+                                    request.headers = {};
+                                }
                                 request.headers['Authorization'] = import.meta.env.VITE_API_KEY;
                             }
                             return request;

@@ -3,13 +3,33 @@ import { useParams, Link } from 'react-router-dom'
 import { getDepartures } from '../services/navitiaApi'
 import { parseUTCDate, getFullMinutes, calculateDelay } from './Utils'
 import Stops from './Stops'
+import type { Disruption } from '../client/models/disruption'
+import type { Departure } from '../client/models/departure'
 
-const Departures = () => {
+interface ProcessedDeparture {
+    id: string | undefined;
+    operator: string;
+    transportationMode: string | undefined;
+    trainNumber: string | undefined;
+    baseDepartureTime: Date;
+    realDepartureTime: Date;
+    destination: string;
+    disruptions: Disruption[];
+}
 
-    const { codeStation } = useParams()
-    const [nextDepartures, setNextDepartures] = useState([])
+interface DisruptionSeverityInfo {
+    tagClass: string;
+    icon: string;
+    severityText: string;
+}
+
+const Departures: React.FC = () => {
+    const { codeStation } = useParams<{ codeStation?: string }>()
+    const [nextDepartures, setNextDepartures] = useState<ProcessedDeparture[]>([])
 
     useEffect(() => {
+        if (!codeStation) return;
+        
         (async function () {
             const response = await getDepartures(codeStation)
             console.log(response)
@@ -17,35 +37,49 @@ const Departures = () => {
             // Extract disruptions from response
             const allDisruptions = response.data.disruptions || []
             
-            const nextDeparturesApi = response.data.departures.map((departure) => {
+            const nextDeparturesApi: ProcessedDeparture[] = (response.data.departures || []).map((departure: Departure) => {
                 // Find vehicle_journey link instead of assuming it's at index 1
                 const vehicleJourneyLink = departure.links?.find(link => 
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
                 );
                 const vehicleJourneyId = vehicleJourneyLink?.id || departure.links?.[1]?.id || departure.links?.[0]?.id;
 
-                // Find disruption links in display_informations
-                const disruptionLinks = departure.display_informations?.links?.filter(link => 
+                // Find disruption links in departure.links
+                const disruptionLinks = departure.links?.filter(link => 
                     link.type === 'disruption'
                 ) || []
                 
-                // Match disruptions using display_informations.links[type=disruption].id = disruptions[].id
-                const matchedDisruptions = disruptionLinks
+                // Match disruptions using departure.links[type=disruption].id = disruptions[].id
+                const matchedDisruptions: Disruption[] = disruptionLinks
                     .map(link => allDisruptions.find(disruption => 
                         disruption.id === link.id || 
                         disruption.disruption_id === link.id ||
                         disruption.disruption_uri === link.id
                     ))
-                    .filter(Boolean) // Remove undefined values
+                    .filter((d): d is Disruption => Boolean(d)) // Remove undefined values
+
+                // Handle stop_date_time - it might be a string or an object in the actual response
+                const stopDateTime = departure.stop_date_time as unknown as {
+                    base_departure_date_time?: string;
+                    departure_date_time?: string;
+                } | string | undefined;
+
+                const baseDepartureTimeStr = typeof stopDateTime === 'object' && stopDateTime?.base_departure_date_time
+                    ? stopDateTime.base_departure_date_time
+                    : typeof stopDateTime === 'string' ? stopDateTime : '';
+                
+                const realDepartureTimeStr = typeof stopDateTime === 'object' && stopDateTime?.departure_date_time
+                    ? stopDateTime.departure_date_time
+                    : typeof stopDateTime === 'string' ? stopDateTime : baseDepartureTimeStr;
 
                 return {
                     id: vehicleJourneyId,
                     operator: '',
-                    transportationMode: departure.display_informations.network,
-                    trainNumber: departure.display_informations.headsign,
-                    baseDepartureTime: parseUTCDate(departure.stop_date_time.base_departure_date_time),
-                    realDepartureTime: parseUTCDate(departure.stop_date_time.departure_date_time),
-                    destination: departure.display_informations.direction.split('(')[0],
+                    transportationMode: departure.display_informations?.network,
+                    trainNumber: departure.display_informations?.headsign,
+                    baseDepartureTime: parseUTCDate(baseDepartureTimeStr),
+                    realDepartureTime: parseUTCDate(realDepartureTimeStr),
+                    destination: departure.display_informations?.direction?.split('(')[0] || '',
                     disruptions: matchedDisruptions,
                 };
             });
@@ -53,7 +87,7 @@ const Departures = () => {
         })();
     }, [codeStation])
 
-    const [isTimeDisplayed, setIsTimeDiplayed] = useState(true)
+    const [isTimeDisplayed, setIsTimeDiplayed] = useState<boolean>(true)
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -65,12 +99,14 @@ const Departures = () => {
     }, [])
 
     // Helper function to get disruption severity styling
-    const getDisruptionSeverity = (disruption) => {
+    const getDisruptionSeverity = (disruption: Disruption): DisruptionSeverityInfo => {
         let severityText = 'unknown';
         if (typeof disruption.severity === 'string') {
             severityText = disruption.severity;
         } else if (disruption.severity && typeof disruption.severity === 'object') {
-            severityText = disruption.severity.name || disruption.severity.label || 'Perturbation';
+            severityText = (disruption.severity as { name?: string; label?: string }).name || 
+                          (disruption.severity as { name?: string; label?: string }).label || 
+                          'Perturbation';
         }
         
         const severityLevel = severityText.toLowerCase();
@@ -94,13 +130,16 @@ const Departures = () => {
     return (
         <div className='departures'>
             {nextDepartures.map((departure, index) => (
-                <div key={departure.id} className={`departure ${index % 2 ? '' : 'departure--light'}`}>
+                <div key={departure.id || index} className={`departure ${index % 2 ? '' : 'departure--light'}`}>
                     <p className='departure__operator'>{departure.operator}</p>
                     <p className='departure__train-type'>{departure.transportationMode}</p>
                     <p className='departure__train-number'>
-                        <Link to={`/train/${encodeURIComponent(departure.id)}`} className='has-text-link'>
-                            {departure.trainNumber}
-                        </Link>
+                        {departure.id && (
+                            <Link to={`/train/${encodeURIComponent(departure.id)}`} className='has-text-link'>
+                                {departure.trainNumber}
+                            </Link>
+                        )}
+                        {!departure.id && <span>{departure.trainNumber}</span>}
                     </p>
                     <p className={`departure__time ${isTimeDisplayed ? '' : 'departure__time--disappear'}`}>
                         {departure.baseDepartureTime.getHours()}h
@@ -120,7 +159,7 @@ const Departures = () => {
                                 {departure.disruptions.map((disruption, disIndex) => {
                                     const { tagClass, icon, severityText } = getDisruptionSeverity(disruption);
                                     const message = disruption.messages && disruption.messages.length > 0 
-                                        ? disruption.messages[0].text || disruption.messages[0].message 
+                                        ? disruption.messages[0].text || (disruption.messages[0] as { message?: string }).message 
                                         : disruption.message || 'Perturbation';
                                     
                                     return (
@@ -135,7 +174,7 @@ const Departures = () => {
                             </div>
                         </div>
                     )}
-                    <Stops idDeparture={departure.id} />
+                    {departure.id && <Stops idDeparture={departure.id} />}
                 </div>
             ))}
         </div>
@@ -143,3 +182,4 @@ const Departures = () => {
 }
 
 export default Departures
+

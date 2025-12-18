@@ -2,16 +2,17 @@ import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
+import type { Place } from '../client/models/place';
 
-const Places = () => {
-    const [searchQuery, setSearchQuery] = useState('');
-    const [coordQuery, setCoordQuery] = useState('');
-    const [places, setPlaces] = useState([]);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [searchType, setSearchType] = useState('text'); // 'text' or 'nearby'
+const Places: React.FC = () => {
+    const [searchQuery, setSearchQuery] = useState<string>('');
+    const [coordQuery, setCoordQuery] = useState<string>('');
+    const [places, setPlaces] = useState<Place[]>([]);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
+    const [searchType, setSearchType] = useState<'text' | 'nearby'>('text'); // 'text' or 'nearby'
 
-    const handleTextSearch = async (e) => {
+    const handleTextSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (!searchQuery.trim()) {
             setError('Veuillez entrer un terme de recherche');
@@ -33,7 +34,7 @@ const Places = () => {
         }
     };
 
-    const handleNearbySearch = async (e) => {
+    const handleNearbySearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (!coordQuery.trim()) {
             setError('Veuillez entrer des coordonnées (format: lon;lat)');
@@ -95,7 +96,7 @@ const Places = () => {
                                     id='search'
                                     type='text'
                                     value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
                                     placeholder='Ex: Paris, Gare du Nord...'
                                     className='form-input'
                                 />
@@ -112,7 +113,7 @@ const Places = () => {
                                     id='coord'
                                     type='text'
                                     value={coordQuery}
-                                    onChange={(e) => setCoordQuery(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoordQuery(e.target.value)}
                                     placeholder='Ex: 2.3522;48.8566'
                                     className='form-input'
                                 />
@@ -133,7 +134,7 @@ const Places = () => {
                         <div className='places-list'>
                             <h2>Résultats ({places.length})</h2>
                             {places.map((place, index) => (
-                                <div key={index} className='place-card'>
+                                <div key={place.id || index} className='place-card'>
                                     <h3 className='place-card__name'>{place.name || 'Sans nom'}</h3>
                                     <p className='place-card__type'>Type: {place.embedded_type || 'N/A'}</p>
                                     {place.id && (

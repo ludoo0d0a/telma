@@ -2,8 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { searchPlaces } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
 import { cleanLocationName } from './Utils';
+import type { Place } from '../client/models/place';
 
-const LocationAutocomplete = ({ 
+interface LocationAutocompleteProps {
+    label: string;
+    value?: string | null;
+    onChange: (id: string | undefined) => void;
+    placeholder?: string;
+    defaultSearchTerm?: string | null;
+    onStationFound?: ((station: Place & { name?: string | null }) => void) | null;
+    disabled?: boolean;
+}
+
+const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({ 
     label, 
     value, 
     onChange, 
@@ -12,16 +23,16 @@ const LocationAutocomplete = ({
     onStationFound = null,
     disabled = false
 }) => {
-    const [inputValue, setInputValue] = useState(value || '');
-    const [suggestions, setSuggestions] = useState([]);
-    const [isOpen, setIsOpen] = useState(false);
-    const [loading, setLoading] = useState(false);
-    const [selectedStation, setSelectedStation] = useState(null);
-    const [favoriteIds, setFavoriteIds] = useState(new Set(getFavorites().map(f => f.id)));
-    const wrapperRef = useRef(null);
-    const searchTimeoutRef = useRef(null);
-    const isUserTypingRef = useRef(false);
-    const previousValueRef = useRef(value || '');
+    const [inputValue, setInputValue] = useState<string>(value || '');
+    const [suggestions, setSuggestions] = useState<Place[]>([]);
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [selectedStation, setSelectedStation] = useState<Place | null>(null);
+    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set(getFavorites().map(f => f.id)));
+    const wrapperRef = useRef<HTMLDivElement>(null);
+    const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const isUserTypingRef = useRef<boolean>(false);
+    const previousValueRef = useRef<string>(value || '');
 
     // Search for default station on mount if defaultSearchTerm is provided
     useEffect(() => {
@@ -45,7 +56,7 @@ const LocationAutocomplete = ({
                             const sortedStations = sortFavoritesFirst(stations);
                             const firstStation = sortedStations[0];
                             const cleanedName = cleanLocationName(firstStation.name);
-                            setInputValue(cleanedName);
+                            setInputValue(cleanedName || '');
                             setSelectedStation(firstStation);
                             onChange(firstStation.id);
                             if (onStationFound) {
@@ -63,7 +74,7 @@ const LocationAutocomplete = ({
             };
             performDefaultSearch();
         }
-    }, [defaultSearchTerm]);
+    }, [defaultSearchTerm, selectedStation, onChange, onStationFound]);
 
     // Update input value when value prop changes externally (not from user typing)
     useEffect(() => {
@@ -88,8 +99,8 @@ const LocationAutocomplete = ({
 
     // Close dropdown when clicking outside
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsOpen(false);
             }
         };
@@ -100,7 +111,7 @@ const LocationAutocomplete = ({
         };
     }, []);
 
-    const searchStation = async (searchTerm, autoSelect = false) => {
+    const searchStation = async (searchTerm: string, autoSelect: boolean = false): Promise<void> => {
         if (!searchTerm || searchTerm.length < 2) {
             setSuggestions([]);
             setIsOpen(false);
@@ -134,7 +145,7 @@ const LocationAutocomplete = ({
         }
     };
 
-    const handleInputChange = (e) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const newValue = e.target.value;
         isUserTypingRef.current = true;
         setInputValue(newValue);
@@ -158,10 +169,10 @@ const LocationAutocomplete = ({
         }, 300);
     };
 
-    const handleSelectStation = (station) => {
+    const handleSelectStation = (station: Place): void => {
         isUserTypingRef.current = false; // User selected, not typing anymore
         const cleanedName = cleanLocationName(station.name);
-        setInputValue(cleanedName);
+        setInputValue(cleanedName || '');
         setSelectedStation(station);
         setIsOpen(false);
         onChange(station.id);
@@ -170,15 +181,17 @@ const LocationAutocomplete = ({
         }
     };
 
-    const handleToggleFavorite = (e, station) => {
+    const handleToggleFavorite = (e: React.MouseEvent, station: Place): void => {
         e.stopPropagation(); // Prevent selecting the station when clicking star
         const stationId = station.id;
+        if (!stationId) return;
+        
         const isFav = isFavorite(stationId);
         
         if (isFav) {
             removeFavorite(stationId);
         } else {
-            addFavorite(stationId, station.name, station.embedded_type);
+            addFavorite(stationId, station.name || '', station.embedded_type || '');
         }
         
         // Update favoriteIds state
@@ -189,7 +202,7 @@ const LocationAutocomplete = ({
         setSuggestions(sortedStations);
     };
 
-    const handleInputFocus = () => {
+    const handleInputFocus = (): void => {
         if (suggestions.length > 0) {
             setIsOpen(true);
         }
@@ -224,7 +237,7 @@ const LocationAutocomplete = ({
                     <div className='dropdown-menu' style={{ width: '100%' }}>
                         <div className='dropdown-content' style={{ maxHeight: '200px', overflowY: 'auto' }}>
                             {suggestions.map((station, index) => {
-                                const isFav = isFavorite(station.id);
+                                const isFav = station.id ? isFavorite(station.id) : false;
                                 return (
                                     <a
                                         key={station.id || index}

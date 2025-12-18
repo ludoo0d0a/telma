@@ -2,14 +2,15 @@ import React, { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getCommercialModes } from '../services/navitiaApi';
+import type { CommercialMode } from '../client/models/commercial-mode';
 
-const CommercialModes = () => {
-    const [modes, setModes] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+const CommercialModes: React.FC = () => {
+    const [modes, setModes] = useState<CommercialMode[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchModes = async () => {
+        const fetchModes = async (): Promise<void> => {
             try {
                 setLoading(true);
                 const response = await getCommercialModes();

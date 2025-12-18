@@ -11,10 +11,12 @@ import { NavitiaClient } from '../client/client';
 import type { AxiosPromise } from 'axios';
 import type {
     Journey,
+    JourneyItem,
     CommercialModesResponse,
     DeparturesResponse,
     ArrivalsResponse,
     CoverageResponse,
+    Coverage,
     PhysicalModesResponse,
     LinesResponse,
     StopAreasResponse,
@@ -24,7 +26,15 @@ import type {
     TerminusSchedulesResponse,
     VehicleJourneysResponse,
     DatasetsResponse,
-    ContributorsResponse
+    ContributorsResponse,
+    CoverageCoverageTrafficReportsGet200Response,
+    CoverageCoverageLineReportsGet200Response,
+    CoverageCoverageEquipmentReportsGet200Response,
+    CoverageCoverageRoutesGet200Response,
+    CoverageCoverageStopPointsGet200Response,
+    CoverageCoverageNetworksGet200Response,
+    CoverageCoverageIsochronesGet200Response,
+    CoverageCoverageCoordCoordFreefloatingsGet200Response
 } from '../client/models';
 import type {
     CoverageCoveragePlacesGetTypeEnum,
@@ -68,6 +78,66 @@ interface PlacesParams {
     count?: number;
     type?: string | string[];
     depth?: number;
+}
+
+interface LinesParams {
+    count?: number;
+    depth?: number;
+    [key: string]: unknown;
+}
+
+interface StopAreasParams {
+    count?: number;
+    depth?: number;
+    [key: string]: unknown;
+}
+
+interface StopSchedulesParams {
+    from_datetime?: string;
+    [key: string]: unknown;
+}
+
+interface RouteSchedulesParams {
+    from_datetime?: string;
+    [key: string]: unknown;
+}
+
+interface TerminusSchedulesParams {
+    stop_area_id?: string;
+    from_datetime?: string;
+    [key: string]: unknown;
+}
+
+interface LineReportsParams {
+    filter?: string;
+    [key: string]: unknown;
+}
+
+interface TrafficReportsParams {
+    [key: string]: unknown;
+}
+
+interface EquipmentReportsParams {
+    filter?: string;
+    [key: string]: unknown;
+}
+
+interface RoutesParams {
+    count?: number;
+    depth?: number;
+    [key: string]: unknown;
+}
+
+interface StopPointsParams {
+    count?: number;
+    depth?: number;
+    [key: string]: unknown;
+}
+
+interface NetworksParams {
+    count?: number;
+    depth?: number;
+    [key: string]: unknown;
 }
 
 interface PlacesNearbyParams {
@@ -158,7 +228,7 @@ export const getCoverage = getCoverages;
 /**
  * Get specific coverage area details
  */
-export const getCoverageDetails = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<any> =>
+export const getCoverageDetails = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<CoverageResponse> =>
     getClient().coverage.coverageCoverageGet(coverage);
 
 /**
@@ -170,13 +240,13 @@ export const getPhysicalModes = (coverage: string = DEFAULT_COVERAGE): AxiosProm
 /**
  * Get all lines
  */
-export const getLines = (coverage: string = DEFAULT_COVERAGE, params: any = {}): AxiosPromise<LinesResponse> =>
+export const getLines = (coverage: string = DEFAULT_COVERAGE, params: LinesParams = {}): AxiosPromise<LinesResponse> =>
     getClient().publicTransportObjects.coverageCoverageLinesGet(coverage);
 
 /**
  * Get all stop areas
  */
-export const getStopAreas = (coverage: string = DEFAULT_COVERAGE, params: any = {}): AxiosPromise<StopAreasResponse> =>
+export const getStopAreas = (coverage: string = DEFAULT_COVERAGE, params: StopAreasParams = {}): AxiosPromise<StopAreasResponse> =>
     getClient().publicTransportObjects.coverageCoverageStopAreasGet(coverage);
 
 /**
@@ -280,7 +350,7 @@ export const getStopSchedules = (
     filterOrStopPointId: string,
     fromDatetimeOrCoverage: string = DEFAULT_COVERAGE,
     coverageOrParams: string | null = null,
-    params: any = {}
+    params: StopSchedulesParams = {}
 ): AxiosPromise<StopSchedulesResponse> => {
     if (filterOrStopPointId.includes('=') || filterOrStopPointId.startsWith('stop_area') || filterOrStopPointId.startsWith('stop_point')) {
         return getClient().schedules.coverageCoverageStopSchedulesGet(
@@ -304,7 +374,7 @@ export const getRouteSchedules = (
     filterOrRouteId: string,
     fromDatetimeOrCoverage: string = DEFAULT_COVERAGE,
     coverageOrParams: string | null = null,
-    params: any = {}
+    params: RouteSchedulesParams = {}
 ): AxiosPromise<RouteSchedulesResponse> => {
     if (filterOrRouteId.includes('=') || filterOrRouteId.startsWith('line') || filterOrRouteId.startsWith('route')) {
         return getClient().schedules.coverageCoverageRouteSchedulesGet(
@@ -329,7 +399,7 @@ export const getTerminusSchedules = (
     stopAreaIdOrFromDatetime: string | null = null,
     fromDatetimeOrCoverage: string = DEFAULT_COVERAGE,
     coverageOrParams: string | null = null,
-    params: any = {}
+    params: TerminusSchedulesParams = {}
 ): AxiosPromise<TerminusSchedulesResponse> => {
     if (filterOrLineId.includes('=')) {
         return getClient().schedules.coverageCoverageTerminusSchedulesGet(
@@ -356,7 +426,7 @@ export const getIsochrones = (
     datetime: string | null = null,
     coverage: string = DEFAULT_COVERAGE,
     params: IsochronesParams = {}
-): AxiosPromise<any> =>
+): AxiosPromise<CoverageCoverageIsochronesGet200Response> =>
     getClient().isochrones.coverageCoverageIsochronesGet(
         coverage,
         from,
@@ -369,8 +439,8 @@ export const getIsochrones = (
 export const getLineReports = (
     filterOrLineId: string,
     coverageOrParams: string = DEFAULT_COVERAGE,
-    params: any = {}
-): AxiosPromise<any> => {
+    params: LineReportsParams = {}
+): AxiosPromise<CoverageCoverageLineReportsGet200Response> => {
     if (filterOrLineId.includes('=')) {
         return getClient().reports.coverageCoverageLineReportsGet(coverageOrParams, filterOrLineId);
     } else {
@@ -381,7 +451,7 @@ export const getLineReports = (
 /**
  * Get traffic reports
  */
-export const getTrafficReports = (coverage: string = DEFAULT_COVERAGE, params: any = {}): AxiosPromise<any> =>
+export const getTrafficReports = (coverage: string = DEFAULT_COVERAGE, params: TrafficReportsParams = {}): AxiosPromise<CoverageCoverageTrafficReportsGet200Response> =>
     getClient().reports.coverageCoverageTrafficReportsGet(coverage);
 
 /**
@@ -390,8 +460,8 @@ export const getTrafficReports = (coverage: string = DEFAULT_COVERAGE, params: a
 export const getEquipmentReports = (
     coverage: string = DEFAULT_COVERAGE,
     filter: string | null = null,
-    params: any = {}
-): AxiosPromise<any> =>
+    params: EquipmentReportsParams = {}
+): AxiosPromise<CoverageCoverageEquipmentReportsGet200Response> =>
     getClient().reports.coverageCoverageEquipmentReportsGet(
         coverage,
         filter || undefined
@@ -447,19 +517,19 @@ export const invertedGeocoding = (
 /**
  * Get routes
  */
-export const getRoutes = (coverage: string = DEFAULT_COVERAGE, params: any = {}): AxiosPromise<any> =>
+export const getRoutes = (coverage: string = DEFAULT_COVERAGE, params: RoutesParams = {}): AxiosPromise<CoverageCoverageRoutesGet200Response> =>
     getClient().publicTransportObjects.coverageCoverageRoutesGet(coverage);
 
 /**
  * Get stop points
  */
-export const getStopPoints = (coverage: string = DEFAULT_COVERAGE, params: any = {}): AxiosPromise<any> =>
+export const getStopPoints = (coverage: string = DEFAULT_COVERAGE, params: StopPointsParams = {}): AxiosPromise<CoverageCoverageStopPointsGet200Response> =>
     getClient().publicTransportObjects.coverageCoverageStopPointsGet(coverage);
 
 /**
  * Get networks
  */
-export const getNetworks = (coverage: string = DEFAULT_COVERAGE, params: any = {}): AxiosPromise<any> =>
+export const getNetworks = (coverage: string = DEFAULT_COVERAGE, params: NetworksParams = {}): AxiosPromise<CoverageCoverageNetworksGet200Response> =>
     getClient().publicTransportObjects.coverageCoverageNetworksGet(coverage);
 
 /**
@@ -470,7 +540,7 @@ export const getFreefloatingsNearby = (
     lon: number,
     coverage: string = DEFAULT_COVERAGE,
     distance: number = 200
-): AxiosPromise<any> => {
+): AxiosPromise<CoverageCoverageCoordCoordFreefloatingsGet200Response> => {
     const coord = `${lon};${lat}`;
     return getClient().places.coverageCoverageCoordCoordFreefloatingsGet(coverage, coord, distance);
 };

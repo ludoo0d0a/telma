@@ -2,15 +2,20 @@ import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/navitiaApi';
+import type { 
+    CoverageCoverageLineReportsGet200Response,
+    CoverageCoverageTrafficReportsGet200Response,
+    CoverageCoverageEquipmentReportsGet200Response
+} from '../client/models';
 
-const Reports = () => {
-    const [reportType, setReportType] = useState('traffic'); // 'line', 'traffic', 'equipment'
-    const [filter, setFilter] = useState('');
-    const [reports, setReports] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+const Reports: React.FC = () => {
+    const [reportType, setReportType] = useState<'line' | 'traffic' | 'equipment'>('traffic'); // 'line', 'traffic', 'equipment'
+    const [filter, setFilter] = useState<string>('');
+    const [reports, setReports] = useState<CoverageCoverageLineReportsGet200Response | CoverageCoverageTrafficReportsGet200Response | CoverageCoverageEquipmentReportsGet200Response | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [error, setError] = useState<string | null>(null);
 
-    const handleSearch = async (e) => {
+    const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
         if (reportType === 'line' && !filter.trim()) {
             setError('Veuillez entrer un filtre pour les rapports de ligne');
@@ -20,8 +25,6 @@ const Reports = () => {
         try {
             setLoading(true);
             setError(null);
-            let data;
-
             let response;
             switch (reportType) {
                 case 'line':
@@ -99,7 +102,7 @@ const Reports = () => {
                                     id='filter'
                                     type='text'
                                     value={filter}
-                                    onChange={(e) => setFilter(e.target.value)}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
                                     placeholder='Ex: line.id=line:SNCF:1'
                                     className='form-input'
                                 />
