@@ -16,7 +16,7 @@ export default defineConfig({
       workbox: {
         maximumFileSizeToCacheInBytes: 3000000
       },
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'pwa-maskable-512x512.png'],
+      includeAssets: ['favicons/favicon.ico', 'favicons/apple-touch-icon.png', 'favicons/pwa-maskable-512x512.png'],
       manifest: {
         name: 'SNCF API Explorer',
         short_name: 'SNCF API',
@@ -24,17 +24,17 @@ export default defineConfig({
         theme_color: '#ffffff',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'favicons/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'favicons/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: 'pwa-maskable-512x512.png',
+            src: 'favicons/pwa-maskable-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',

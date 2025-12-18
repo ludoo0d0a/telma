@@ -107,8 +107,11 @@ npm run vercel-build
 ```
 api-sncf/
 ├── public/              # Static assets and OpenAPI specification
+│   ├── favicons/       # PWA favicons and icons
 │   ├── images/         # Station images
 │   └── openapi.json    # API documentation
+├── scripts/            # Build and utility scripts
+│   └── generate-favicons.js  # Favicon generation script
 ├── src/
 │   ├── components/     # Reusable React components
 │   │   ├── Arrivals.jsx
@@ -128,6 +131,35 @@ api-sncf/
 │   └── styles/         # SCSS stylesheets
 └── package.json
 ```
+
+## 🎨 Favicons
+
+The project includes a comprehensive set of PWA favicons and icons located in `public/favicons/`. All favicon references in the application point to the `/favicons/` directory.
+
+### Generating Favicons
+
+To regenerate PWA icons from source files, use the provided npm script:
+
+```bash
+npm run generate-favicons
+```
+
+This script generates the following icons from source files:
+- `pwa-192x192.png` - PWA icon (192x192)
+- `pwa-512x512.png` - PWA icon (512x512)
+- `pwa-maskable-512x512.png` - PWA maskable icon with safe zone (512x512)
+- `favicon-196.png` - Standard favicon (196x196)
+
+The script uses the source icons (`android-chrome-192.png` and `android-chrome-512.png`) to generate all required PWA icons.
+
+### Favicon Sources
+
+The original favicons were created using the [Random Favicon Generator](https://toolcool.org/random-favicon-generator/) tool:
+
+- [Arrow Right Circle Icon](https://toolcool.org/random-favicon-generator/?icon=arrow-right-circle&category=Arrows&stroke-width=2.21&stroke-color=27-61-147-1&has-stroke=true&fill-color=80-111-113-1&has-fill=false&bg-color=117-227-184-1&bg-type=3&rotation=0.00&scale=1.02&sharpness=0.00&smoothness=1.00)
+- [Hexagons Icon](https://toolcool.org/random-favicon-generator/?icon=hexagons&category=Shapes&stroke-width=2.21&stroke-color=27-61-147-1&has-stroke=true&fill-color=80-111-113-1&has-fill=false&bg-color=117-227-184-1&bg-type=3&rotation=0.00&scale=1.02&sharpness=0.00&smoothness=1.00)
+
+The tool provides over 1950 MIT-licensed, free Tabler icons that can be customized with colors, stroke width, and other styling properties.
 
 ## 🔑 API Configuration
 

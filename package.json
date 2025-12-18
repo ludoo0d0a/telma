@@ -30,7 +30,8 @@
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "test": "vitest",
-    "generate-client": "npx @openapitools/openapi-generator-cli generate -i public/openapi.json -g typescript-axios -o src/client --additional-properties=supportsES6=true,withInterfaces=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api"
+    "generate-client": "npx @openapitools/openapi-generator-cli generate -i public/openapi.json -g typescript-axios -o src/client --additional-properties=supportsES6=true,withInterfaces=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api",
+    "generate-favicons": "node scripts/generate-favicons.js"
   },
   "eslintConfig": {
     "extends": [
@@ -59,6 +60,7 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "pwa-asset-generator": "^8.1.2",
+    "sharp": "^0.34.5",
     "typescript": "^5.9.3",
     "vite": "^7.3.0",
     "vite-plugin-pwa": "^1.2.0",
