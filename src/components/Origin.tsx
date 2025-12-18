@@ -46,7 +46,7 @@ const Origin: React.FC<OriginProps> = ({ idArrival}) => {
             {stops.map((stop, index) => (
                 <li className='stops__station' key={`${stop}-${index}`}>
                     {stop}
-                    <img src='../images/yellow.jpg' alt='yellow point' style={{
+                    <img src='https://via.placeholder.com/10x10/FFD700/FFD700.png' alt='yellow point' style={{
                         display: `${index === stops.length - 1 ? 'none' : 'inline'}`
                     }}/>
                 </li>

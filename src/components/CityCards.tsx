@@ -19,13 +19,13 @@ const CityCards: React.FC<CityCardsProps> = ({ searchTerm, itemsToShow }) => {
     const visibleCities: string[] = filteredCities.slice(0, itemsToShow);
 
     return (
-        <div className='columns is-multiline is-mobile'>
+        <ul className='city-list'>
             {visibleCities.map((city: string) => (
-                <div key={city} className='column is-6-mobile is-4-tablet is-3-desktop'>
+                <li key={city}>
                     <CityCard city={city} />
-                </div>
+                </li>
             ))}
-        </div>
+        </ul>
     );
 };
 
