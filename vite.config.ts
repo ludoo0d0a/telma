@@ -3,11 +3,31 @@ import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
+import type { Plugin } from 'vite';
+
+// Plugin to rewrite absolute paths in HTML for base URL
+function rewriteHtmlBase(): Plugin {
+  return {
+    name: 'rewrite-html-base',
+    transformIndexHtml(html) {
+      const base = process.env.PUBLIC_URL || '/';
+      if (base !== '/') {
+        // Rewrite absolute paths for favicons and other assets
+        return html.replace(
+          /href="\/(favicons\/[^"]+)"/g,
+          `href="${base}$1"`
+        );
+      }
+      return html;
+    },
+  };
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    rewriteHtmlBase(),
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {

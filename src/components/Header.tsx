@@ -12,7 +12,7 @@ const Header: React.FC = () => {
                 </div>
                 <div className='navbar-item'>
                     <img 
-                        src="/favicons/favicon.svg" 
+                        src={`${import.meta.env.BASE_URL}favicons/favicon.svg`}
                         alt="Logo" 
                         style={{ height: '100px', width: '120px' }}
                     />
