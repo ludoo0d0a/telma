@@ -1,0 +1,14 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle with better contrast -->
+  <circle cx="256" cy="256" r="240" fill="#4f46e5"/>
+  
+  <!-- Train arrow icon centered - maximized to fill the circle -->
+  <g transform="translate(56, 96)">
+    <!-- Big white arrow left to right - much larger -->
+    <path d="M 0 120 L 300 120 L 300 60 L 400 160 L 300 260 L 300 200 L 0 200 Z" fill="#ffffff"/>
+    
+    <!-- Two circles under the base of the arrow - larger -->
+    <circle cx="60" cy="280" r="50" fill="#10b981"/>
+    <circle cx="240" cy="280" r="50" fill="#10b981"/>
+  </g>
+</svg>

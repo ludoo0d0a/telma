@@ -1,0 +1,16 @@
+<svg width="200" height="60" viewBox="0 0 200 60" xmlns="http://www.w3.org/2000/svg">
+  <!-- Train arrow icon -->
+  <g transform="translate(5, 10)">
+    <!-- Big white arrow left to right -->
+    <path d="M 0 8 L 30 8 L 30 4 L 38 12 L 30 20 L 30 16 L 0 16 Z" fill="#ffffff"/>
+    
+    <!-- Two circles under the base of the arrow -->
+    <circle cx="8" cy="24" r="5" fill="#10b981"/>
+    <circle cx="22" cy="24" r="5" fill="#10b981"/>
+  </g>
+  
+  <!-- Telma text -->
+  <text x="45" y="38" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="700" fill="#1e293b">
+    telma
+  </text>
+</svg>

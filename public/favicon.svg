@@ -1,0 +1,14 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background with better contrast -->
+  <rect width="32" height="32" rx="6" fill="#4f46e5"/>
+  
+  <!-- Minimal train icon -->
+  <g transform="translate(2, 6)">
+    <!-- Big white arrow left to right -->
+    <path d="M 0 5 L 18 5 L 18 2 L 22 6 L 18 10 L 18 7 L 0 7 Z" fill="#ffffff"/>
+    
+    <!-- Two circles under the base of the arrow -->
+    <circle cx="4" cy="16" r="3" fill="#10b981"/>
+    <circle cx="14" cy="16" r="3" fill="#10b981"/>
+  </g>
+</svg>
