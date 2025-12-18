@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { searchPlaces } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
-import { cleanLocationName } from './Utils';
+import { cleanLocationName } from '../services/locationService';
 import type { Place } from '../client/models/place';
 
 interface LocationAutocompleteProps {

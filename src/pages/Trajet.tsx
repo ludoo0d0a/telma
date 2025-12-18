@@ -4,7 +4,11 @@ import Footer from '../components/Footer';
 import Header from '../components/Header';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
-import { parseUTCDate, cleanLocationName, getTransportIcon, formatTime, formatDate, getDelay, getMaxDelay, getJourneyInfo, type JourneyInfo } from '../components/Utils';
+import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
+import { cleanLocationName } from '../services/locationService';
+import { getDelay, getMaxDelay } from '../services/delayService';
+import { getJourneyInfo, type JourneyInfo } from '../services/journeyService';
+import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '../services/disruptionService';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { Disruption } from '../client/models/disruption';
 import type { Section } from '../client/models/section';
@@ -322,16 +326,37 @@ const Trajet: React.FC = () => {
                         isMatch = true;
                     }
                     
-                    // Match by trip ID
-                    if (ptObject.embedded_type === 'trip') {
-                        sections.forEach((section: Section) => {
-                            if (section.type === 'public_transport') {
-                                const sectionTripId = section.trip?.id || (section.vehicle_journey && typeof section.vehicle_journey === 'object' && 'trip' in section.vehicle_journey ? (section.vehicle_journey as { trip?: { id?: string } }).trip?.id : undefined);
-                                if (sectionTripId && ptObject.id === sectionTripId) {
-                                    isMatch = true;
-                                }
+                    // Match by trip ID using pt_object.trip (using shared function)
+                    sections.forEach((section: Section) => {
+                        if (section.type === 'public_transport') {
+                            const sectionTripId = section.trip?.id || (section.vehicle_journey && typeof section.vehicle_journey === 'object' && 'trip' in section.vehicle_journey ? (section.vehicle_journey as { trip?: { id?: string } }).trip?.id : undefined);
+                            if (sectionTripId && doesDisruptionMatchSectionByTrip(disruption, sectionTripId)) {
+                                isMatch = true;
                             }
-                        });
+                        }
+                    });
+                    
+                    // Match by stop_point ID (using shared function)
+                    const stopPointIds: string[] = [];
+                    sections.forEach((section: Section) => {
+                        if (section.type === 'public_transport') {
+                            // Collect all stop point IDs from this section
+                            const fromStopId = section.from?.stop_point?.id || section.from?.stop_area?.id;
+                            const toStopId = section.to?.stop_point?.id || section.to?.stop_area?.id;
+                            if (fromStopId) stopPointIds.push(fromStopId);
+                            if (toStopId) stopPointIds.push(toStopId);
+                            
+                            // Collect intermediate stops
+                            if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
+                                section.stop_date_times.forEach((stopTime) => {
+                                    const intermediateStopId = stopTime.stop_point?.id || stopTime.stop_area?.id;
+                                    if (intermediateStopId) stopPointIds.push(intermediateStopId);
+                                });
+                            }
+                        }
+                    });
+                    if (stopPointIds.length > 0 && doesDisruptionMatchSectionByStopPoint(disruption, stopPointIds)) {
+                        isMatch = true;
                     }
                     
                     // Match by route ID

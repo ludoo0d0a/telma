@@ -1,6 +1,6 @@
 import React, { useEffect, useState} from 'react'
 import axios from 'axios'
-import { cleanLocationName } from './Utils'
+import { cleanLocationName } from '../services/locationService'
 
 interface StopsProps {
     idDeparture: string | undefined;

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import React, { useEffect, useState } from 'react'
-import { cleanLocationName } from './Utils'
+import { cleanLocationName } from '../services/locationService'
 
 interface OriginProps {
     idArrival: string | undefined;

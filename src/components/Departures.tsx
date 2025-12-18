@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getDepartures } from '../services/navitiaApi'
-import { parseUTCDate, getFullMinutes, calculateDelay } from './Utils'
+import { parseUTCDate, getFullMinutes } from './Utils'
+import { calculateDelay } from '../services/delayService'
+import { matchDisruptionsForDepartureArrival } from '../services/disruptionService'
 import Stops from './Stops'
 import type { Disruption } from '../client/models/disruption'
 import type { Departure } from '../client/models/departure'
@@ -49,14 +51,20 @@ const Departures: React.FC = () => {
                     link.type === 'disruption'
                 ) || []
                 
-                // Match disruptions using departure.links[type=disruption].id = disruptions[].id
-                const matchedDisruptions: Disruption[] = disruptionLinks
-                    .map(link => allDisruptions.find(disruption => 
-                        disruption.id === link.id || 
-                        disruption.disruption_id === link.id ||
-                        disruption.disruption_uri === link.id
-                    ))
-                    .filter((d): d is Disruption => Boolean(d)) // Remove undefined values
+                // Get trip ID and stop point ID
+                const tripLink = departure.links?.find(link => 
+                    link.type === 'trip' || link.id?.includes('trip')
+                );
+                const tripId = tripLink?.id;
+                const departureStopPointId = departure.stop_point?.id;
+                
+                // Match disruptions using shared function
+                const matchedDisruptions = matchDisruptionsForDepartureArrival(
+                    allDisruptions,
+                    disruptionLinks,
+                    tripId,
+                    departureStopPointId
+                );
 
                 // Handle stop_date_time - it might be a string or an object in the actual response
                 const stopDateTime = departure.stop_date_time as unknown as {
