@@ -1,7 +1,11 @@
-import React from 'react';
-import Navbar from './Navbar';
+import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
+import { Player } from '@lottiefiles/react-lottie-player';
+import animation from '../95504-bullet-train.json';
 
 const Header = () => {
+    const [isActive, setIsActive] = useState(false);
+
     return (
         <nav className='navbar is-primary' role='navigation' aria-label='main navigation'>
             <div className='navbar-brand'>
