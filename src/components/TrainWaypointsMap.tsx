@@ -120,14 +120,27 @@ const TrainWaypointsMap: React.FC<TrainWaypointsMapProps> = ({ waypoints }) => {
                         <div
                             style={{
                                 backgroundColor: '#3273dc',
-                                width: 20,
-                                height: 20,
+                                width: 32,
+                                height: 32,
                                 borderRadius: '50%',
                                 border: '2px solid white',
                                 cursor: 'pointer',
-                                boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}
-                        />
+                        >
+                            <svg 
+                                width="18" 
+                                height="18" 
+                                viewBox="0 0 24 24" 
+                                fill="white" 
+                                xmlns="http://www.w3.org/2000/svg"
+                            >
+                                <path d="M12 2c-4 0-8 .5-8 4v9.5c0 .95.38 1.81 1 2.44L3 22h3l.5-2h11l.5 2h3l-2-4.06c.62-.63 1-1.49 1-2.44V6c0-3.5-3.58-4-8-4zM5.5 16c-.83 0-1.5-.67-1.5-1.5S4.67 13 5.5 13s1.5.67 1.5 1.5S6.33 16 5.5 16zm13 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5H4V6h16v5z"/>
+                            </svg>
+                        </div>
                     </Marker>
                 ))}
                 {selectedMarker !== null && waypoints && waypoints[selectedMarker] && (

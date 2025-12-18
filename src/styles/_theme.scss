@@ -126,24 +126,40 @@
   
   tbody {
     tr {
-      background: rgba(30, 41, 59, 0.3);
+      // Default row background for better contrast against dark blue background
+      background: rgba(30, 41, 59, 0.75);
       transition: all 0.2s ease;
       
       &:hover {
-        background: rgba(99, 102, 241, 0.1);
+        background: rgba(99, 102, 241, 0.25);
       }
       
       td {
         color: var(--text-primary);
-        border-color: rgba(99, 102, 241, 0.1);
+        border-color: rgba(99, 102, 241, 0.15);
         padding: 0.5rem 0.25rem;
         font-size: 0.85rem;
       }
     }
   }
   
+  // Striped table: alternating row colors for better readability
+  &.is-striped tbody tr:nth-child(odd) {
+    // Odd rows: darker background
+    background: rgba(30, 41, 59, 0.75);
+    
+    &:hover {
+      background: rgba(99, 102, 241, 0.25);
+    }
+  }
+  
   &.is-striped tbody tr:nth-child(even) {
-    background: rgba(30, 41, 59, 0.2);
+    // Even rows: slightly lighter background for clear distinction
+    background: rgba(51, 65, 85, 0.7);
+    
+    &:hover {
+      background: rgba(99, 102, 241, 0.25);
+    }
   }
 }
 

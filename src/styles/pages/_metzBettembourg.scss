@@ -92,17 +92,23 @@
     grid-template-columns: 100px 150px 200px 200px 120px 80px;
     gap: 1rem;
     padding: 1.25rem 1rem;
-    background: rgba(255, 255, 255, 0.08);
+    // Improved contrast: darker background for better visibility
+    background: rgba(30, 41, 59, 0.75);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     border-radius: 12px;
     margin-bottom: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
     transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
 
+    // Even rows: slightly different background for better distinction
+    &:nth-child(even) {
+        background: rgba(51, 65, 85, 0.7);
+    }
+
     &:hover {
-        background: rgba(255, 255, 255, 0.15);
+        background: rgba(99, 102, 241, 0.3);
         transform: translateX(8px) translateY(-2px);
         box-shadow: 0 8px 25px rgba(0, 158, 255, 0.3);
         border-color: rgba(0, 158, 255, 0.5);
@@ -117,7 +123,7 @@
         align-items: center;
         justify-content: center;
         font-family: 'Roboto Mono', monospace;
-        color: #ccc;
+        color: var(--text-primary);
         font-size: 0.85rem;
     }
 
@@ -143,7 +149,7 @@
         }
 
         .train-network {
-            color: rgba(204, 204, 204, 0.8);
+            color: var(--text-secondary);
             font-size: 0.8rem;
             font-style: italic;
         }
@@ -165,7 +171,7 @@
 
         .time-base {
             font-family: 'Roboto Mono', monospace;
-            color: rgba(204, 204, 204, 0.9);
+            color: var(--text-primary);
             font-size: 1.1rem;
             font-weight: 600;
         }
@@ -186,7 +192,7 @@
 
         .delay {
             font-size: 0.85rem;
-            color: #ccc;
+            color: var(--text-secondary);
 
             &--late {
                 color: #ff4444;
@@ -206,7 +212,7 @@
         align-items: center;
         justify-content: center;
         font-family: 'Roboto Mono', monospace;
-        color: #ccc;
+        color: var(--text-primary);
         font-size: 0.9rem;
     }
 }
@@ -251,7 +257,7 @@
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.15);
     margin-top: 2rem;
-    color: #ccc;
+    color: var(--text-secondary);
     width: 100%;
     max-width: 800px;
 
@@ -289,7 +295,7 @@
         ul {
             list-style: disc;
             margin: 1rem 0 1rem 2rem;
-            color: #ccc;
+            color: var(--text-secondary);
 
             li {
                 margin: 0.5rem 0;

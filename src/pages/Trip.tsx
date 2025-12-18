@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
@@ -58,8 +58,7 @@ const Trip: React.FC = () => {
     const [error, setError] = useState<string | null>(null);
     const [vehicleJourneyId, setVehicleJourneyId] = useState<string | null>(null);
 
-    useEffect(() => {
-        const loadTripData = async (): Promise<void> => {
+    const loadTripData = useCallback(async (forceRefresh: boolean = false): Promise<void> => {
             try {
                 setLoading(true);
                 setError(null);
@@ -71,12 +70,15 @@ const Trip: React.FC = () => {
                     return;
                 }
                 
-                const storedData = sessionStorage.getItem(`trip_${tripId}`);
-                if (storedData) {
-                    const data = JSON.parse(storedData) as TripData;
-                    setTripData(data);
-                    setLoading(false);
-                    return;
+                // Skip cache if force refresh
+                if (!forceRefresh) {
+                    const storedData = sessionStorage.getItem(`trip_${tripId}`);
+                    if (storedData) {
+                        const data = JSON.parse(storedData) as TripData;
+                        setTripData(data);
+                        setLoading(false);
+                        return;
+                    }
                 }
 
                 // If not in sessionStorage, try to decode tripId and fetch from API
@@ -117,7 +119,7 @@ const Trip: React.FC = () => {
 
                     // If we found a vehicle journey ID, try to fetch it
                     if (extractedVehicleJourneyId) {
-                        const response = await getVehicleJourney(vehicleJourneyId, 'sncf');
+                        const response = await getVehicleJourney(extractedVehicleJourneyId, 'sncf');
                         const vehicleJourneyData = response.data;
                         
                         if (vehicleJourneyData.vehicle_journeys && vehicleJourneyData.vehicle_journeys.length > 0) {
@@ -219,10 +221,11 @@ const Trip: React.FC = () => {
             } finally {
                 setLoading(false);
             }
-        };
-
-        loadTripData();
     }, [tripId]);
+
+    useEffect(() => {
+        loadTripData();
+    }, [loadTripData]);
 
     // Compute derived data - must be called before any early returns to maintain hook order
     const sections = tripData?.journey?.sections || [];
@@ -361,18 +364,23 @@ const Trip: React.FC = () => {
                     <div className='level mb-5'>
                         <div className='level-left'>
                             <div className='level-item'>
-                                <button 
-                                    className='button is-light mr-3' 
-                                    onClick={() => navigate(-1)}
-                                >
-                                    <span className='icon'>
-                                        <i className='fas fa-arrow-left'></i>
-                                    </span>
-                                    <span>Retour</span>
-                                </button>
                                 <h1 className='title is-2'>
                                     Détails du trajet
                                 </h1>
+                            </div>
+                        </div>
+                        <div className='level-right'>
+                            <div className='level-item'>
+                                <button 
+                                    className='button is-light' 
+                                    onClick={() => loadTripData(true)}
+                                    disabled={loading}
+                                >
+                                    <span className='icon'>
+                                        <i className={`fas fa-sync-alt ${loading ? 'fa-spin' : ''}`}></i>
+                                    </span>
+                                    <span>Actualiser</span>
+                                </button>
                             </div>
                         </div>
                     </div>
