@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { getArrivals } from '../services/navitiaApi'
+import { extractVehicleJourneyId } from '../services/vehicleJourneyService'
 import Origin from './Origin'
 import { getFullMinutes, parseUTCDate } from './Utils'
 import { calculateDelay } from '../services/delayService'
@@ -43,7 +44,9 @@ const Arrivals: React.FC = () => {
                 const vehicleJourneyLink = arrival.links?.find(link => 
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
                 );
-                const vehicleJourneyId = vehicleJourneyLink?.id || arrival.links?.[1]?.id || arrival.links?.[0]?.id;
+                // Extract the ID properly (handles full URLs and plain IDs)
+                const rawVehicleJourneyId = vehicleJourneyLink?.id || vehicleJourneyLink?.href || arrival.links?.[1]?.id || arrival.links?.[0]?.id;
+                const vehicleJourneyId = extractVehicleJourneyId(rawVehicleJourneyId) || undefined;
 
                 // Find disruption links in arrival.links
                 const disruptionLinks = arrival.links?.filter(link => 

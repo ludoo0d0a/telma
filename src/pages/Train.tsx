@@ -3,7 +3,8 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import Header from '../components/Header';
 import TrainWaypointsMap from '../components/TrainWaypointsMap';
-import { getVehicleJourney, autocompletePT } from '../services/navitiaApi';
+import { autocompletePT } from '../services/navitiaApi';
+import { getVehicleJourney } from '../services/vehicleJourneyService';
 import { parseUTCDate, formatTime } from '../components/Utils';
 import { calculateDelay } from '../services/delayService';
 import { cleanLocationName } from '../services/locationService';
@@ -46,6 +47,7 @@ const Train: React.FC = () => {
     const [trainData, setTrainData] = useState<ExtendedVehicleJourney | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [refreshing, setRefreshing] = useState<boolean>(false);
     
     // Search state
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -55,37 +57,49 @@ const Train: React.FC = () => {
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        const fetchTrainDetails = async (): Promise<void> => {
-            if (!id) {
-                setLoading(false);
-                return;
-            }
+    const fetchTrainDetails = async (isRefresh: boolean = false): Promise<void> => {
+        if (!id) {
+            setLoading(false);
+            return;
+        }
 
-            try {
+        try {
+            if (isRefresh) {
+                setRefreshing(true);
+            } else {
                 setLoading(true);
-                setError(null);
-                // Decode the ID if it's URL encoded
-                const decodedId = decodeURIComponent(id);
-                const response = await getVehicleJourney(decodedId, 'sncf');
-                const data = response.data;
-                
-                if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
-                    setTrainData(data.vehicle_journeys[0] as ExtendedVehicleJourney);
-                } else {
-                    setError('Train non trouvé');
-                }
-            } catch (err) {
-                const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
-                setError('Erreur lors de la récupération des détails du train: ' + errorMessage);
-                console.error(err);
-            } finally {
+            }
+            setError(null);
+            // Decode the ID if it's URL encoded
+            const decodedId = decodeURIComponent(id);
+            const response = await getVehicleJourney(decodedId, 'sncf');
+            const data = response.data;
+            
+            if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
+                setTrainData(data.vehicle_journeys[0] as ExtendedVehicleJourney);
+            } else {
+                setError('Train non trouvé');
+            }
+        } catch (err) {
+            const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+            setError('Erreur lors de la récupération des détails du train: ' + errorMessage);
+            console.error(err);
+        } finally {
+            if (isRefresh) {
+                setRefreshing(false);
+            } else {
                 setLoading(false);
             }
-        };
+        }
+    };
 
+    useEffect(() => {
         fetchTrainDetails();
     }, [id]);
+
+    const handleRefresh = (): void => {
+        fetchTrainDetails(true);
+    };
 
     // Close dropdown when clicking outside
     useEffect(() => {
@@ -337,7 +351,17 @@ const Train: React.FC = () => {
                             </div>
                             <div className='level-right'>
                                 <div className='level-item'>
-                                    <Link to='/train' className='button is-light mr-2'>
+                                    <button 
+                                        className='button is-primary mr-2' 
+                                        onClick={handleRefresh}
+                                        disabled={refreshing}
+                                    >
+                                        <span className='icon'>
+                                            <i className={`fas ${refreshing ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`}></i>
+                                        </span>
+                                        <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
+                                    </button>
+                                    <Link to='/train' className='button is-light'>
                                         <span className='icon'><i className='fas fa-search'></i></span>
                                         <span>Rechercher</span>
                                     </Link>

@@ -1,6 +1,6 @@
-import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { cleanLocationName } from '../services/locationService'
+import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService'
 
 interface OriginProps {
     idArrival: string | undefined;
@@ -22,20 +22,23 @@ const Origin: React.FC<OriginProps> = ({ idArrival}) => {
     useEffect(() => {
         if (!idArrival) return;
         
-        axios.get<VehicleJourneyResponse>(`https://api.sncf.com/v1/coverage/sncf/vehicle_journeys/${idArrival}`, {
-            headers: {
-                'Authorization': `${import.meta.env.VITE_API_KEY}`
-            },
-        })
-        .then((response) => {
-            const stopsApi = response.data.vehicle_journeys[0]?.stop_times.map(
-                (stop) => cleanLocationName(stop.stop_point.name) || ''
-            ) || []
-            setStops(stopsApi)
-        })
-        .catch((error) => {
-            console.error('Error fetching origin stops:', error);
-        })
+        // Extract the vehicle journey ID (handles full URLs and plain IDs)
+        const vehicleJourneyId = extractVehicleJourneyId(idArrival);
+        if (!vehicleJourneyId) {
+            console.error('Could not extract vehicle journey ID from:', idArrival);
+            return;
+        }
+        
+        getVehicleJourney(vehicleJourneyId)
+            .then((response) => {
+                const stopsApi = response.data.vehicle_journeys?.[0]?.stop_times?.map(
+                    (stop) => cleanLocationName(stop.stop_point?.name) || ''
+                ) || []
+                setStops(stopsApi)
+            })
+            .catch((error) => {
+                console.error('Error fetching origin stops:', error);
+            })
     }, [idArrival])
 
   return (

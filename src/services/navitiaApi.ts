@@ -41,12 +41,12 @@ import type {
     CoverageCoveragePlacesNearbyGetTypeEnum
 } from '../client/api/places-api';
 
-const DEFAULT_COVERAGE = 'sncf';
+export const DEFAULT_COVERAGE = 'sncf';
 
 // Initialize the client singleton
 let clientInstance: NavitiaClient | null = null;
 
-const getClient = (): NavitiaClient => {
+export const getClient = (): NavitiaClient => {
     if (!clientInstance) {
         const apiKey = import.meta.env.VITE_API_KEY;
         if (!apiKey) {
@@ -545,11 +545,3 @@ export const getFreefloatingsNearby = (
     return getClient().places.coverageCoverageCoordCoordFreefloatingsGet(coverage, coord, distance);
 };
 
-/**
- * Get vehicle journey details
- */
-export const getVehicleJourney = (
-    vehicleJourneyId: string,
-    coverage: string = DEFAULT_COVERAGE
-): AxiosPromise<VehicleJourneysResponse> =>
-    getClient().publicTransportObjects.coverageCoverageVehicleJourneysIdGet(coverage, vehicleJourneyId);
