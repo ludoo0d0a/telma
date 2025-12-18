@@ -1,3 +1,7 @@
+// Import Font Awesome 6 Free
+@import '@fortawesome/fontawesome-free/scss/fontawesome';
+@import '@fortawesome/fontawesome-free/scss/solid';
+
 @use 'theme' as *;
 @use 'settings' as *;
 @use './pages/home' as *;

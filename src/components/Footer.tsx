@@ -1,4 +1,5 @@
 import React from 'react'
+import packageJson from '../../package.json'
 
 const Footer: React.FC = () => {
   return (
@@ -9,6 +10,9 @@ const Footer: React.FC = () => {
         </p>
         <p className='has-text-white is-size-7 mt-2'>
           Powered by Navitia API
+        </p>
+        <p className='has-text-white is-size-7 mt-2'>
+          Version {packageJson.version}
         </p>
       </div>
     </footer>
