@@ -224,6 +224,77 @@ const Trip: React.FC = () => {
         loadTripData();
     }, [tripId]);
 
+    // Compute derived data - must be called before any early returns to maintain hook order
+    const sections = tripData?.journey?.sections || [];
+    const publicTransportSections = sections.filter((s: Section) => s.type === 'public_transport');
+    
+    // Get all stops from all sections
+    const allStops: ExtendedStopTime[] = [];
+    publicTransportSections.forEach((section: Section) => {
+        if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
+            section.stop_date_times.forEach((stopTime, index) => {
+                const isFirst = index === 0;
+                const isLast = index === section.stop_date_times!.length - 1;
+                allStops.push({
+                    ...(stopTime as ExtendedStopTime),
+                    section,
+                    isFirst,
+                    isLast,
+                    commercialMode: section.display_informations?.commercial_mode,
+                    network: section.display_informations?.network,
+                    trainNumber: section.display_informations?.headsign || section.display_informations?.trip_short_name
+                });
+            });
+        }
+    });
+
+    // Get sections with geojson for map display
+    const sectionsWithGeoJSON = useMemo<Section[]>(() => {
+        return sections.filter((section: Section) => section.geojson);
+    }, [sections]);
+
+    // Get markers for start and end points
+    const journeyMarkers = useMemo<JourneyMarker[]>(() => {
+        const markers: JourneyMarker[] = [];
+        if (sections.length > 0 && sections[0].from) {
+            const from = sections[0].from;
+            const coord: Coord | undefined = from.stop_point?.coord || from.coord;
+            if (coord && coord.lat !== undefined && coord.lon !== undefined) {
+                markers.push({
+                    lat: coord.lat,
+                    lon: coord.lon,
+                    name: cleanLocationName(from.stop_point?.name || from.name || 'Départ'),
+                    popup: (
+                        <div>
+                            <strong>{cleanLocationName(from.stop_point?.name || from.name || 'Départ')}</strong>
+                            <div>Départ</div>
+                        </div>
+                    )
+                });
+            }
+        }
+        if (sections.length > 0) {
+            const lastSection = sections[sections.length - 1];
+            if (lastSection.to) {
+                const to = lastSection.to;
+                const coord: Coord | undefined = to.stop_point?.coord || to.coord;
+                if (coord && coord.lat !== undefined && coord.lon !== undefined) {
+                    markers.push({
+                        lat: coord.lat,
+                        lon: coord.lon,
+                        name: cleanLocationName(to.stop_point?.name || to.name || 'Arrivée'),
+                        popup: (
+                            <div>
+                                <strong>{cleanLocationName(to.stop_point?.name || to.name || 'Arrivée')}</strong>
+                                <div>Arrivée</div>
+                            </div>
+                        )
+                    });
+                }
+            }
+        }
+        return markers;
+    }, [sections]);
 
     if (loading) {
         return (
@@ -282,80 +353,9 @@ const Trip: React.FC = () => {
     }
 
     const { journey, info, disruptions } = tripData;
-    const sections = journey.sections || [];
-    const publicTransportSections = sections.filter((s: Section) => s.type === 'public_transport');
-    
-    // Get all stops from all sections
-    const allStops: ExtendedStopTime[] = [];
-    publicTransportSections.forEach((section: Section) => {
-        if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
-            section.stop_date_times.forEach((stopTime, index) => {
-                const isFirst = index === 0;
-                const isLast = index === section.stop_date_times!.length - 1;
-                allStops.push({
-                    ...(stopTime as ExtendedStopTime),
-                    section,
-                    isFirst,
-                    isLast,
-                    commercialMode: section.display_informations?.commercial_mode,
-                    network: section.display_informations?.network,
-                    trainNumber: section.display_informations?.headsign || section.display_informations?.trip_short_name
-                });
-            });
-        }
-    });
-
     const transportInfo = getTransportIcon(info.commercialMode, info.network);
     const depDate = parseUTCDate(info.departureTime);
     const arrDate = parseUTCDate(info.arrivalTime);
-
-    // Get sections with geojson for map display
-    const sectionsWithGeoJSON = useMemo<Section[]>(() => {
-        return sections.filter((section: Section) => section.geojson);
-    }, [sections]);
-
-    // Get markers for start and end points
-    const journeyMarkers = useMemo<JourneyMarker[]>(() => {
-        const markers: JourneyMarker[] = [];
-        if (sections.length > 0 && sections[0].from) {
-            const from = sections[0].from;
-            const coord: Coord | undefined = from.stop_point?.coord || from.coord;
-            if (coord && coord.lat !== undefined && coord.lon !== undefined) {
-                markers.push({
-                    lat: coord.lat,
-                    lon: coord.lon,
-                    name: cleanLocationName(from.stop_point?.name || from.name || 'Départ'),
-                    popup: (
-                        <div>
-                            <strong>{cleanLocationName(from.stop_point?.name || from.name || 'Départ')}</strong>
-                            <div>Départ</div>
-                        </div>
-                    )
-                });
-            }
-        }
-        if (sections.length > 0) {
-            const lastSection = sections[sections.length - 1];
-            if (lastSection.to) {
-                const to = lastSection.to;
-                const coord: Coord | undefined = to.stop_point?.coord || to.coord;
-                if (coord && coord.lat !== undefined && coord.lon !== undefined) {
-                    markers.push({
-                        lat: coord.lat,
-                        lon: coord.lon,
-                        name: cleanLocationName(to.stop_point?.name || to.name || 'Arrivée'),
-                        popup: (
-                            <div>
-                                <strong>{cleanLocationName(to.stop_point?.name || to.name || 'Arrivée')}</strong>
-                                <div>Arrivée</div>
-                            </div>
-                        )
-                    });
-                }
-            }
-        }
-        return markers;
-    }, [sections]);
 
     return (
         <>

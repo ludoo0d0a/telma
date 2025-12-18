@@ -49,41 +49,80 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
     const mapRef = useRef<MapRef>(null);
     const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
 
+    // Convert multi-geometries to single geometries (MapLibre doesn't support MultiLineString, MultiPolygon, MultiPoint in filters)
+    const expandMultiGeometries = (feature: GeoJSONFeature): GeoJSONFeature[] => {
+        if (!feature.geometry) return [feature];
+
+        const geomType = feature.geometry.type;
+        const coords = feature.geometry.coordinates;
+
+        if (geomType === 'MultiLineString' && Array.isArray(coords)) {
+            // Convert MultiLineString to multiple LineString features
+            return coords.map((lineStringCoords: unknown) => ({
+                type: 'Feature',
+                geometry: {
+                    type: 'LineString',
+                    coordinates: lineStringCoords
+                },
+                properties: feature.properties || {}
+            }));
+        }
+
+        if (geomType === 'MultiPolygon' && Array.isArray(coords)) {
+            // Convert MultiPolygon to multiple Polygon features
+            return coords.map((polygonCoords: unknown) => ({
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: polygonCoords
+                },
+                properties: feature.properties || {}
+            }));
+        }
+
+        if (geomType === 'MultiPoint' && Array.isArray(coords)) {
+            // Convert MultiPoint to multiple Point features
+            return coords.map((pointCoords: unknown) => ({
+                type: 'Feature',
+                geometry: {
+                    type: 'Point',
+                    coordinates: pointCoords
+                },
+                properties: feature.properties || {}
+            }));
+        }
+
+        // Return as-is for other geometry types
+        return [feature];
+    };
+
     // Process GeoJSON data
     const processedGeoJSON = useMemo<GeoJSONFeatureCollection | null>(() => {
         if (!geojsonData) return null;
 
         const data = geojsonData as GeoJSONFeature | GeoJSONFeatureCollection | GeoJSONFeature[] | { geojson?: unknown };
 
+        let features: GeoJSONFeature[] = [];
+
         // If it's already a FeatureCollection, use it as is
         if (typeof data === 'object' && 'type' in data && data.type === 'FeatureCollection') {
-            return data as GeoJSONFeatureCollection;
+            features = (data as GeoJSONFeatureCollection).features;
         }
-
         // If it's a single Feature, wrap it in a FeatureCollection
-        if (typeof data === 'object' && 'type' in data && data.type === 'Feature') {
-            return {
-                type: 'FeatureCollection',
-                features: [data as GeoJSONFeature]
-            };
+        else if (typeof data === 'object' && 'type' in data && data.type === 'Feature') {
+            features = [data as GeoJSONFeature];
         }
-
         // If it's a Geometry object, wrap it in a Feature
-        if (typeof data === 'object' && 'type' in data && 
+        else if (typeof data === 'object' && 'type' in data && 
             ['Point', 'LineString', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon'].includes(data.type)) {
-            return {
-                type: 'FeatureCollection',
-                features: [{
-                    type: 'Feature',
-                    geometry: data as GeoJSONFeature['geometry'],
-                    properties: {}
-                }]
-            };
+            features = [{
+                type: 'Feature',
+                geometry: data as GeoJSONFeature['geometry'],
+                properties: {}
+            }];
         }
-
         // If it's an array, process each item
-        if (Array.isArray(data)) {
-            const features: GeoJSONFeature[] = [];
+        else if (Array.isArray(data)) {
             data
                 .filter((item): item is { geojson?: unknown } => item !== null && typeof item === 'object')
                 .forEach((item, index) => {
@@ -129,16 +168,20 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                         });
                     }
                 });
-
-            if (features.length === 0) return null;
-
-            return {
-                type: 'FeatureCollection',
-                features
-            };
         }
 
-        return null;
+        if (features.length === 0) return null;
+
+        // Expand multi-geometries to single geometries
+        const expandedFeatures: GeoJSONFeature[] = [];
+        features.forEach(feature => {
+            expandedFeatures.push(...expandMultiGeometries(feature));
+        });
+
+        return {
+            type: 'FeatureCollection',
+            features: expandedFeatures
+        };
     }, [geojsonData]);
 
     // Calculate bounds from GeoJSON data (format: [[minLon, minLat], [maxLon, maxLat]])
@@ -226,14 +269,14 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
     const hasLines = useMemo(() => {
         if (!processedGeoJSON) return false;
         return processedGeoJSON.features.some(f => 
-            f.geometry?.type === 'LineString' || f.geometry?.type === 'MultiLineString'
+            f.geometry?.type === 'LineString'
         );
     }, [processedGeoJSON]);
 
     const hasPolygons = useMemo(() => {
         if (!processedGeoJSON) return false;
         return processedGeoJSON.features.some(f => 
-            f.geometry?.type === 'Polygon' || f.geometry?.type === 'MultiPolygon'
+            f.geometry?.type === 'Polygon'
         );
     }, [processedGeoJSON]);
 
@@ -288,7 +331,7 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                             <Layer
                                 id="geojson-lines"
                                 type="line"
-                                filter={['in', '$type', 'LineString', 'MultiLineString']}
+                                filter={['==', '$type', 'LineString']}
                                 paint={{
                                     'line-color': layerPaint['line-color'] as string,
                                     'line-width': layerPaint['line-width'] as number,
@@ -301,7 +344,7 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                                 <Layer
                                     id="geojson-polygons-fill"
                                     type="fill"
-                                    filter={['in', '$type', 'Polygon', 'MultiPolygon']}
+                                    filter={['==', '$type', 'Polygon']}
                                     paint={{
                                         'fill-color': layerPaint['fill-color'] as string,
                                         'fill-opacity': layerPaint['fill-opacity'] as number
@@ -310,7 +353,7 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                                 <Layer
                                     id="geojson-polygons-outline"
                                     type="line"
-                                    filter={['in', '$type', 'Polygon', 'MultiPolygon']}
+                                    filter={['==', '$type', 'Polygon']}
                                     paint={{
                                         'line-color': layerPaint['line-color'] as string,
                                         'line-width': (layerPaint['line-width'] as number) / 2,

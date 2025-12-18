@@ -256,6 +256,26 @@ const Train: React.FC = () => {
                                     <p className='help has-text-grey mt-2'>Aucun train trouvé</p>
                                 )}
                             </div>
+
+                            {/* Samples Section */}
+                            <div className='mt-6'>
+                                <h3 className='title is-4 mb-4'>Exemples</h3>
+                                <div className='tags are-medium'>
+                                    <Link 
+                                        to={`/train/${encodeVehicleJourneyId('vehicle_journey:SNCF:2025-12-18:88776:1187:Train')}`}
+                                        className='tag is-link is-light'
+                                        style={{ cursor: 'pointer' }}
+                                    >
+                                        <span className='icon mr-1'>
+                                            <i className='fas fa-train'></i>
+                                        </span>
+                                        Train 88776
+                                    </Link>
+                                </div>
+                                <p className='help mt-2 has-text-grey'>
+                                    Cliquez sur un exemple pour voir les détails du train
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </section>
