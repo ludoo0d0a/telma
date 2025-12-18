@@ -1,5 +1,5 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import TrainStation from './components/TrainStation'
 import City from './pages/City'
 import Home from './pages/Home'
@@ -17,8 +17,16 @@ import Favorites from './pages/Favorites'
 import Train from './pages/Train'
 import Trip from './pages/Trip'
 import Snowfall from 'react-snowfall'
+import { trackPageView } from './utils/analytics'
 
 const App: React.FC = () => {
+    const location = useLocation()
+
+    useEffect(() => {
+        // Track page view on route change
+        trackPageView(location.pathname + location.search)
+    }, [location])
+
     return (
         <div className='App'>
               { /*  <Snowfall
