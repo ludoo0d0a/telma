@@ -397,7 +397,7 @@ const Train: React.FC = () => {
                                         </thead>
                                         <tbody>
                                             {stopTimes.map((stop, index) => {
-                                                const extendedStop = stop as ExtendedVehicleJourney['stop_times']?.[0];
+                                                const extendedStop = stop as NonNullable<ExtendedVehicleJourney['stop_times']>[0];
                                                 const baseArrival = extendedStop?.base_arrival_date_time;
                                                 const realArrival = extendedStop?.arrival_date_time;
                                                 const baseDeparture = extendedStop?.base_departure_date_time;
