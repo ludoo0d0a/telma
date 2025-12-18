@@ -30,6 +30,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          PUBLIC_URL: /telma/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
