@@ -95,10 +95,7 @@ npm run build
 
 ### Deploy
 
-Deploy to GitHub Pages:
-```bash
-npm run deploy
-```
+Deployment to GitHub Pages is automated. Every push to the `main` branch will trigger a new deployment.
 
 Deploy to Vercel:
 ```bash
