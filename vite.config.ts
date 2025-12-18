@@ -40,7 +40,7 @@ export default defineConfig({
       },
     }),
   ],
-  base: process.env.PUBLIC_URL || '/telma/',
+  base: process.env.PUBLIC_URL || '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
