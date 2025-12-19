@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import TrainStation from './components/TrainStation'
 import City from './pages/City'
@@ -19,14 +19,12 @@ import Snowfall from 'react-snowfall'
 import { trackPageView } from './utils/analytics'
 import BottomNavbar from './components/BottomNavbar'
 import Sidebar from './components/Sidebar'
+import Header from './components/Header'
+import { SidebarProvider, useSidebar } from './contexts/SidebarContext'
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
     const location = useLocation()
-    const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-    const toggleSidebar = () => {
-        setSidebarOpen(!isSidebarOpen);
-    };
+    const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
 
     useEffect(() => {
         // Track page view on route change
@@ -35,7 +33,8 @@ const App: React.FC = () => {
 
     return (
         <div className='App'>
-            <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
+            <Sidebar isOpen={isOpen} onClose={closeSidebar} />
+            <Header />
               { /*  <Snowfall
                 style={{
                     position: 'fixed',
@@ -53,7 +52,8 @@ const App: React.FC = () => {
                 <Route path='/lines' element={<Lines />} />
                 <Route path='/isochrones' element={<Isochrones />} />
                 <Route path='/api-docs' element={<SwaggerUIPage />} />
-                <Route path='/trajet/:from/:to' element={<Trajet />} />
+                <Route path='/itinerary' element={<Trajet />} />
+                <Route path='/itinerary/:from/:to' element={<Trajet />} />
                 <Route path='/train/:id' element={<Train />} />
                 <Route path='/train' element={<Train />} />
                 <Route path='/trip/:tripId' element={<Trip />} />
@@ -64,6 +64,14 @@ const App: React.FC = () => {
             </Routes>
             <BottomNavbar onMoreClick={toggleSidebar} />
         </div>
+    )
+}
+
+const App: React.FC = () => {
+    return (
+        <SidebarProvider>
+            <AppContent />
+        </SidebarProvider>
     )
 }
 

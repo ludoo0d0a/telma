@@ -2,12 +2,10 @@ import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 
 const SwaggerUIPage: React.FC = () => {
     return (
         <>
-            <Header />
             <div className='swagger-page'>
                 <div className='swagger-page__header'>
                     <h1 className='swagger-page__title'>

@@ -1,3 +1,23 @@
+.sidebar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .sidebar {
   position: fixed;
   top: 0;
@@ -9,6 +29,7 @@
   transition: left 0.3s ease-in-out;
   z-index: 1000;
   border-right: 1px solid var(--background-darker);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 
   &.is-open {
     left: 0;
@@ -39,6 +60,14 @@
       color: var(--text-primary);
       text-decoration: none;
       transition: color 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .icon {
+        width: 1.25rem;
+        text-align: center;
+      }
 
       &:hover {
         color: var(--primary);

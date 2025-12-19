@@ -29,6 +29,6 @@
 @use './components/stops' as *;
 
 // Import statements must come after @use
-@import '@fortawesome/fontawesome-free/scss/fontawesome';
-@import '@fortawesome/fontawesome-free/scss/solid';
+@use '@fortawesome/fontawesome-free/scss/fontawesome' as *;
+@use '@fortawesome/fontawesome-free/scss/solid' as *;
 @import 'bulma/css/bulma.css';

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
 import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
@@ -91,7 +90,7 @@ const Trajet: React.FC = () => {
         if (toId && toName) {
             const fromSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent(toName.toLowerCase().replace(/\s+/g, '-'));
-            navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
+            navigate(`/itinerary/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
 
@@ -105,7 +104,7 @@ const Trajet: React.FC = () => {
         if (fromId && fromName) {
             const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
-            navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
+            navigate(`/itinerary/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
 
@@ -134,7 +133,7 @@ const Trajet: React.FC = () => {
         // Update URL
         const fromSlug = encodeURIComponent(newFromName.toLowerCase().replace(/\s+/g, '-'));
         const toSlug = encodeURIComponent(newToName.toLowerCase().replace(/\s+/g, '-'));
-        navigate(`/trajet/${fromSlug}/${toSlug}`, { replace: true });
+        navigate(`/itinerary/${fromSlug}/${toSlug}`, { replace: true });
         
         // Trigger search with swapped stations
         fetchTerTrains(newFromId, newToId);
@@ -498,7 +497,6 @@ const Trajet: React.FC = () => {
 
     return (
         <>
-            <Header />
             <section className='section'>
                 <div className='container'>
                     <div className='level mb-5'>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import GeoJSONMap from '../components/GeoJSONMap';
 import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
 import { cleanLocationName } from '../services/locationService';
@@ -399,7 +398,6 @@ const Trip: React.FC = () => {
     if (loading) {
         return (
             <>
-                <Header />
                 <section className='section'>
                     <div className='container'>
                         <div className='box has-text-centered'>
@@ -418,7 +416,6 @@ const Trip: React.FC = () => {
     if (error || !tripData) {
         return (
             <>
-                <Header />
                 <section className='section'>
                     <div className='container'>
                         <div className='box has-text-centered'>
@@ -455,7 +452,6 @@ const Trip: React.FC = () => {
 
     return (
         <>
-            <Header />
             <section className='section'>
                 <div className='container'>
                     <div className='level mb-5'>

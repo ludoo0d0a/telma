@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import GeoJSONMap from '../components/GeoJSONMap';
 import { getIsochrones } from '../services/navitiaApi';
 import type { CoverageCoverageIsochronesGet200Response } from '../client/models';
@@ -43,58 +42,90 @@ const Isochrones: React.FC = () => {
 
     return (
         <>
-            <Header />
-            <div className='isochrones-page'>
-                <div className='isochrones-page__content-wrapper'>
-                    <h1 className='isochrones-page__title'>
-                        Isochrones <span>(Beta)</span>
-                    </h1>
-
-                    <div className='beta-notice'>
-                        <p>⚠️ Cette fonctionnalité est en version Beta</p>
+            <section className='section'>
+                <div className='container'>
+                    <div className='level mb-5'>
+                        <div className='level-left'>
+                            <div className='level-item'>
+                                <h1 className='title is-2'>
+                                    Isochrones <span className='tag is-warning'>Beta</span>
+                                </h1>
+                            </div>
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSearch} className='isochrones-form'>
-                        <div className='form-group'>
-                            <label htmlFor='from'>Point de départ (ID admin ou coordonnées)</label>
-                            <input
-                                id='from'
-                                type='text'
-                                value={from}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFrom(e.target.value)}
-                                placeholder='admin:fr:75056 ou 2.3522;48.8566'
-                                className='form-input'
-                            />
-                        </div>
+                    <div className='notification is-warning mb-5'>
+                        <p><strong>⚠️ Cette fonctionnalité est en version Beta</strong></p>
+                    </div>
 
-                        <div className='form-group'>
-                            <label htmlFor='maxDuration'>Durée maximale (en secondes)</label>
-                            <input
-                                id='maxDuration'
-                                type='number'
-                                value={maxDuration}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxDuration(e.target.value)}
-                                placeholder='3600'
-                                className='form-input'
-                            />
-                        </div>
+                    <div className='box mb-5'>
+                        <h3 className='title is-5 mb-4'>Calculer les isochrones</h3>
+                        <form onSubmit={handleSearch}>
+                            <div className='field'>
+                                <label className='label' htmlFor='from'>Point de départ</label>
+                                <div className='control'>
+                                    <input
+                                        id='from'
+                                        className='input'
+                                        type='text'
+                                        value={from}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFrom(e.target.value)}
+                                        placeholder='admin:fr:75056 ou 2.3522;48.8566'
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <p className='help'>ID admin (ex: admin:fr:75056) ou coordonnées (ex: 2.3522;48.8566)</p>
+                            </div>
 
-                        <button type='submit' className='form-button' disabled={loading}>
-                            {loading ? 'Calcul...' : 'Calculer les isochrones'}
-                        </button>
-                    </form>
+                            <div className='field'>
+                                <label className='label' htmlFor='maxDuration'>Durée maximale (en secondes)</label>
+                                <div className='control'>
+                                    <input
+                                        id='maxDuration'
+                                        className='input'
+                                        type='number'
+                                        value={maxDuration}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMaxDuration(e.target.value)}
+                                        placeholder='3600'
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <p className='help'>Durée maximale en secondes (ex: 3600 = 1 heure)</p>
+                            </div>
+
+                            <div className='field'>
+                                <div className='control'>
+                                    <button type='submit' className='button is-primary' disabled={loading}>
+                                        <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-calculator'}`}></i></span>
+                                        <span>{loading ? 'Calcul...' : 'Calculer les isochrones'}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    {loading && (
+                        <div className='box has-text-centered'>
+                            <div className='loader-wrapper'>
+                                <div className='loader is-loading'></div>
+                            </div>
+                            <p className='mt-4 subtitle is-5'>Calcul des isochrones...</p>
+                        </div>
+                    )}
 
                     {error && (
-                        <div className='error'>
+                        <div className='notification is-danger'>
+                            <button className='delete' onClick={() => setError(null)}></button>
+                            <p className='title is-5'>Erreur</p>
                             <p>{error}</p>
                         </div>
                     )}
 
                     {!loading && isochrones && (
-                        <div className='isochrones-result'>
-                            <h2>Résultats</h2>
+                        <div className='box'>
+                            <h2 className='title is-4 mb-5'>Résultats</h2>
                             {isochrones.isochrones && isochrones.isochrones.length > 0 && (
-                                <div className='isochrones-map' style={{ marginBottom: '2rem' }}>
+                                <div className='mb-5'>
                                     <GeoJSONMap 
                                         geojsonData={isochrones.isochrones}
                                         style={(feature: unknown) => {
@@ -113,25 +144,35 @@ const Isochrones: React.FC = () => {
                                     />
                                 </div>
                             )}
-                            <div className='isochrones-info' style={{ marginBottom: '1rem' }}>
+                            <div className='content mb-4'>
                                 {isochrones.isochrones && isochrones.isochrones.map((iso, index) => (
-                                    <div key={index} style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: '#f5f5f5', borderRadius: '4px' }}>
+                                    <div key={index} className='box mb-3'>
                                         <strong>Isochrone {index + 1}:</strong> Durée maximale: {iso.max_duration ? `${Math.floor(iso.max_duration / 60)} minutes` : 'N/A'}
                                     </div>
                                 ))}
                             </div>
                             <details>
-                                <summary style={{ cursor: 'pointer', marginBottom: '1rem', fontWeight: 'bold' }}>
+                                <summary className='title is-6 mb-4' style={{ cursor: 'pointer' }}>
                                     Afficher les données JSON
                                 </summary>
-                                <div className='isochrones-content'>
-                                    <pre>{JSON.stringify(isochrones, null, 2)}</pre>
+                                <div className='content mt-4'>
+                                    <pre style={{
+                                        background: 'rgba(0, 0, 0, 0.3)',
+                                        borderRadius: '10px',
+                                        padding: '1.5rem',
+                                        overflow: 'auto',
+                                        color: '#ccc',
+                                        fontFamily: "'Roboto Mono', monospace",
+                                        fontSize: '0.9rem',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word'
+                                    }}>{JSON.stringify(isochrones, null, 2)}</pre>
                                 </div>
                             </details>
                         </div>
                     )}
                 </div>
-            </div>
+            </section>
             <Footer />
         </>
     );

@@ -239,10 +239,29 @@
 
 // Navbar burger menu styling
 .navbar-burger {
-  color: var(--text-primary);
+  color: white;
+  margin-left: 0;
+  margin-right: auto;
+  display: block !important; // Ensure hamburger is always visible
   
   span {
-    background-color: var(--text-primary);
+    background-color: white;
+  }
+  
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Ensure hamburger is on the left in navbar-brand
+.navbar-brand {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  
+  .navbar-burger {
+    order: -1; // Place hamburger first (on the left)
+    margin-right: 0.5rem;
   }
 }
 
