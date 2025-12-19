@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
 import TrainStation from './components/TrainStation'
 import City from './pages/City'
@@ -17,9 +17,16 @@ import Train from './pages/Train'
 import Trip from './pages/Trip'
 import Snowfall from 'react-snowfall'
 import { trackPageView } from './utils/analytics'
+import BottomNavbar from './components/BottomNavbar'
+import Sidebar from './components/Sidebar'
 
 const App: React.FC = () => {
     const location = useLocation()
+    const [isSidebarOpen, setSidebarOpen] = useState(false);
+
+    const toggleSidebar = () => {
+        setSidebarOpen(!isSidebarOpen);
+    };
 
     useEffect(() => {
         // Track page view on route change
@@ -28,6 +35,7 @@ const App: React.FC = () => {
 
     return (
         <div className='App'>
+            <Sidebar isOpen={isSidebarOpen} onClose={toggleSidebar} />
               { /*  <Snowfall
                 style={{
                     position: 'fixed',
@@ -50,13 +58,13 @@ const App: React.FC = () => {
                 <Route path='/train' element={<Train />} />
                 <Route path='/trip/:tripId' element={<Trip />} />
                 <Route path='/favorites' element={<Favorites />} />
-                <Route path='/:city' element={<City />}>
+                <Route path='/city/:city' element={<City />}>
                     <Route path=':codeStation' element={<TrainStation />} />
                 </Route>
             </Routes>
+            <BottomNavbar onMoreClick={toggleSidebar} />
         </div>
     )
 }
 
 export default App
-

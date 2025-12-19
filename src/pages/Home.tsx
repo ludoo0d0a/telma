@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import CityCards from '../components/CityCards';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import stations from '../gares.json';
 
 const Home: React.FC = () => {
@@ -27,7 +26,6 @@ const Home: React.FC = () => {
 
     return (
         <>
-            <Header />
             <section className='section'>
                 <div className='container'>
                     <h1 className='title is-2 has-text-centered mb-6'>
@@ -70,4 +68,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-

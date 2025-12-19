@@ -1,68 +1,69 @@
-// Modern Theme Colors
-// Primary: Indigo (#6366f1) - Modern, vibrant, professional
-// Secondary: Emerald (#10b981) - Fresh, complementary, energetic
+// Orange Theme from Mockup
+// Primary: Orange - Vibrant, modern, friendly
 
 :root {
-  // Primary Color Palette
-  --primary: #6366f1;
-  --primary-dark: #4f46e5;
-  --primary-light: #818cf8;
-  --primary-lighter: #a5b4fc;
-  --primary-lightest: #c7d2fe;
-  
-  // Secondary Color Palette
+  // Primary Color Palette (Orange)
+  --primary: #f97316;
+  --primary-dark: #ea580c;
+  --primary-light: #fb923c;
+  --primary-lighter: #fdba74;
+  --primary-lightest: #fed7aa;
+
+  // Secondary Color Palette (Emerald - Kept for potential other uses)
   --secondary: #10b981;
   --secondary-dark: #059669;
   --secondary-light: #34d399;
   --secondary-lighter: #6ee7b7;
   --secondary-lightest: #a7f3d0;
-  
-  // Neutral Colors
-  --background-dark: #0f172a;
-  --background-darker: #020617;
-  --background-light: #1e293b;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  
+
+  // Neutral Colors (Light Theme from Mockup)
+  --background-dark: #f3f4f6; // Light Gray for body background
+  --background-darker: #e5e7eb; // Darker Gray
+  --background-light: #ffffff; // White for cards, inputs
+  --text-primary: #1f2937;   // Dark Gray for text
+  --text-secondary: #6b7280; // Lighter Gray for secondary text
+  --text-muted: #9ca3af;     // Muted Gray
+
   // Gradient Background
-  --gradient-start: #6366f1;
-  --gradient-end: #0f172a;
-  
-  // Bulma table variable overrides (may not be used by all Bulma versions)
-  --bulma-table-striped-row-even-background-color: rgba(51, 65, 85, 0.7);
-  --bulma-table-striped-row-odd-background-color: rgba(30, 41, 59, 0.75);
-  --table-striped-row-even-background-color: rgba(51, 65, 85, 0.7);
-  --table-striped-row-odd-background-color: rgba(30, 41, 59, 0.75);
-  
+  --gradient-start: #f97316;
+  --gradient-end: #ea580c;
+
+  // Bulma table variable overrides for light theme
+  --bulma-table-striped-row-even-background-color: #f9fafb;
+  --bulma-table-striped-row-odd-background-color: #ffffff;
+  --table-striped-row-even-background-color: #f9fafb;
+  --table-striped-row-odd-background-color: #ffffff;
+
   // Bulma background variable overrides
-  --bulma-light: rgba(30, 41, 59, 0.75);
+  --bulma-light: #f3f4f6;
 }
 
-// Bulma color overrides using CSS custom properties
 
-// Custom Bulma overrides
+// Custom Bulma overrides for Light Theme
 .navbar.is-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  // Mockup doesn't have a top navbar, this will be for the bottom bar later.
+  // The header is a solid orange color.
+  background: var(--primary);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
 .button.is-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: var(--primary);
   border: none;
   transition: all 0.3s ease;
-  
+  color: white; // Make sure text is white
+
   &:hover {
-    background: linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 100%);
+    background: var(--primary-dark);
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+    box-shadow: 0 10px 20px rgba(249, 115, 22, 0.3);
   }
-  
+
   &.is-inverted {
     background: transparent;
     color: var(--primary);
     border: 2px solid var(--primary);
-    
+
     &:hover {
       background: var(--primary);
       color: white;
@@ -72,12 +73,12 @@
 
 .button.is-secondary,
 .tag.is-secondary {
-  background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+  background: var(--secondary);
   color: white;
   border: none;
-  
+
   &:hover {
-    background: linear-gradient(135deg, var(--secondary-light) 0%, var(--secondary) 100%);
+    background: var(--secondary-dark);
   }
 }
 
@@ -91,340 +92,177 @@
   color: white;
 }
 
-// Card styling
+// Card styling based on mockup
 .card {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  background: var(--background-light); // white
+  border-radius: 1rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--background-darker);
   transition: all 0.3s ease;
-  
+
   &:hover {
-    border-color: var(--primary);
-    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.2);
+    border-color: var(--primary-light);
+    box-shadow: 0 10px 25px rgba(249, 115, 22, 0.1);
     transform: translateY(-4px);
   }
-  
+
   &.has-background-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: var(--primary);
     border: none;
-    
-    .title {
+
+    .title, .subtitle {
       color: white;
     }
   }
 }
 
-// Table styling
+// Table styling for light theme
 .table {
-  background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(10px);
+  background: var(--background-light);
   border-radius: 8px;
   overflow: hidden;
-  
+
   thead {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    
+    background: var(--background-dark);
+
     th {
-      color: white;
+      color: var(--text-primary);
       font-weight: 600;
       border: none;
       padding: 0.5rem 0.25rem;
       font-size: 0.85rem;
     }
   }
-  
+
   tbody {
     tr {
-      // Default row background for better contrast against dark blue background
-      background: rgba(30, 41, 59, 0.75);
+      background: var(--background-light);
       transition: all 0.2s ease;
-      
+
       &:hover {
-        background: rgba(99, 102, 241, 0.25);
+        background: var(--background-dark);
       }
-      
+
       td {
-        color: #ffffff;
-        border-color: rgba(99, 102, 241, 0.15);
+        color: var(--text-primary);
+        border-color: var(--background-darker);
         padding: 0.5rem 0.25rem;
         font-size: 0.85rem;
-        
-        // First column: even brighter white text
+
         &:first-child {
-          color: #ffffff !important;
+          color: var(--text-primary) !important;
           font-weight: 500;
-          
+
           strong {
-            color: #ffffff !important;
-            font-weight: 600;
+            color: var(--text-primary) !important;
           }
         }
         
-        // Ensure all text elements in table cells are light
         strong {
-          color: #ffffff !important;
+          color: var(--text-primary) !important;
         }
-        
+
         a {
-          color: #ffffff !important;
-          
+          color: var(--primary) !important;
           &:hover {
-            color: var(--primary-light) !important;
+            color: var(--primary-dark) !important;
           }
         }
       }
     }
   }
-  
-  // Striped table: alternating row colors for better readability
-  &.is-striped tbody tr:nth-child(odd) {
-    // Odd rows: darker background
-    background: rgba(30, 41, 59, 0.75) !important;
-    
-    &:hover {
-      background: rgba(99, 102, 241, 0.25) !important;
-    }
-  }
-  
+
   &.is-striped tbody tr:nth-child(even) {
-    // Even rows: slightly lighter background for clear distinction
-    // Using !important to override Bulma's default white background
-    background: rgba(51, 65, 85, 0.7) !important;
-    background-color: rgba(51, 65, 85, 0.7) !important;
-    
-    &:hover {
-      background: rgba(99, 102, 241, 0.25) !important;
-      background-color: rgba(99, 102, 241, 0.25) !important;
-    }
+    background: var(--background-dark) !important;
   }
 }
 
-// Additional override for Bulma's striped table rows (higher specificity)
-.table.is-striped tbody tr:nth-child(even) {
-  background: rgba(51, 65, 85, 0.7) !important;
-  background-color: rgba(51, 65, 85, 0.7) !important;
-  
-  td {
-    color: #ffffff !important;
-    
-    &:first-child {
-      color: #ffffff !important;
-      
-      strong {
-        color: #ffffff !important;
-      }
-    }
-    
-    strong {
-      color: #ffffff !important;
-    }
-  }
-}
 
-// Ensure all table text is white/very light
-.table tbody td {
-  color: #ffffff !important;
-  
-  &:first-child {
-    color: #ffffff !important;
-    font-weight: 500;
-    
-    // Override any Bulma text color classes in first column
-    &.has-text-grey,
-    &.has-text-dark,
-    &.has-text-black {
-      color: #ffffff !important;
-    }
-    
-    strong,
-    b,
-    span,
-    p,
-    div {
-      color: #ffffff !important;
-    }
-  }
-  
-  strong,
-  b {
-    color: #ffffff !important;
-    font-weight: 600;
-  }
-  
-  span,
-  p,
-  div {
-    color: #ffffff !important;
-  }
-  
-  // Keep danger/error colors for delays but make other text white
-  .has-text-danger {
-    color: #ff6b6b !important; // Keep red for delays but make it bright
-  }
-  
-  .has-text-success {
-    color: #51cf66 !important; // Keep green bright
-  }
-  
-  .has-text-grey:not(.has-text-danger):not(.has-text-success) {
-    color: #ffffff !important;
-  }
-}
-
-// Mobile table optimizations
-@media (max-width: 768px) {
-  .table-container {
-    margin: 0 -0.5rem;
-    padding: 0.5rem;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .table {
-    font-size: 0.75rem;
-    min-width: 100%;
-    
-    thead th {
-      padding: 0.4rem 0.2rem;
-      font-size: 0.7rem;
-      white-space: nowrap;
-    }
-    
-    tbody td {
-      padding: 0.4rem 0.2rem;
-      font-size: 0.7rem;
-      white-space: nowrap;
-    }
-  }
-}
-
-// Input styling
+// Input styling from mockup
 .input,
 .textarea,
 .select select {
-  background: rgba(30, 41, 59, 0.6);
-  border-color: rgba(99, 102, 241, 0.3);
+  background: var(--background-light);
+  border-color: var(--background-darker);
   color: var(--text-primary);
+  border-radius: 0.75rem;
+  box-shadow: none;
   transition: all 0.3s ease;
-  
+
   &:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 0.125em rgba(99, 102, 241, 0.25);
-    background: rgba(30, 41, 59, 0.8);
+    box-shadow: 0 0 0 0.125em rgba(249, 115, 22, 0.25);
+    background: var(--background-light);
   }
-  
+
   &::placeholder {
     color: var(--text-muted);
   }
-  
+
   &.is-large {
     font-size: 1.25rem;
   }
 }
 
-.input:focus,
-.textarea:focus,
-.select select:focus {
-  border-color: var(--primary);
-}
-
 // Box styling
 .box {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid rgba(99, 102, 241, 0.2);
-  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.37);
+  background: var(--background-light);
+  border: 1px solid var(--background-darker);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
   color: var(--text-primary);
+  border-radius: 1rem;
 }
 
 // Notification styling
 .notification {
   &.is-primary {
-    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    background: var(--primary);
     color: white;
   }
   
   &.is-success {
-    background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+    background: var(--secondary);
     color: white;
   }
   
   &.is-warning {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    background: #f59e0b;
     color: white;
   }
 }
 
-// Pagination styling
-.pagination {
-  .pagination-link.is-current {
-    background: var(--primary);
-    border-color: var(--primary);
-    color: white;
-  }
-  
-  .pagination-link,
-  .pagination-previous,
-  .pagination-next {
-    background: rgba(30, 41, 59, 0.6);
-    border-color: rgba(99, 102, 241, 0.3);
-    color: var(--text-primary);
-    
-    &:hover:not(.is-disabled) {
-      background: var(--primary);
-      border-color: var(--primary);
-      color: white;
-    }
-  }
-}
-
-// Footer styling
-.footer.has-background-primary {
-  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--background-dark) 100%);
-  border-top: 2px solid var(--primary);
-  
-  .button.is-primary.is-inverted {
-    border-color: rgba(255, 255, 255, 0.3);
-    color: white;
-    
-    &:hover {
-      background: var(--secondary);
-      border-color: var(--secondary);
-    }
-  }
+// Footer styling (The old footer, not the new nav bar)
+.footer {
+  background: var(--background-dark);
+  border-top: 1px solid var(--background-darker);
 }
 
 // Navbar burger menu styling
 .navbar-burger {
-  color: white;
+  color: var(--text-primary);
   
   span {
-    background-color: white;
-  }
-  
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: var(--text-primary);
   }
 }
 
 .navbar-menu {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+  background: var(--background-light);
   
   .navbar-item {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
     
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-      color: white;
+      background-color: var(--background-dark);
+      color: var(--primary);
     }
     
     &.has-text-secondary {
-      color: var(--secondary-light) !important;
+      color: var(--secondary) !important;
       
       &:hover {
-        color: white !important;
-        background-color: rgba(16, 185, 129, 0.2);
+        color: var(--secondary-dark) !important;
+        background-color: rgba(16, 185, 129, 0.1);
       }
     }
   }
@@ -459,22 +297,19 @@
 }
 
 .has-text-white {
-  color: var(--text-primary) !important;
+  color: #fff !important;
 }
 
 // Background colors
 .has-background-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%) !important;
+  background: var(--primary) !important;
 }
 
 .has-background-secondary {
-  background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%) !important;
+  background: var(--secondary) !important;
 }
 
 .has-background-light {
-  background: rgba(30, 41, 59, 0.75) !important;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: var(--background-light) !important;
   color: var(--text-primary) !important;
 }
-
