@@ -96,6 +96,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                 <span>API Documentation</span>
               </NavLink>
             </li>
+            <li>
+              <NavLink to='/about' className="sidebar-link" onClick={onClose}>
+                <span className='icon'><i className='fas fa-info-circle'></i></span>
+                <span>About</span>
+              </NavLink>
+            </li>
           </ul>
         </div>
       </aside>

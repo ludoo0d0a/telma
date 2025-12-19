@@ -68,16 +68,12 @@ const Trajet: React.FC = () => {
         }
     }, [from, to]);
 
-    // Search for default stations on component mount
+    // Clear itinerary when stations change (don't auto-search)
     useEffect(() => {
-        const findDefaultStations = async (): Promise<void> => {
-            if (fromId && toId) {
-                // Stations already set, fetch journeys
-                await fetchTerTrains(fromId, toId);
-            }
-        };
-
-        findDefaultStations();
+        // Clear current results when stations change
+        setTerTrains([]);
+        setDisruptions([]);
+        setError(null);
     }, [fromId, toId]);
 
     const handleFromStationFound = (station: Place & { name?: string | null }): void => {
@@ -86,6 +82,9 @@ const Trajet: React.FC = () => {
         const cleanedName = cleanLocationName(station.name);
         setFromName(cleanedName || '');
         setError(null);
+        // Clear current itinerary
+        setTerTrains([]);
+        setDisruptions([]);
         // Update URL if toId is also set
         if (toId && toName) {
             const fromSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
@@ -100,6 +99,9 @@ const Trajet: React.FC = () => {
         const cleanedName = cleanLocationName(station.name);
         setToName(cleanedName || '');
         setError(null);
+        // Clear current itinerary
+        setTerTrains([]);
+        setDisruptions([]);
         // Update URL if fromId is also set
         if (fromId && fromName) {
             const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));

@@ -1,6 +1,7 @@
 {
   "name": "api-sncf",
   "version": "0.0.1",
+  "author": "Ludovic Valente",
   "private": true,
   "homepage": "https://ludooo0d0a.github.io/telma/",
   "dependencies": {

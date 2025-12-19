@@ -15,6 +15,7 @@ import Trajet from './pages/Trajet'
 import Favorites from './pages/Favorites'
 import Train from './pages/Train'
 import Trip from './pages/Trip'
+import About from './pages/About'
 import Snowfall from 'react-snowfall'
 import { trackPageView } from './utils/analytics'
 import BottomNavbar from './components/BottomNavbar'
@@ -61,6 +62,7 @@ const AppContent: React.FC = () => {
                 <Route path='/city/:city' element={<City />}>
                     <Route path=':codeStation' element={<TrainStation />} />
                 </Route>
+                <Route path='/about' element={<About />} />
             </Routes>
             <BottomNavbar onMoreClick={toggleSidebar} />
         </div>
