@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/navitiaApi';
 import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '../client/models';
 
@@ -51,96 +50,144 @@ const Schedules: React.FC = () => {
 
     return (
         <>
-            <Header />
-            <div className='schedules-page'>
-                <div className='schedules-page__content-wrapper'>
-                    <h1 className='schedules-page__title'>
-                        Horaires et <span>planning</span>
-                    </h1>
-
-                    <div className='schedule-tabs'>
-                        <button
-                            className={`tab-button ${scheduleType === 'stop' ? 'active' : ''}`}
-                            onClick={() => {
-                                setScheduleType('stop');
-                                setSchedules(null);
-                                setError(null);
-                            }}
-                        >
-                            Horaires d'arrêt
-                        </button>
-                        <button
-                            className={`tab-button ${scheduleType === 'route' ? 'active' : ''}`}
-                            onClick={() => {
-                                setScheduleType('route');
-                                setSchedules(null);
-                                setError(null);
-                            }}
-                        >
-                            Horaires de ligne
-                        </button>
-                        <button
-                            className={`tab-button ${scheduleType === 'terminus' ? 'active' : ''}`}
-                            onClick={() => {
-                                setScheduleType('terminus');
-                                setSchedules(null);
-                                setError(null);
-                            }}
-                        >
-                            Horaires terminus
-                        </button>
+            <section className='section'>
+                <div className='container'>
+                    <div className='level mb-5'>
+                        <div className='level-left'>
+                            <div className='level-item'>
+                                <h1 className='title is-2'>
+                                    Horaires et <span>planning</span>
+                                </h1>
+                            </div>
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSearch} className='schedules-form'>
-                        <div className='form-group'>
-                            <label htmlFor='filter'>
-                                Filtre (ex: stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1)
-                            </label>
-                            <input
-                                id='filter'
-                                type='text'
-                                value={filter}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
-                                placeholder='stop_area.id=stop_area:SNCF:87391003'
-                                className='form-input'
-                            />
+                    <div className='box mb-5'>
+                        <h3 className='title is-5 mb-4'>Type de planning</h3>
+                        <div className='tabs is-boxed mb-4'>
+                            <ul>
+                                <li className={scheduleType === 'stop' ? 'is-active' : ''}>
+                                    <a onClick={() => {
+                                        setScheduleType('stop');
+                                        setSchedules(null);
+                                        setError(null);
+                                    }}>
+                                        <span className='icon is-small'><i className='fas fa-map-marker-alt'></i></span>
+                                        <span>Horaires d'arrêt</span>
+                                    </a>
+                                </li>
+                                <li className={scheduleType === 'route' ? 'is-active' : ''}>
+                                    <a onClick={() => {
+                                        setScheduleType('route');
+                                        setSchedules(null);
+                                        setError(null);
+                                    }}>
+                                        <span className='icon is-small'><i className='fas fa-route'></i></span>
+                                        <span>Horaires de ligne</span>
+                                    </a>
+                                </li>
+                                <li className={scheduleType === 'terminus' ? 'is-active' : ''}>
+                                    <a onClick={() => {
+                                        setScheduleType('terminus');
+                                        setSchedules(null);
+                                        setError(null);
+                                    }}>
+                                        <span className='icon is-small'><i className='fas fa-flag-checkered'></i></span>
+                                        <span>Horaires terminus</span>
+                                    </a>
+                                </li>
+                            </ul>
                         </div>
 
-                        <div className='form-group'>
-                            <label htmlFor='datetime'>
-                                Date et heure (optionnel, format: YYYYMMDDTHHmmss)
-                            </label>
-                            <input
-                                id='datetime'
-                                type='text'
-                                value={datetime}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDatetime(e.target.value)}
-                                placeholder='20250113T152944'
-                                className='form-input'
-                            />
-                        </div>
+                        <form onSubmit={handleSearch}>
+                            <div className='field'>
+                                <label className='label' htmlFor='filter'>
+                                    Filtre
+                                </label>
+                                <div className='control'>
+                                    <input
+                                        id='filter'
+                                        className='input'
+                                        type='text'
+                                        value={filter}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
+                                        placeholder='stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1'
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <p className='help'>
+                                    Exemples: stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1
+                                </p>
+                            </div>
 
-                        <button type='submit' className='form-button' disabled={loading}>
-                            {loading ? 'Chargement...' : 'Rechercher'}
-                        </button>
-                    </form>
+                            <div className='field'>
+                                <label className='label' htmlFor='datetime'>
+                                    Date et heure (optionnel)
+                                </label>
+                                <div className='control'>
+                                    <input
+                                        id='datetime'
+                                        className='input'
+                                        type='text'
+                                        value={datetime}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDatetime(e.target.value)}
+                                        placeholder='20250113T152944'
+                                        disabled={loading}
+                                    />
+                                </div>
+                                <p className='help'>Format: YYYYMMDDTHHmmss (ex: 20250113T152944)</p>
+                            </div>
+
+                            <div className='field'>
+                                <div className='control'>
+                                    <button type='submit' className='button is-primary' disabled={loading}>
+                                        <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`}></i></span>
+                                        <span>{loading ? 'Chargement...' : 'Rechercher'}</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    {loading && (
+                        <div className='box has-text-centered'>
+                            <div className='loader-wrapper'>
+                                <div className='loader is-loading'></div>
+                            </div>
+                            <p className='mt-4 subtitle is-5'>Chargement des horaires...</p>
+                        </div>
+                    )}
 
                     {error && (
-                        <div className='error'>
+                        <div className='notification is-danger'>
+                            <button className='delete' onClick={() => setError(null)}></button>
+                            <p className='title is-5'>Erreur</p>
                             <p>{error}</p>
                         </div>
                     )}
 
                     {!loading && schedules && (
-                        <div className='schedules-result'>
-                            <h2>Résultats</h2>
-                            <div className='schedules-content'>
-                                <pre>{JSON.stringify(schedules, null, 2)}</pre>
+                        <div className='box'>
+                            <h2 className='title is-4 mb-5'>Résultats</h2>
+                            <div className='content'>
+                                <div className='table-container'>
+                                    <pre style={{
+                                        background: 'rgba(0, 0, 0, 0.3)',
+                                        borderRadius: '10px',
+                                        padding: '1.5rem',
+                                        overflow: 'auto',
+                                        color: '#ccc',
+                                        fontFamily: "'Roboto Mono', monospace",
+                                        fontSize: '0.9rem',
+                                        whiteSpace: 'pre-wrap',
+                                        wordWrap: 'break-word'
+                                    }}>{JSON.stringify(schedules, null, 2)}</pre>
+                                </div>
                             </div>
                         </div>
                     )}
                 </div>
-            </div>
+            </section>
             <Footer />
         </>
     );

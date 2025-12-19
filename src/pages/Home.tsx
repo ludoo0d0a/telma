@@ -1,67 +1,224 @@
-import React, { useState } from 'react';
-import CityCards from '../components/CityCards';
+import React from 'react';
+import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
-import stations from '../gares.json';
+
+interface DashboardCard {
+    title: string;
+    description: string;
+    path: string;
+    icon: string;
+    color?: 'primary' | 'secondary';
+}
 
 const Home: React.FC = () => {
-    const [searchTerm, setSearchTerm] = useState<string>('');
-    const [itemsToShow, setItemsToShow] = useState<number>(12); // Nombre initial de cartes à afficher
-    const itemsPerLoad: number = 12; // Nombre de cartes à charger à chaque clic sur "Load More"
+    const mainPages: DashboardCard[] = [
+        {
+            title: 'Train',
+            description: 'Rechercher et suivre les trains',
+            path: '/train',
+            icon: 'fa-train',
+            color: 'primary'
+        },
+        {
+            title: 'Places',
+            description: 'Rechercher des lieux et gares',
+            path: '/places',
+            icon: 'fa-map-marker-alt'
+        },
+        {
+            title: 'Lignes',
+            description: 'Explorer les lignes de transport',
+            path: '/lines',
+            icon: 'fa-route'
+        },
+        {
+            title: 'Horaires',
+            description: 'Consulter les horaires',
+            path: '/schedules',
+            icon: 'fa-clock'
+        },
+        {
+            title: 'Rapports',
+            description: 'Voir les rapports et statistiques',
+            path: '/reports',
+            icon: 'fa-chart-bar'
+        },
+        {
+            title: 'Couverture',
+            description: 'Carte de couverture du réseau',
+            path: '/coverage',
+            icon: 'fa-map'
+        },
+        {
+            title: 'Isochrones',
+            description: 'Visualiser les isochrones',
+            path: '/isochrones',
+            icon: 'fa-circle'
+        },
+        {
+            title: 'Favoris',
+            description: 'Vos favoris sauvegardés',
+            path: '/favorites',
+            icon: 'fa-star'
+        },
+        {
+            title: 'Modes Commerciaux',
+            description: 'Types de transport disponibles',
+            path: '/commercial-modes',
+            icon: 'fa-bus'
+        }
+    ];
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-        setSearchTerm(e.target.value);
-        setItemsToShow(itemsPerLoad); // Réinitialiser le nombre d'éléments affichés lors de la recherche
-    };
+    const sampleRoutes: DashboardCard[] = [
+        {
+            title: 'Bettembourg → Metz',
+            description: 'Exemple de trajet',
+            path: '/itinerary/bettembourg/metz',
+            icon: 'fa-arrow-right',
+            color: 'secondary'
+        },
+        {
+            title: 'Metz → Thionville',
+            description: 'Exemple de trajet',
+            path: '/itinerary/metz/thionville',
+            icon: 'fa-arrow-right',
+            color: 'secondary'
+        }
+    ];
 
-    const handleLoadMore = (): void => {
-        setItemsToShow((prev) => prev + itemsPerLoad);
-    };
-
-    const cities: string[] = Object.keys(stations as Record<string, unknown>);
-    const filteredCities: string[] = cities.filter((city: string) =>
-        city.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-    const hasMoreItems: boolean = itemsToShow < filteredCities.length;
+    const apiDocs: DashboardCard[] = [
+        {
+            title: 'API Documentation',
+            description: 'Documentation Swagger de l\'API',
+            path: '/api-docs',
+            icon: 'fa-book',
+            color: 'primary'
+        }
+    ];
 
     return (
         <>
-            <Header />
             <section className='section'>
                 <div className='container'>
-                    <h1 className='title is-2 has-text-centered mb-6'>
-                        Choisissez une <span className='has-text-primary'>ville</span> pour afficher les{' '}
-                        <span className='has-text-secondary'>horaires</span> des trains
-                    </h1>
-                    <div className='field'>
-                        <div className='control has-icons-left'>
-                            <input
-                                className='input is-large'
-                                type='text'
-                                placeholder='Rechercher une gare...'
-                                value={searchTerm}
-                                onChange={handleSearchChange}
-                            />
-                            <span className='icon is-left'>
-                                <i className='fas fa-search'></i>
+                    <div className='has-text-centered mb-6'>
+                        <h1 className='title is-1 mb-4'>
+                            Dashboard
+                        </h1>
+                        <p className='subtitle is-4 has-text-secondary'>
+                            Accédez rapidement aux principales fonctionnalités
+                        </p>
+                    </div>
+
+                    {/* Main Pages Section */}
+                    <div className='mb-6'>
+                        <h2 className='title is-3 mb-4'>
+                            <span className='icon mr-2'>
+                                <i className='fas fa-th-large'></i>
                             </span>
+                            Pages Principales
+                        </h2>
+                        <div className='columns is-multiline'>
+                            {mainPages.map((page) => (
+                                <div key={page.path} className='column is-one-third-tablet is-half-mobile'>
+                                    <Link to={page.path} className='dashboard-card-link'>
+                                        <div className={`card dashboard-card ${page.color === 'primary' ? 'has-background-primary' : ''}`}>
+                                            <div className='card-content'>
+                                                <div className='media'>
+                                                    <div className='media-left'>
+                                                        <span className={`icon is-large ${page.color === 'primary' ? 'has-text-white' : ''}`}>
+                                                            <i className={`fas ${page.icon} fa-2x`}></i>
+                                                        </span>
+                                                    </div>
+                                                    <div className='media-content'>
+                                                        <p className={`title is-5 ${page.color === 'primary' ? 'has-text-white' : ''}`}>
+                                                            {page.title}
+                                                        </p>
+                                                        <p className={`subtitle is-6 ${page.color === 'primary' ? 'has-text-white' : 'has-text-secondary'}`}>
+                                                            {page.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
                         </div>
                     </div>
-                    <CityCards
-                        searchTerm={searchTerm}
-                        itemsToShow={itemsToShow}
-                    />
-                    {hasMoreItems && (
-                        <div className='has-text-centered mt-5'>
-                            <button
-                                className='button is-primary is-large'
-                                onClick={handleLoadMore}
-                            >
-                                Charger plus
-                            </button>
+
+                    {/* Sample Routes Section */}
+                    <div className='mb-6'>
+                        <h2 className='title is-3 mb-4'>
+                            <span className='icon mr-2'>
+                                <i className='fas fa-route'></i>
+                            </span>
+                            Exemples de Trajets
+                        </h2>
+                        <div className='columns is-multiline'>
+                            {sampleRoutes.map((route) => (
+                                <div key={route.path} className='column is-half-tablet is-full-mobile'>
+                                    <Link to={route.path} className='dashboard-card-link'>
+                                        <div className={`card dashboard-card ${route.color === 'secondary' ? 'has-background-secondary' : ''}`}>
+                                            <div className='card-content'>
+                                                <div className='media'>
+                                                    <div className='media-left'>
+                                                        <span className={`icon is-large ${route.color === 'secondary' ? 'has-text-white' : ''}`}>
+                                                            <i className={`fas ${route.icon} fa-2x`}></i>
+                                                        </span>
+                                                    </div>
+                                                    <div className='media-content'>
+                                                        <p className={`title is-5 ${route.color === 'secondary' ? 'has-text-white' : ''}`}>
+                                                            {route.title}
+                                                        </p>
+                                                        <p className={`subtitle is-6 ${route.color === 'secondary' ? 'has-text-white' : 'has-text-secondary'}`}>
+                                                            {route.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
                         </div>
-                    )}
+                    </div>
+
+                    {/* API Documentation Section */}
+                    <div className='mb-6'>
+                        <h2 className='title is-3 mb-4'>
+                            <span className='icon mr-2'>
+                                <i className='fas fa-code'></i>
+                            </span>
+                            Documentation
+                        </h2>
+                        <div className='columns'>
+                            {apiDocs.map((doc) => (
+                                <div key={doc.path} className='column is-half-tablet is-full-mobile'>
+                                    <Link to={doc.path} className='dashboard-card-link'>
+                                        <div className={`card dashboard-card ${doc.color === 'primary' ? 'has-background-primary' : ''}`}>
+                                            <div className='card-content'>
+                                                <div className='media'>
+                                                    <div className='media-left'>
+                                                        <span className={`icon is-large ${doc.color === 'primary' ? 'has-text-white' : ''}`}>
+                                                            <i className={`fas ${doc.icon} fa-2x`}></i>
+                                                        </span>
+                                                    </div>
+                                                    <div className='media-content'>
+                                                        <p className={`title is-5 ${doc.color === 'primary' ? 'has-text-white' : ''}`}>
+                                                            {doc.title}
+                                                        </p>
+                                                        <p className={`subtitle is-6 ${doc.color === 'primary' ? 'has-text-white' : 'has-text-secondary'}`}>
+                                                            {doc.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </section>
             <Footer />
@@ -70,4 +227,3 @@ const Home: React.FC = () => {
 };
 
 export default Home;
-

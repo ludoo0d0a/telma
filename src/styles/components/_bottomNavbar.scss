@@ -1,0 +1,57 @@
+// Styles for the new BottomNavbar component
+
+.bottom-navbar {
+  position: fixed;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 400px; // A max-width for larger screens
+  background-color: var(--background-light);
+  border-radius: 2rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  z-index: 1000;
+  border: 1px solid var(--background-darker);
+}
+
+.bottom-navbar-menu {
+  display: flex;
+  justify-content: space-around;
+  padding: 0.5rem 0;
+}
+
+.bottom-navbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  text-decoration: none;
+  width: 100%;
+  padding: 0.5rem 0;
+  transition: color 0.3s ease;
+
+  .icon {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .bottom-navbar-item-label {
+    font-size: 0.75rem;
+    font-weight: 500;
+  }
+
+  &:hover {
+    color: var(--text-primary);
+  }
+
+  // Active state styling
+  &.active {
+    color: var(--primary);
+
+    .icon, .bottom-navbar-item-label {
+      color: var(--primary);
+    }
+  }
+}

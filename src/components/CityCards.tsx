@@ -1,5 +1,5 @@
 import React from 'react';
-import CityCard from './CityCard';
+import TrainCard from './TrainCard';
 import stations from '../gares.json';
 
 interface CityCardsProps {
@@ -19,15 +19,12 @@ const CityCards: React.FC<CityCardsProps> = ({ searchTerm, itemsToShow }) => {
     const visibleCities: string[] = filteredCities.slice(0, itemsToShow);
 
     return (
-        <ul className='city-list'>
+        <div className='city-list'>
             {visibleCities.map((city: string) => (
-                <li key={city}>
-                    <CityCard city={city} />
-                </li>
+                <TrainCard key={city} city={city} />
             ))}
-        </ul>
+        </div>
     );
 };
 
 export default CityCards;
-

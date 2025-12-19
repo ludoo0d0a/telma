@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
+import { useSidebar } from '../contexts/SidebarContext';
 
 const Header: React.FC = () => {
-    const [isActive, setIsActive] = useState<boolean>(false);
+    const { toggleSidebar } = useSidebar();
 
     return (
         <nav className='navbar is-primary' role='navigation' aria-label='main navigation'>
             <div className='navbar-brand'>
-                <div className='navbar-item'>
-
-                </div>
+                <a
+                    role='button'
+                    className='navbar-burger'
+                    aria-label='menu'
+                    aria-expanded='false'
+                    onClick={toggleSidebar}
+                >
+                    <span aria-hidden='true'></span>
+                    <span aria-hidden='true'></span>
+                    <span aria-hidden='true'></span>
+                </a>
                 <div className='navbar-item'>
                     <img 
                         src={`${import.meta.env.BASE_URL}favicons/favicon.svg`}
@@ -20,62 +29,42 @@ const Header: React.FC = () => {
                 <Link to='/' className='navbar-item'>
                     <span className='title is-4 has-text-white'>Telma</span>
                 </Link>
-                <a
-                    role='button'
-                    className={`navbar-burger ${isActive ? 'is-active' : ''}`}
-                    aria-label='menu'
-                    aria-expanded='false'
-                    onClick={() => setIsActive(!isActive)}
-                >
-                    <span aria-hidden='true'></span>
-                    <span aria-hidden='true'></span>
-                    <span aria-hidden='true'></span>
-                </a>
             </div>
 
-            <div className={`navbar-menu ${isActive ? 'is-active' : ''}`}>
+            <div className='navbar-menu is-hidden-mobile'>
                 <div className='navbar-start'>
-                    <Link to='/' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/' className='navbar-item'>
                         Accueil
                     </Link>
-                    <Link to='/train' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/train' className='navbar-item'>
                         🚂 Train
                     </Link>
-                    <Link to='/trajet/bettembourg/metz' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
+                    <Link to='/itinerary/bettembourg/metz' className='navbar-item has-text-secondary'>
                         🚂 Bettembourg→Metz
                     </Link>
-                    <Link to='/trajet/metz/thionville' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
+                    <Link to='/itinerary/metz/thionville' className='navbar-item has-text-secondary'>
                         🚂 Metz→Thionville
                     </Link>
-                    <Link to='/places' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/places' className='navbar-item'>
                         Lieux
                     </Link>
-                    <Link to='/lines' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/lines' className='navbar-item'>
                         Lignes
                     </Link>
-                    <Link to='/schedules' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/schedules' className='navbar-item'>
                         Horaires
                     </Link>
-                    <Link to='/reports' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/reports' className='navbar-item'>
                         Rapports
                     </Link>
-                    <Link to='/coverage' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/coverage' className='navbar-item'>
                         Couverture
                     </Link>
-                    <Link to='/isochrones' className='navbar-item' onClick={() => setIsActive(false)}>
+                    <Link to='/isochrones' className='navbar-item'>
                         Isochrones
                     </Link>
                 </div>
-                <div className='navbar-end'>
-                    <Link to='/favorites' className='navbar-item has-text-warning' onClick={() => setIsActive(false)}>
-                        <span className='icon'><i className='fas fa-star'></i></span>
-                        <span>Favoris</span>
-                    </Link>
-                    <Link to='/api-docs' className='navbar-item has-text-secondary' onClick={() => setIsActive(false)}>
-                        📚 API Docs
-                    </Link>
-                </div>
-        </div>
+            </div>
         </nav>
     )
 }
