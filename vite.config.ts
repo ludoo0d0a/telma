@@ -68,6 +68,10 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.js'],
     testTimeout: 30000,
     hookTimeout: 30000,
+    // Use happy-dom for UI tests (files matching *.ui.test.tsx)
+    environmentMatchGlobs: [
+      ['**/*.ui.test.{ts,tsx}', 'happy-dom'],
+    ],
   },
 });
 
