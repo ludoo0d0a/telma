@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { searchPlaces } from '../services/navitiaApi';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
 import { cleanLocationName } from '../services/locationService';
 import type { Place } from '../client/models/place';
@@ -28,15 +28,46 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     const [suggestions, setSuggestions] = useState<Place[]>([]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
+    const [geolocating, setGeolocating] = useState<boolean>(false);
+    const [geolocationError, setGeolocationError] = useState<string | null>(null);
     const [selectedStation, setSelectedStation] = useState<Place | null>(null);
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set(getFavorites().map(f => f.id)));
     const wrapperRef = useRef<HTMLDivElement>(null);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    // Internal input state - user has full control while typing
+    const [inputValue, setInputValue] = useState<string>(value);
+    const hasUserInteractedRef = useRef<boolean>(false);
 
-    // Effect to perform search for the default term
+    const handleSelectStation = useCallback((station: Place): void => {
+        const cleanedName = cleanLocationName(station.name);
+        const newValue = cleanedName || '';
+        setInputValue(newValue); // Update internal state
+        onValueChange(newValue); // Update parent's state
+        setSelectedStation(station);
+        setIsOpen(false);
+        setGeolocationError(null); // Clear geolocation error when station is selected
+        onChange(station.id); // Notify parent of ID change
+        hasUserInteractedRef.current = false; // Reset interaction flag after selection
+        if (onStationFound) {
+            onStationFound({ ...station, name: cleanedName });
+        }
+    }, [onValueChange, onChange, onStationFound]);
+
+    // Sync inputValue with value prop only when user hasn't interacted
+    useEffect(() => {
+        if (!hasUserInteractedRef.current) {
+            setInputValue(value);
+        }
+    }, [value]);
+
+    // Effect to perform search for the default term (only on mount, not when user types)
     useEffect(() => {
         const performDefaultSearch = async () => {
-            if (defaultSearchTerm && defaultSearchTerm.length >= 2 && !selectedStation) {
+            // Only run default search if:
+            // 1. defaultSearchTerm is provided
+            // 2. No station is selected yet
+            // 3. User hasn't interacted with the input
+            if (defaultSearchTerm && defaultSearchTerm.length >= 2 && !selectedStation && !hasUserInteractedRef.current) {
                 setLoading(true);
                 try {
                     const response = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
@@ -59,7 +90,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         };
 
         performDefaultSearch();
-    }, [defaultSearchTerm, handleSelectStation]);
+    }, [defaultSearchTerm, handleSelectStation, selectedStation]);
 
     // Effect to close dropdown when clicking outside
     useEffect(() => {
@@ -111,8 +142,11 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const newValue = e.target.value;
+        setInputValue(newValue); // Update internal state immediately
+        hasUserInteractedRef.current = true; // Mark that user has interacted
         onValueChange(newValue); // Notify parent of value change
         setSelectedStation(null); // Reset selection
+        setGeolocationError(null); // Clear geolocation error when user types
 
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
@@ -128,16 +162,6 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         }, 300);
     };
 
-    const handleSelectStation = (station: Place): void => {
-        const cleanedName = cleanLocationName(station.name);
-        onValueChange(cleanedName || ''); // Update parent's state
-        setSelectedStation(station);
-        setIsOpen(false);
-        onChange(station.id); // Notify parent of ID change
-        if (onStationFound) {
-            onStationFound({ ...station, name: cleanedName });
-        }
-    };
 
     const handleToggleFavorite = (e: React.MouseEvent, station: Place): void => {
         e.stopPropagation(); // Prevent selecting the station when clicking star
@@ -166,30 +190,125 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         }
     };
 
+    const handleGetCurrentLocation = async (): Promise<void> => {
+        if (!navigator.geolocation) {
+            setGeolocationError('La géolocalisation n\'est pas supportée par votre navigateur');
+            return;
+        }
+
+        setGeolocating(true);
+        setGeolocationError(null);
+        setLoading(true);
+
+        try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                    resolve,
+                    reject,
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 10000,
+                        maximumAge: 0
+                    }
+                );
+            });
+
+            const { latitude, longitude } = position.coords;
+            
+            // Find nearby stations using coordinates
+            const coordStr = `${longitude};${latitude}`;
+            const response = await getPlacesNearby(coordStr, 'sncf', {
+                type: ['stop_area', 'stop_point'],
+                count: 20,
+                distance: 2000 // Search within 2km
+            });
+
+            const results = response.data;
+            const stations = results.places?.filter(place =>
+                place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
+            ) || [];
+
+            if (stations.length > 0) {
+                // Sort favorites first
+                const sortedStations = sortFavoritesFirst(stations);
+                setSuggestions(sortedStations);
+                setIsOpen(true);
+                
+                // Auto-select the closest station (first in results)
+                if (sortedStations.length > 0) {
+                    handleSelectStation(sortedStations[0]);
+                }
+            } else {
+                setGeolocationError('Aucune gare trouvée à proximité');
+            }
+        } catch (error) {
+            console.error('Error getting location:', error);
+            if (error && typeof error === 'object' && 'code' in error) {
+                const geoError = error as GeolocationPositionError;
+                switch (geoError.code) {
+                    case geoError.PERMISSION_DENIED:
+                        setGeolocationError('Permission de géolocalisation refusée. Veuillez autoriser l\'accès à votre position dans les paramètres de votre navigateur.');
+                        break;
+                    case geoError.POSITION_UNAVAILABLE:
+                        setGeolocationError('Impossible de déterminer votre position');
+                        break;
+                    case geoError.TIMEOUT:
+                        setGeolocationError('La demande de géolocalisation a expiré');
+                        break;
+                    default:
+                        setGeolocationError('Erreur lors de la géolocalisation');
+                }
+            } else {
+                setGeolocationError('Erreur lors de la recherche de gares à proximité');
+            }
+        } finally {
+            setGeolocating(false);
+            setLoading(false);
+        }
+    };
+
     return (
         <div className='field' ref={wrapperRef}>
             <label className='label'>{label}</label>
-            <div className='control has-icons-right'>
-                <input
-                    className='input'
-                    type='text'
-                    value={value}
-                    onChange={handleInputChange}
-                    onFocus={handleInputFocus}
-                    placeholder={placeholder}
-                    disabled={disabled}
-                />
-                {loading && (
-                    <span className='icon is-right'>
-                        <i className='fas fa-spinner fa-spin'></i>
-                    </span>
-                )}
-                {!loading && selectedStation && (
-                    <span className='icon is-right has-text-success'>
-                        <i className='fas fa-check-circle'></i>
-                    </span>
-                )}
+            <div className='field has-addons'>
+                <div className='control is-expanded has-icons-right'>
+                    <input
+                        className='input'
+                        type='text'
+                        value={inputValue}
+                        onChange={handleInputChange}
+                        onFocus={handleInputFocus}
+                        placeholder={placeholder}
+                        disabled={disabled || geolocating}
+                    />
+                    {loading && !geolocating && (
+                        <span className='icon is-right'>
+                            <i className='fas fa-spinner fa-spin'></i>
+                        </span>
+                    )}
+                    {!loading && !geolocating && selectedStation && (
+                        <span className='icon is-right has-text-success'>
+                            <i className='fas fa-check-circle'></i>
+                        </span>
+                    )}
+                </div>
+                <div className='control'>
+                    <button
+                        type='button'
+                        className={`button ${geolocating ? 'is-loading' : ''}`}
+                        onClick={handleGetCurrentLocation}
+                        disabled={disabled || geolocating || loading}
+                        title='Utiliser ma position actuelle'
+                    >
+                        <span className='icon'>
+                            <i className='fas fa-location-arrow'></i>
+                        </span>
+                    </button>
+                </div>
             </div>
+            {geolocationError && (
+                <p className='help is-danger'>{geolocationError}</p>
+            )}
             {isOpen && suggestions.length > 0 && (
                 <div className='dropdown is-active' style={{ width: '100%', position: 'relative' }}>
                     <div className='dropdown-menu' style={{ width: '100%' }}>
