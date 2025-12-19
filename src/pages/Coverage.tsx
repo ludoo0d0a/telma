@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import { getCoverage, getCoverageDetails } from '../services/navitiaApi';
 import type { CoverageResponse, Coverage } from '../client/models';
 import type { Link } from '../client/models/link';
@@ -83,30 +82,40 @@ const CoveragePage: React.FC = () => {
 
     const getStatusBadge = (status: string | undefined): React.ReactNode => {
         if (status === 'running') {
-            return <span className='coverage-status-badge coverage-status-badge--running'>En cours</span>;
+            return <span className='tag is-success'>En cours</span>;
         } else if (status === 'closed') {
-            return <span className='coverage-status-badge coverage-status-badge--closed'>Fermé</span>;
+            return <span className='tag is-danger'>Fermé</span>;
         }
-        return <span className='coverage-status-badge'>{status || 'N/A'}</span>;
+        return <span className='tag is-light'>{status || 'N/A'}</span>;
     };
 
     return (
         <>
-            <Header />
-            <div className='coverage-page'>
-                <div className='coverage-page__content-wrapper'>
-                    <h1 className='coverage-page__title'>
-                        Zones de <span>couverture</span>
-                    </h1>
+            <section className='section'>
+                <div className='container'>
+                    <div className='level mb-5'>
+                        <div className='level-left'>
+                            <div className='level-item'>
+                                <h1 className='title is-2'>
+                                    Zones de <span>couverture</span>
+                                </h1>
+                            </div>
+                        </div>
+                    </div>
 
                     {loading && !selectedCoverage && (
-                        <div className='loading'>
-                            <p>Chargement des zones de couverture...</p>
+                        <div className='box has-text-centered'>
+                            <div className='loader-wrapper'>
+                                <div className='loader is-loading'></div>
+                            </div>
+                            <p className='mt-4 subtitle is-5'>Chargement des zones de couverture...</p>
                         </div>
                     )}
 
                     {error && (
-                        <div className='error'>
+                        <div className='notification is-danger'>
+                            <button className='delete' onClick={() => setError(null)}></button>
+                            <p className='title is-5'>Erreur</p>
                             <p>{error}</p>
                         </div>
                     )}
@@ -114,9 +123,9 @@ const CoveragePage: React.FC = () => {
                     {!loading && !selectedCoverage && (
                         <>
                             {coverageResponse?.context && (
-                                <div className='coverage-context'>
-                                    <h2 className='coverage-context__title'>Contexte</h2>
-                                    <div className='coverage-context__content'>
+                                <div className='box mb-5'>
+                                    <h2 className='title is-4 mb-4'>Contexte</h2>
+                                    <div className='content'>
                                         {coverageResponse.context.timezone && (
                                             <p><strong>Fuseau horaire:</strong> {coverageResponse.context.timezone}</p>
                                         )}
@@ -124,7 +133,7 @@ const CoveragePage: React.FC = () => {
                                             <p><strong>Date/heure actuelle:</strong> {formatDateTime(coverageResponse.context.current_datetime)}</p>
                                         )}
                                         {coverageResponse.context.car_direct_path && (
-                                            <div className='coverage-context__car-path'>
+                                            <div>
                                                 <strong>Chemin direct en voiture:</strong>
                                                 {coverageResponse.context.car_direct_path.co2_emission && (
                                                     <p>CO₂: {coverageResponse.context.car_direct_path.co2_emission.value} {coverageResponse.context.car_direct_path.co2_emission.unit}</p>
@@ -148,114 +157,125 @@ const CoveragePage: React.FC = () => {
                                 </div>
                             )}
 
-                        <div className='coverages-list'>
-                            {coverages.length === 0 ? (
-                                <p>Aucune zone de couverture trouvée</p>
-                            ) : (
-                                coverages.map((coverage) => (
-                                    <div
-                                        key={coverage.id}
-                                        className='coverage-card'
-                                        onClick={() => handleCoverageClick(coverage.id)}
-                                    >
-                                        <h3 className='coverage-card__name'>{coverage.id}</h3>
-                                            <div className='coverage-card__status'>
-                                                {getStatusBadge(coverage.status)}
-                                            </div>
-                                            {coverage.start_production_date && (
-                                                <p className='coverage-card__date'>
-                                                    <strong>Début:</strong> {formatDate(coverage.start_production_date)}
-                                                </p>
-                                            )}
-                                            {coverage.end_production_date && (
-                                                <p className='coverage-card__date'>
-                                                    <strong>Fin:</strong> {formatDate(coverage.end_production_date)}
-                                                </p>
-                                            )}
+                            <div className='box'>
+                                <h2 className='title is-4 mb-5'>
+                                    Zones de couverture <span className='tag is-primary is-medium'>{coverages.length}</span>
+                                </h2>
+                                {coverages.length === 0 ? (
+                                    <div className='has-text-centered'>
+                                        <p className='subtitle is-5'>Aucune zone de couverture trouvée</p>
                                     </div>
-                                ))
-                            )}
-                        </div>
-
-                            {coverageResponse?.links && coverageResponse.links.length > 0 && (
-                                <div className='coverage-links'>
-                                    <h3 className='coverage-links__title'>Liens disponibles</h3>
-                                    <div className='coverage-links__list'>
-                                        {coverageResponse.links.map((link, index) => (
-                                            <a
-                                                key={index}
-                                                href={link.href}
-                                                target='_blank'
-                                                rel='noopener noreferrer'
-                                                className='coverage-link'
+                                ) : (
+                                    <div className='columns is-multiline'>
+                                        {coverages.map((coverage) => (
+                                            <div
+                                                key={coverage.id}
+                                                className='column is-half-tablet is-one-third-desktop'
                                             >
-                                                {link.type || link.rel || 'Lien'}
-                                            </a>
+                                                <div className='box is-clickable' onClick={() => handleCoverageClick(coverage.id)} style={{ cursor: 'pointer' }}>
+                                                    <h3 className='title is-5 mb-3'>{coverage.id}</h3>
+                                                    <div className='content'>
+                                                        <div className='mb-3'>
+                                                            {getStatusBadge(coverage.status)}
+                                                        </div>
+                                                        {coverage.start_production_date && (
+                                                            <p><strong>Début:</strong> {formatDate(coverage.start_production_date)}</p>
+                                                        )}
+                                                        {coverage.end_production_date && (
+                                                            <p><strong>Fin:</strong> {formatDate(coverage.end_production_date)}</p>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         ))}
                                     </div>
-                                </div>
-                            )}
+                                )}
+
+                                {coverageResponse?.links && coverageResponse.links.length > 0 && (
+                                    <div className='mt-5'>
+                                        <h3 className='title is-5 mb-3'>Liens disponibles</h3>
+                                        <div className='tags'>
+                                            {coverageResponse.links.map((link, index) => (
+                                                <a
+                                                    key={index}
+                                                    href={link.href}
+                                                    target='_blank'
+                                                    rel='noopener noreferrer'
+                                                    className='tag is-link is-medium'
+                                                >
+                                                    {link.type || link.rel || 'Lien'}
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </>
                     )}
 
                     {selectedCoverage && (
-                        <div className='coverage-details'>
-                            <button
-                                className='back-button'
-                                onClick={() => setSelectedCoverage(null)}
-                            >
-                                ← Retour à la liste
-                            </button>
+                        <div className='box'>
+                            <div className='level mb-5'>
+                                <div className='level-left'>
+                                    <div className='level-item'>
+                                        <button
+                                            className='button is-light'
+                                            onClick={() => setSelectedCoverage(null)}
+                                        >
+                                            <span className='icon'><i className='fas fa-arrow-left'></i></span>
+                                            <span>Retour à la liste</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                             
-                            <div className='coverage-details__header'>
-                                <h2 className='coverage-details__title'>Détails: {selectedCoverage.id}</h2>
+                            <div className='level mb-5'>
+                                <div className='level-left'>
+                                    <div className='level-item'>
+                                        <h2 className='title is-3'>Détails: {selectedCoverage.id}</h2>
+                                    </div>
+                                </div>
                                 {selectedCoverage.status && (
-                                    <div className='coverage-details__status'>
-                                        {getStatusBadge(selectedCoverage.status)}
+                                    <div className='level-right'>
+                                        <div className='level-item'>
+                                            {getStatusBadge(selectedCoverage.status)}
+                                        </div>
                                     </div>
                                 )}
                             </div>
 
-                            <div className='coverage-details__content'>
-                                <div className='coverage-details__section'>
-                                    <h3 className='coverage-details__section-title'>Informations générales</h3>
-                                    <div className='coverage-details__info-grid'>
+                            <div className='content'>
+                                <div className='box mb-5'>
+                                    <h3 className='title is-5 mb-4'>Informations générales</h3>
+                                    <div className='content'>
                                         {selectedCoverage.id && (
-                                            <div className='coverage-details__info-item'>
-                                                <strong>ID:</strong> <code>{selectedCoverage.id}</code>
-                                            </div>
+                                            <p><strong>ID:</strong> <code>{selectedCoverage.id}</code></p>
                                         )}
                                         {selectedCoverage.start_production_date && (
-                                            <div className='coverage-details__info-item'>
-                                                <strong>Date de début de production:</strong> {formatDate(selectedCoverage.start_production_date)}
-                                            </div>
+                                            <p><strong>Date de début de production:</strong> {formatDate(selectedCoverage.start_production_date)}</p>
                                         )}
                                         {selectedCoverage.end_production_date && (
-                                            <div className='coverage-details__info-item'>
-                                                <strong>Date de fin de production:</strong> {formatDate(selectedCoverage.end_production_date)}
-                                            </div>
+                                            <p><strong>Date de fin de production:</strong> {formatDate(selectedCoverage.end_production_date)}</p>
                                         )}
                                         {selectedCoverage.status && (
-                                            <div className='coverage-details__info-item'>
-                                                <strong>Statut:</strong> {selectedCoverage.status}
-                                            </div>
+                                            <p><strong>Statut:</strong> {selectedCoverage.status}</p>
                                         )}
                                     </div>
                                 </div>
 
                                 {selectedCoverage.shape && (
-                                    <div className='coverage-details__section'>
-                                        <h3 className='coverage-details__section-title'>Forme géographique</h3>
-                                        <div className='coverage-details__shape'>
-                                            <code>{selectedCoverage.shape}</code>
+                                    <div className='box mb-5'>
+                                        <h3 className='title is-5 mb-4'>Forme géographique</h3>
+                                        <div className='content'>
+                                            <pre>{selectedCoverage.shape}</pre>
                                         </div>
                                     </div>
                                 )}
 
                                 {selectedCoverage.context && (
-                                    <div className='coverage-details__section'>
-                                        <h3 className='coverage-details__section-title'>Contexte</h3>
-                                        <div className='coverage-details__context'>
+                                    <div className='box mb-5'>
+                                        <h3 className='title is-5 mb-4'>Contexte</h3>
+                                        <div className='content'>
                                             {selectedCoverage.context.timezone && (
                                                 <p><strong>Fuseau horaire:</strong> {selectedCoverage.context.timezone}</p>
                                             )}
@@ -288,16 +308,16 @@ const CoveragePage: React.FC = () => {
                                 )}
 
                                 {selectedCoverage.links && selectedCoverage.links.length > 0 && (
-                                    <div className='coverage-details__section'>
-                                        <h3 className='coverage-details__section-title'>Liens disponibles</h3>
-                                        <div className='coverage-details__links'>
+                                    <div className='box mb-5'>
+                                        <h3 className='title is-5 mb-4'>Liens disponibles</h3>
+                                        <div className='tags'>
                                             {selectedCoverage.links.map((link, index) => (
                                                 <a
                                                     key={index}
                                                     href={link.href}
                                                     target='_blank'
                                                     rel='noopener noreferrer'
-                                                    className='coverage-link'
+                                                    className='tag is-link is-medium'
                                                 >
                                                     {link.type || link.rel || 'Lien'} {link.templated && '(templated)'}
                                                 </a>
@@ -306,17 +326,29 @@ const CoveragePage: React.FC = () => {
                                     </div>
                                 )}
 
-                                <details className='coverage-details__raw'>
-                                    <summary className='coverage-details__raw-summary'>Afficher les données JSON brutes</summary>
-                                    <div className='coverage-details__raw-content'>
-                                <pre>{JSON.stringify(selectedCoverage, null, 2)}</pre>
-                                    </div>
-                                </details>
+                                <div className='box'>
+                                    <details>
+                                        <summary className='title is-6 mb-4' style={{ cursor: 'pointer' }}>Afficher les données JSON brutes</summary>
+                                        <div className='content mt-4'>
+                                            <pre style={{
+                                                background: 'rgba(0, 0, 0, 0.3)',
+                                                borderRadius: '10px',
+                                                padding: '1.5rem',
+                                                overflow: 'auto',
+                                                color: '#ccc',
+                                                fontFamily: "'Roboto Mono', monospace",
+                                                fontSize: '0.9rem',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word'
+                                            }}>{JSON.stringify(selectedCoverage, null, 2)}</pre>
+                                        </div>
+                                    </details>
+                                </div>
                             </div>
                         </div>
                     )}
                 </div>
-            </div>
+            </section>
             <Footer />
         </>
     );

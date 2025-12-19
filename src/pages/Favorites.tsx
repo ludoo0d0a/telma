@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../components/Header';
 import Footer from '../components/Footer';
 import { getFavorites, removeFavorite, type FavoriteLocation } from '../services/favoritesService';
 
@@ -41,7 +40,6 @@ const Favorites: React.FC = () => {
 
     return (
         <>
-            <Header />
             <section className='section'>
                 <div className='container'>
                     <div className='level mb-5'>

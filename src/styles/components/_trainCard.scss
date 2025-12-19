@@ -1,0 +1,56 @@
+// Styles for the new TrainCard component
+
+.train-card-wrapper {
+  display: block;
+  text-decoration: none;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+    .card {
+      box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      border-color: var(--primary-light);
+    }
+  }
+}
+
+.train-card-item {
+  // Use the card styles defined in _theme.scss
+  padding: 0.75rem;
+
+  .card-content {
+    padding: 0.5rem;
+  }
+
+  .media {
+    align-items: center; // Vertically align items in the media object
+  }
+
+  .media-left {
+    margin-right: 1rem;
+  }
+
+  .media-content {
+    // The title and subtitle styles from Bulma/theme are sufficient
+    .title {
+        color: var(--text-primary);
+    }
+    .subtitle {
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+  }
+
+  .media-right {
+    margin-left: 1rem;
+    .icon {
+        transition: transform 0.3s ease;
+    }
+  }
+
+  &:hover {
+    .media-right .icon {
+        transform: translateX(5px);
+    }
+  }
+}

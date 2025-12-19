@@ -26,11 +26,11 @@
         font-family: 'Roboto Mono', monospace;
         margin-top: 1rem;
         margin-bottom: 2rem;
-        color: #009eff;
+        color: var(--text-primary);
         font-size: 2rem;
 
         span {
-            color: #fd9a00;
+            color: var(--secondary);
         }
         
         @media (max-width: 768px) {
@@ -75,7 +75,7 @@
 
     h2 {
         font-family: 'Roboto Mono', monospace;
-        color: #009eff;
+        color: var(--text-primary);
         margin-bottom: 1rem;
         text-align: center;
     }

@@ -175,7 +175,7 @@ The API key must be provided in the `Authorization` header for all requests.
 - `/commercial-modes` - Commercial modes overview
 - `/journeys` - Journey planning
 - `/coverage` - Coverage areas
-- `/places` - Places search
+- `/places` - Places search (Lieux in French)
 - `/schedules` - Schedule information
 - `/reports` - Train reports
 - `/lines` - Train lines

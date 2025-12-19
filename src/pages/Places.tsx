@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 import type { Place } from '../client/models/place';
 
@@ -58,105 +57,155 @@ const Places: React.FC = () => {
 
     return (
         <>
-            <Header />
-            <div className='places-page'>
-                <div className='places-page__content-wrapper'>
-                    <h1 className='places-page__title'>
-                        Recherche de <span>lieux</span>
-                    </h1>
-
-                    <div className='search-tabs'>
-                        <button
-                            className={`tab-button ${searchType === 'text' ? 'active' : ''}`}
-                            onClick={() => {
-                                setSearchType('text');
-                                setPlaces([]);
-                                setError(null);
-                            }}
-                        >
-                            Recherche par texte
-                        </button>
-                        <button
-                            className={`tab-button ${searchType === 'nearby' ? 'active' : ''}`}
-                            onClick={() => {
-                                setSearchType('nearby');
-                                setPlaces([]);
-                                setError(null);
-                            }}
-                        >
-                            Recherche par coordonnées
-                        </button>
+            <section className='section'>
+                <div className='container'>
+                    <div className='level mb-5'>
+                        <div className='level-left'>
+                            <div className='level-item'>
+                                <h1 className='title is-2'>
+                                    Recherche de <span>lieux</span>
+                                </h1>
+                            </div>
+                        </div>
                     </div>
 
-                    {searchType === 'text' ? (
-                        <form onSubmit={handleTextSearch} className='places-form'>
-                            <div className='form-group'>
-                                <label htmlFor='search'>Rechercher un lieu</label>
-                                <input
-                                    id='search'
-                                    type='text'
-                                    value={searchQuery}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                                    placeholder='Ex: Paris, Gare du Nord...'
-                                    className='form-input'
-                                />
+                    <div className='box mb-5'>
+                        <h3 className='title is-5 mb-4'>Type de recherche</h3>
+                        <div className='tabs is-boxed mb-4'>
+                            <ul>
+                                <li className={searchType === 'text' ? 'is-active' : ''}>
+                                    <a onClick={() => {
+                                        setSearchType('text');
+                                        setPlaces([]);
+                                        setError(null);
+                                    }}>
+                                        <span className='icon is-small'><i className='fas fa-search'></i></span>
+                                        <span>Recherche par texte</span>
+                                    </a>
+                                </li>
+                                <li className={searchType === 'nearby' ? 'is-active' : ''}>
+                                    <a onClick={() => {
+                                        setSearchType('nearby');
+                                        setPlaces([]);
+                                        setError(null);
+                                    }}>
+                                        <span className='icon is-small'><i className='fas fa-map-marker-alt'></i></span>
+                                        <span>Recherche par coordonnées</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                        {searchType === 'text' ? (
+                            <form onSubmit={handleTextSearch}>
+                                <div className='field'>
+                                    <label className='label' htmlFor='search'>Rechercher un lieu</label>
+                                    <div className='control'>
+                                        <input
+                                            id='search'
+                                            className='input'
+                                            type='text'
+                                            value={searchQuery}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
+                                            placeholder='Ex: Paris, Gare du Nord...'
+                                            disabled={loading}
+                                        />
+                                    </div>
+                                </div>
+                                <div className='field'>
+                                    <div className='control'>
+                                        <button type='submit' className='button is-primary' disabled={loading}>
+                                            <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`}></i></span>
+                                            <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        ) : (
+                            <form onSubmit={handleNearbySearch}>
+                                <div className='field'>
+                                    <label className='label' htmlFor='coord'>Coordonnées (format: lon;lat)</label>
+                                    <div className='control'>
+                                        <input
+                                            id='coord'
+                                            className='input'
+                                            type='text'
+                                            value={coordQuery}
+                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoordQuery(e.target.value)}
+                                            placeholder='Ex: 2.3522;48.8566'
+                                            disabled={loading}
+                                        />
+                                    </div>
+                                    <p className='help'>Format: longitude;latitude (ex: 2.3522;48.8566 pour Paris)</p>
+                                </div>
+                                <div className='field'>
+                                    <div className='control'>
+                                        <button type='submit' className='button is-primary' disabled={loading}>
+                                            <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`}></i></span>
+                                            <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        )}
+                    </div>
+
+                    {loading && (
+                        <div className='box has-text-centered'>
+                            <div className='loader-wrapper'>
+                                <div className='loader is-loading'></div>
                             </div>
-                            <button type='submit' className='form-button' disabled={loading}>
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </button>
-                        </form>
-                    ) : (
-                        <form onSubmit={handleNearbySearch} className='places-form'>
-                            <div className='form-group'>
-                                <label htmlFor='coord'>Coordonnées (format: lon;lat)</label>
-                                <input
-                                    id='coord'
-                                    type='text'
-                                    value={coordQuery}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoordQuery(e.target.value)}
-                                    placeholder='Ex: 2.3522;48.8566'
-                                    className='form-input'
-                                />
-                            </div>
-                            <button type='submit' className='form-button' disabled={loading}>
-                                {loading ? 'Recherche...' : 'Rechercher'}
-                            </button>
-                        </form>
+                            <p className='mt-4 subtitle is-5'>Chargement des lieux...</p>
+                        </div>
                     )}
 
                     {error && (
-                        <div className='error'>
+                        <div className='notification is-danger'>
+                            <button className='delete' onClick={() => setError(null)}></button>
+                            <p className='title is-5'>Erreur</p>
                             <p>{error}</p>
                         </div>
                     )}
 
                     {!loading && places.length > 0 && (
-                        <div className='places-list'>
-                            <h2>Résultats ({places.length})</h2>
-                            {places.map((place, index) => (
-                                <div key={place.id || index} className='place-card'>
-                                    <h3 className='place-card__name'>{place.name || 'Sans nom'}</h3>
-                                    <p className='place-card__type'>Type: {place.embedded_type || 'N/A'}</p>
-                                    {place.id && (
-                                        <p className='place-card__id'>ID: {place.id}</p>
-                                    )}
-                                    {place.administrative_regions && place.administrative_regions.length > 0 && (
-                                        <p className='place-card__region'>
-                                            Région: {place.administrative_regions[0].name}
-                                        </p>
-                                    )}
-                                </div>
-                            ))}
+                        <div className='box'>
+                            <h2 className='title is-4 mb-5'>
+                                Résultats <span className='tag is-primary is-medium'>{places.length}</span>
+                            </h2>
+                            <div className='columns is-multiline'>
+                                {places.map((place, index) => (
+                                    <div key={place.id || index} className='column is-half'>
+                                        <div className='box'>
+                                            <h3 className='title is-5 mb-3'>{place.name || 'Sans nom'}</h3>
+                                            <div className='content'>
+                                                <p><strong>Type:</strong> {place.embedded_type || 'N/A'}</p>
+                                                {place.id && (
+                                                    <p><strong>ID:</strong> <code>{place.id}</code></p>
+                                                )}
+                                                {place.administrative_regions && place.administrative_regions.length > 0 && (
+                                                    <p><strong>Région:</strong> {place.administrative_regions[0].name}</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
 
-                    {!loading && places.length === 0 && !error && (
-                        <div className='no-results'>
-                            <p>Aucun résultat trouvé</p>
+                    {!loading && places.length === 0 && !error && searchQuery && (
+                        <div className='box has-text-centered'>
+                            <div className='content'>
+                                <span className='icon is-large has-text-warning mb-4' style={{fontSize: '4rem'}}>📍</span>
+                                <h2 className='title is-4'>Aucun résultat trouvé</h2>
+                                <p className='subtitle is-6 has-text-grey'>
+                                    Aucun lieu ne correspond à votre recherche.
+                                </p>
+                            </div>
                         </div>
                     )}
                 </div>
-            </div>
+            </section>
             <Footer />
         </>
     );

@@ -5,6 +5,56 @@
     flex-direction: column;
 }
 
+// Dashboard styles
+.dashboard-card-link {
+    text-decoration: none;
+    display: block;
+    height: 100%;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
+.dashboard-card {
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+
+    &:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-content {
+        padding: 1.5rem;
+    }
+
+    .media {
+        align-items: center;
+    }
+
+    .media-left {
+        margin-right: 1rem;
+    }
+
+    .icon {
+        transition: transform 0.3s ease;
+    }
+
+    &:hover .icon {
+        transform: scale(1.1);
+    }
+
+    &.has-background-primary,
+    &.has-background-secondary {
+        .title,
+        .subtitle {
+            color: white !important;
+        }
+    }
+}
+
 .home {
   display: flex;
   justify-content: center;

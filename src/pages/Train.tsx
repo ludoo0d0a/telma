@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
-import Header from '../components/Header';
 import TrainWaypointsMap from '../components/TrainWaypointsMap';
 import { autocompletePT } from '../services/navitiaApi';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
@@ -203,7 +202,6 @@ const Train: React.FC = () => {
     if (!id) {
         return (
             <>
-                <Header />
                 <section className='section'>
                     <div className='container'>
                         <div className='box'>
@@ -340,7 +338,6 @@ const Train: React.FC = () => {
     if (loading) {
         return (
             <>
-                <Header />
                 <section className='section'>
                     <div className='container'>
                         <div className='box has-text-centered'>
@@ -359,7 +356,6 @@ const Train: React.FC = () => {
     if (error || !trainData) {
         return (
             <>
-                <Header />
                 <section className='section'>
                     <div className='container'>
                         <div className='box has-text-centered'>
@@ -413,7 +409,6 @@ const Train: React.FC = () => {
 
     return (
         <>
-            <Header />
             <section className='section'>
                 <div className='container'>
                     <div className='box'>

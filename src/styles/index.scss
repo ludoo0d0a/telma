@@ -19,8 +19,9 @@
 @use './pages/isochrones' as *;
 @use './pages/metzBettembourg' as *;
 @use './components/cityCards' as *;
-@use './components/cityCard' as *;
-@use './components/navbar' as *;
+@use './components/trainCard' as *;
+@use './components/bottomNavbar' as *;
+@use './components/sidebar' as *;
 @use './components/departures' as *;
 @use './components/arrivals' as *;
 @use './components/trainStations' as *;
@@ -28,6 +29,6 @@
 @use './components/stops' as *;
 
 // Import statements must come after @use
-@import '@fortawesome/fontawesome-free/scss/fontawesome';
-@import '@fortawesome/fontawesome-free/scss/solid';
+@use '@fortawesome/fontawesome-free/scss/fontawesome' as *;
+@use '@fortawesome/fontawesome-free/scss/solid' as *;
 @import 'bulma/css/bulma.css';
