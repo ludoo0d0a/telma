@@ -48,9 +48,6 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
 }) => {
     const mapRef = useRef<MapRef>(null);
     const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
-    // #region agent log
-    React.useEffect(()=>{fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeoJSONMap.tsx:48',message:'GeoJSONMap received markers prop',data:{markersCount:markers.length,markers:markers.map(m=>({lat:m.lat,lon:m.lon,name:m.name,hasValidCoords:!!(m.lat&&m.lon)}))},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});},[markers]);
-    // #endregion
 
     // Convert multi-geometries to single geometries (MapLibre doesn't support MultiLineString, MultiPolygon, MultiPoint in filters)
     const expandMultiGeometries = (feature: GeoJSONFeature): GeoJSONFeature[] => {
@@ -369,14 +366,8 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                 )}
                 {markers.map((marker, idx) => {
                     if (!marker.lat || !marker.lon) {
-                        // #region agent log
-                        fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeoJSONMap.tsx:368',message:'Marker filtered out - invalid coordinates',data:{idx,lat:marker.lat,lon:marker.lon},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'D'})}).catch(()=>{});
-                        // #endregion
                         return null;
                     }
-                    // #region agent log
-                    fetch('http://127.0.0.1:7243/ingest/f31e33b6-7657-4ad5-990d-1ee8cb465bca',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'GeoJSONMap.tsx:370',message:'Rendering marker',data:{idx,lat:marker.lat,lon:marker.lon,name:marker.name},timestamp:Date.now(),sessionId:'debug-session',runId:'run1',hypothesisId:'E'})}).catch(()=>{});
-                    // #endregion
                     return (
                         <Marker
                             key={idx}
