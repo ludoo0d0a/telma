@@ -5,18 +5,32 @@ import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 import type { Plugin } from 'vite';
 
+// Get base URL from environment variable, defaulting to root
+const BASE_URL = process.env.PUBLIC_URL || '/';
+// Ensure base URL ends with / for consistency
+const BASE_PATH = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
+
 // Plugin to rewrite absolute paths in HTML for base URL
 function rewriteHtmlBase(): Plugin {
   return {
     name: 'rewrite-html-base',
     transformIndexHtml(html) {
-      const base = process.env.PUBLIC_URL || '/';
-      if (base !== '/') {
+      if (BASE_URL !== '/') {
         // Rewrite absolute paths for favicons and other assets
-        return html.replace(
-          /href="\/(favicons\/[^"]+)"/g,
-          `href="${base}$1"`
-        );
+        // Match href="/path" or src="/path" where path doesn't start with http:// or https://
+        return html
+          .replace(
+            /(href|src)="\/([^"]+)"/g,
+            (match, attr, path) => {
+              // Don't rewrite external URLs or data URIs
+              if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+                return match;
+              }
+              // Remove leading slash and add base path
+              const cleanPath = path.startsWith('/') ? path.slice(1) : path;
+              return `${attr}="${BASE_PATH}${cleanPath}"`;
+            }
+          );
       }
       return html;
     },
@@ -39,19 +53,20 @@ export default defineConfig({
         short_name: 'SNCF API',
         description: 'An explorer for the SNCF API',
         theme_color: '#ffffff',
-        icons: [
+        start_url: BASE_URL === '/' ? '/' : BASE_PATH.slice(0, -1), // Remove trailing slash for start_url
+        icons: [Ë
           {
-            src: 'favicons/pwa-192x192.png',
+            src: `${BASE_PATH}favicons/pwa-192x192.png`,
             sizes: '192x192',
             type: 'image/png',
           },
           {
-            src: 'favicons/pwa-512x512.png',
+            src: `${BASE_PATH}favicons/pwa-512x512.png`,
             sizes: '512x512',
             type: 'image/png',
           },
           {
-            src: 'favicons/pwa-maskable-512x512.png',
+            src: `${BASE_PATH}favicons/pwa-maskable-512x512.png`,
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable',
@@ -60,7 +75,7 @@ export default defineConfig({
       },
     }),
   ],
-  base: process.env.PUBLIC_URL || '/',
+  base: BASE_URL,
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
