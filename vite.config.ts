@@ -25,6 +25,7 @@ export default defineConfig({
         description: 'An explorer for the SNCF API',
         theme_color: '#ffffff',
         start_url: BASE_URL === '/' ? '/' : BASE_PATH.slice(0, -1), // Remove trailing slash for start_url
+        scope: BASE_URL === '/' ? '/' : BASE_PATH.slice(0, -1), // Ensure scope matches start_url
         icons: [
           {
             src: `${BASE_PATH}favicons/pwa-192x192.png`,
