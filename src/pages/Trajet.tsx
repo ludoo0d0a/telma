@@ -532,6 +532,7 @@ const Trajet: React.FC = () => {
                                 <LocationAutocomplete
                                     label='Gare de départ'
                                     value={fromName}
+                                    onValueChange={setFromName}
                                     onChange={(id: string | undefined) => setFromId(id)}
                                     defaultSearchTerm={fromName || 'Metz'}
                                     onStationFound={handleFromStationFound}
@@ -559,6 +560,7 @@ const Trajet: React.FC = () => {
                                 <LocationAutocomplete
                                     label="Gare d'arrivée"
                                     value={toName}
+                                    onValueChange={setToName}
                                     onChange={(id: string | undefined) => setToId(id)}
                                     defaultSearchTerm={toName || 'Thionville'}
                                     onStationFound={handleToStationFound}

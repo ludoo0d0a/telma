@@ -6,7 +6,8 @@ import type { Place } from '../client/models/place';
 
 interface LocationAutocompleteProps {
     label: string;
-    value?: string | null;
+    value: string;
+    onValueChange: (newValue: string) => void;
     onChange: (id: string | undefined) => void;
     placeholder?: string;
     defaultSearchTerm?: string | null;
@@ -14,16 +15,16 @@ interface LocationAutocompleteProps {
     disabled?: boolean;
 }
 
-const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({ 
-    label, 
-    value, 
-    onChange, 
+const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
+    label,
+    value,
+    onValueChange,
+    onChange,
     placeholder = 'Rechercher une gare...',
     defaultSearchTerm = null,
     onStationFound = null,
     disabled = false
 }) => {
-    const [inputValue, setInputValue] = useState<string>(value || '');
     const [suggestions, setSuggestions] = useState<Place[]>([]);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
@@ -31,73 +32,36 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set(getFavorites().map(f => f.id)));
     const wrapperRef = useRef<HTMLDivElement>(null);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    const isUserTypingRef = useRef<boolean>(false);
-    const previousValueRef = useRef<string>(value || '');
 
-    // Search for default station on mount if defaultSearchTerm is provided
+    // Effect to perform search for the default term
     useEffect(() => {
-        // Search if we have a defaultSearchTerm but haven't selected a station yet
-        // Allow search even if value/inputValue is set (from URL params) - we still need to find the station ID
-        if (defaultSearchTerm && !selectedStation) {
-            setInputValue(defaultSearchTerm);
-            // Auto-select first result for default search
-            const performDefaultSearch = async () => {
-                if (defaultSearchTerm.length >= 2) {
-                    setLoading(true);
-                    try {
-                        const response = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
-                        const results = response.data;
-                        const stations = results.places?.filter(place => 
-                            place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
-                        ) || [];
-                        
-                        if (stations.length > 0) {
-                            // Sort favorites first and select the first one
-                            const sortedStations = sortFavoritesFirst(stations);
-                            const firstStation = sortedStations[0];
-                            const cleanedName = cleanLocationName(firstStation.name);
-                            setInputValue(cleanedName || '');
-                            setSelectedStation(firstStation);
-                            onChange(firstStation.id);
-                            if (onStationFound) {
-                                onStationFound({ ...firstStation, name: cleanedName });
-                            }
-                            // Update favoriteIds state
-                            setFavoriteIds(new Set(getFavorites().map(f => f.id)));
-                        }
-                    } catch (error) {
-                        console.error('Error searching default place:', error);
-                    } finally {
-                        setLoading(false);
+        const performDefaultSearch = async () => {
+            if (defaultSearchTerm && defaultSearchTerm.length >= 2 && !selectedStation) {
+                setLoading(true);
+                try {
+                    const response = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
+                    const results = response.data;
+                    const stations = results.places?.filter(place =>
+                        place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
+                    ) || [];
+
+                    if (stations.length > 0) {
+                        const sortedStations = sortFavoritesFirst(stations);
+                        const firstStation = sortedStations[0];
+                        handleSelectStation(firstStation); // Select the first station
                     }
+                } catch (error) {
+                    console.error('Error searching default place:', error);
+                } finally {
+                    setLoading(false);
                 }
-            };
-            performDefaultSearch();
-        }
-    }, [defaultSearchTerm, selectedStation, onChange, onStationFound]);
+            }
+        };
 
-    // Update input value when value prop changes externally (not from user typing)
-    useEffect(() => {
-        // Only sync from prop if:
-        // 1. The value prop actually changed externally
-        // 2. User is not currently typing
-        // 3. The new value is different from current inputValue
-        const valueChanged = value !== previousValueRef.current;
-        if (valueChanged && !isUserTypingRef.current) {
-            // Use a function to get current inputValue to avoid stale closure
-            setInputValue(prevInputValue => {
-                // Only update if the prop value is meaningfully different
-                if (value && value !== prevInputValue) {
-                    return value;
-                }
-                return prevInputValue;
-            });
-            setSelectedStation(null); // Clear selection when value changes externally
-        }
-        previousValueRef.current = value || '';
-    }, [value]);
+        performDefaultSearch();
+    }, [defaultSearchTerm, handleSelectStation]);
 
-    // Close dropdown when clicking outside
+    // Effect to close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -147,16 +111,13 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const newValue = e.target.value;
-        isUserTypingRef.current = true;
-        setInputValue(newValue);
-        setSelectedStation(null);
-        
-        // Clear previous timeout
+        onValueChange(newValue); // Notify parent of value change
+        setSelectedStation(null); // Reset selection
+
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
         }
-        
-        // Debounce search
+
         searchTimeoutRef.current = setTimeout(() => {
             if (newValue.length >= 2) {
                 searchStation(newValue);
@@ -164,18 +125,15 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                 setSuggestions([]);
                 setIsOpen(false);
             }
-            // Reset typing flag after debounce completes
-            isUserTypingRef.current = false;
         }, 300);
     };
 
     const handleSelectStation = (station: Place): void => {
-        isUserTypingRef.current = false; // User selected, not typing anymore
         const cleanedName = cleanLocationName(station.name);
-        setInputValue(cleanedName || '');
+        onValueChange(cleanedName || ''); // Update parent's state
         setSelectedStation(station);
         setIsOpen(false);
-        onChange(station.id);
+        onChange(station.id); // Notify parent of ID change
         if (onStationFound) {
             onStationFound({ ...station, name: cleanedName });
         }
@@ -215,7 +173,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                 <input
                     className='input'
                     type='text'
-                    value={inputValue}
+                    value={value}
                     onChange={handleInputChange}
                     onFocus={handleInputFocus}
                     placeholder={placeholder}
