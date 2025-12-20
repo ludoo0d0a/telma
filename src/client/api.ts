@@ -19,6 +19,8 @@ export * from './api/contributors-api';
 export * from './api/coverage-api';
 export * from './api/datasets-api';
 export * from './api/departures-api';
+export * from './api/disruptions-api';
+export * from './api/inverted-geocoding-api';
 export * from './api/isochrones-api';
 export * from './api/journeys-api';
 export * from './api/places-api';

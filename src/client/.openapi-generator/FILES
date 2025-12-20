@@ -6,6 +6,8 @@ api/contributors-api.ts
 api/coverage-api.ts
 api/datasets-api.ts
 api/departures-api.ts
+api/disruptions-api.ts
+api/inverted-geocoding-api.ts
 api/isochrones-api.ts
 api/journeys-api.ts
 api/places-api.ts
@@ -26,12 +28,15 @@ docs/Co2Emission.md
 docs/Co2EmissionRate.md
 docs/CommercialMode.md
 docs/CommercialModesResponse.md
+docs/CompaniesResponse.md
+docs/Company.md
 docs/Context.md
 docs/ContextCarDirectPath.md
 docs/Contributor.md
 docs/ContributorsApi.md
 docs/ContributorsResponse.md
 docs/Coord.md
+docs/CoordsResponse.md
 docs/Coverage.md
 docs/CoverageApi.md
 docs/CoverageCoverageCoordCoordFreefloatingsGet200Response.md
@@ -59,6 +64,8 @@ docs/DisplayInformation.md
 docs/Disruption.md
 docs/DisruptionMessagesInner.md
 docs/DisruptionMessagesInnerChannel.md
+docs/DisruptionsApi.md
+docs/DisruptionsResponse.md
 docs/Error.md
 docs/ErrorError.md
 docs/Fare.md
@@ -71,6 +78,7 @@ docs/ImpactApplicationPeriodsInner.md
 docs/ImpactImpactedStopsInner.md
 docs/ImpactPtObject.md
 docs/ImpactPtObjectTrip.md
+docs/InvertedGeocodingApi.md
 docs/IsochronesApi.md
 docs/Journey.md
 docs/JourneyCalendar.md
@@ -83,6 +91,9 @@ docs/Line.md
 docs/LinesResponse.md
 docs/Link.md
 docs/Network.md
+docs/POIType.md
+docs/POITypesResponse.md
+docs/POIsResponse.md
 docs/Pagination.md
 docs/PhysicalMode.md
 docs/PhysicalModesResponse.md
@@ -129,11 +140,14 @@ models/co2-emission-rate.ts
 models/co2-emission.ts
 models/commercial-mode.ts
 models/commercial-modes-response.ts
+models/companies-response.ts
+models/company.ts
 models/context-car-direct-path.ts
 models/context.ts
 models/contributor.ts
 models/contributors-response.ts
 models/coord.ts
+models/coords-response.ts
 models/coverage-coverage-coord-coord-freefloatings-get200-response.ts
 models/coverage-coverage-equipment-reports-get200-response-equipment-reports-inner-equipments-inner.ts
 models/coverage-coverage-equipment-reports-get200-response-equipment-reports-inner.ts
@@ -158,6 +172,7 @@ models/display-information.ts
 models/disruption-messages-inner-channel.ts
 models/disruption-messages-inner.ts
 models/disruption.ts
+models/disruptions-response.ts
 models/error-error.ts
 models/fare-total.ts
 models/fare.ts
@@ -190,6 +205,9 @@ models/place-poi-poi-type.ts
 models/place-poi.ts
 models/place.ts
 models/places-response.ts
+models/pois-response.ts
+models/poitype.ts
+models/poitypes-response.ts
 models/route-schedule-table-inner.ts
 models/route-schedule.ts
 models/route-schedules-response.ts

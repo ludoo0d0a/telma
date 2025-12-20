@@ -15,21 +15,17 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Disruption } from './disruption';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Pagination } from './pagination';
+import type { POIType } from './poitype';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { VehicleJourney } from './vehicle-journey';
+import type { Pagination } from './pagination';
 
-export interface VehicleJourneysResponse {
-    'vehicle_journeys'?: Array<VehicleJourney>;
+export interface POITypesResponse {
+    'poi_types'?: Array<POIType>;
     'pagination'?: Pagination;
     'links'?: Array<Link>;
-    'disruptions'?: Array<Disruption>;
 }
 
