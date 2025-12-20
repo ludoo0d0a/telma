@@ -14,7 +14,7 @@ const Sample1: React.FC = () => {
                     </div>
                 </div>
                 <div className="notification">
-                    <Icon name="fa-circle" />
+                    <Icon name="fa-bell" />
                 </div>
             </header>
 
