@@ -39,10 +39,21 @@ export const extractVehicleJourneyId = (linkId: string | undefined | null): stri
 
 /**
  * Get vehicle journey details
+ * @param vehicleJourneyId - The vehicle journey ID
+ * @param coverage - Coverage area (default: 'sncf')
+ * @param depth - Depth level for nested objects (default: 2 to get stop_times)
  */
 export const getVehicleJourney = (
     vehicleJourneyId: string,
-    coverage: string = DEFAULT_COVERAGE
-): AxiosPromise<VehicleJourneysResponse> =>
-    getClient().publicTransportObjects.coverageCoverageVehicleJourneysIdGet(coverage, vehicleJourneyId);
+    coverage: string = DEFAULT_COVERAGE,
+    depth: number = 2
+): AxiosPromise<VehicleJourneysResponse> => {
+    // Add depth parameter to get stop_times and other nested data
+    const options = {
+        params: {
+            depth: depth
+        }
+    };
+    return getClient().publicTransportObjects.coverageCoverageVehicleJourneysIdGet(coverage, vehicleJourneyId, options);
+};
 

@@ -1,38 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Map, { Marker, Popup, Source, Layer } from 'react-map-gl/maplibre';
+import Map, { Marker, Popup, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import type { MapRef, ViewState } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-
-interface GeoJSONMarker {
-    lat: number;
-    lon: number;
-    name?: string | null;
-    popup?: React.ReactNode;
-}
-
-interface GeoJSONMapProps {
-    geojsonData?: unknown;
-    style?: ((feature: unknown) => Record<string, unknown>) | Record<string, unknown>;
-    markers?: GeoJSONMarker[];
-    height?: number;
-    center?: [number, number];
-    zoom?: number;
-    fitBounds?: boolean;
-}
-
-interface GeoJSONFeature {
-    type: string;
-    geometry?: {
-        type: string;
-        coordinates: unknown;
-    };
-    properties?: Record<string, unknown>;
-}
-
-interface GeoJSONFeatureCollection {
-    type: 'FeatureCollection';
-    features: GeoJSONFeature[];
-}
+import type { GeoJSONMapProps } from '../types/geojsonMap';
+import { processGeoJSONData, calculateBounds, hasLineStrings, hasPolygons } from '../services/geojsonService';
+import type { FeatureCollection } from 'geojson';
 
 /**
  * GeoJSONMap component to display GeoJSON geometries on a map
@@ -48,186 +20,44 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
 }) => {
     const mapRef = useRef<MapRef>(null);
     const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const [layersReady, setLayersReady] = useState(false);
 
-    // Convert multi-geometries to single geometries (MapLibre doesn't support MultiLineString, MultiPolygon, MultiPoint in filters)
-    const expandMultiGeometries = (feature: GeoJSONFeature): GeoJSONFeature[] => {
-        if (!feature.geometry) return [feature];
-
-        const geomType = feature.geometry.type;
-        const coords = feature.geometry.coordinates;
-
-        if (geomType === 'MultiLineString' && Array.isArray(coords)) {
-            // Convert MultiLineString to multiple LineString features
-            return coords.map((lineStringCoords: unknown) => ({
-                type: 'Feature',
-                geometry: {
-                    type: 'LineString',
-                    coordinates: lineStringCoords
-                },
-                properties: feature.properties || {}
-            }));
-        }
-
-        if (geomType === 'MultiPolygon' && Array.isArray(coords)) {
-            // Convert MultiPolygon to multiple Polygon features
-            return coords.map((polygonCoords: unknown) => ({
-                type: 'Feature',
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: polygonCoords
-                },
-                properties: feature.properties || {}
-            }));
-        }
-
-        if (geomType === 'MultiPoint' && Array.isArray(coords)) {
-            // Convert MultiPoint to multiple Point features
-            return coords.map((pointCoords: unknown) => ({
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: pointCoords
-                },
-                properties: feature.properties || {}
-            }));
-        }
-
-        // Return as-is for other geometry types
-        return [feature];
-    };
-
-    // Process GeoJSON data
-    const processedGeoJSON = useMemo<GeoJSONFeatureCollection | null>(() => {
-        if (!geojsonData) return null;
-
-        const data = geojsonData as GeoJSONFeature | GeoJSONFeatureCollection | GeoJSONFeature[] | { geojson?: unknown };
-
-        let features: GeoJSONFeature[] = [];
-
-        // If it's already a FeatureCollection, use it as is
-        if (typeof data === 'object' && 'type' in data && data.type === 'FeatureCollection') {
-            features = (data as GeoJSONFeatureCollection).features;
-        }
-        // If it's a single Feature, wrap it in a FeatureCollection
-        else if (typeof data === 'object' && 'type' in data && data.type === 'Feature') {
-            features = [data as GeoJSONFeature];
-        }
-        // If it's a Geometry object, wrap it in a Feature
-        else if (typeof data === 'object' && 'type' in data && 
-            ['Point', 'LineString', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon'].includes(data.type)) {
-            features = [{
-                type: 'Feature',
-                geometry: data as GeoJSONFeature['geometry'],
-                properties: {}
-            }];
-        }
-        // If it's an array, process each item
-        else if (Array.isArray(data)) {
-            data
-                .filter((item): item is { geojson?: unknown } => item !== null && typeof item === 'object')
-                .forEach((item, index) => {
-                    const geom = item.geojson;
-                    if (!geom || typeof geom !== 'object') return;
-                    
-                    // If it's already a FeatureCollection, extract its features
-                    if ('type' in geom && geom.type === 'FeatureCollection' && 'features' in geom && Array.isArray(geom.features)) {
-                        geom.features.forEach((feature: unknown) => {
-                            if (typeof feature === 'object' && feature !== null) {
-                                features.push({
-                                    ...(feature as GeoJSONFeature),
-                                    properties: {
-                                        ...((feature as GeoJSONFeature).properties || {}),
-                                        ...item,
-                                        index
-                                    }
-                                });
-                            }
-                        });
-                    }
-                    // If it's a single Feature, use it
-                    else if ('type' in geom && geom.type === 'Feature') {
-                        features.push({
-                            ...(geom as GeoJSONFeature),
-                            properties: {
-                                ...((geom as GeoJSONFeature).properties || {}),
-                                ...item,
-                                index
-                            }
-                        });
-                    }
-                    // If it's a Geometry object, wrap it in a Feature
-                    else if ('type' in geom && 
-                        ['Point', 'LineString', 'Polygon', 'MultiPoint', 'MultiLineString', 'MultiPolygon'].includes(geom.type as string)) {
-                        features.push({
-                            type: 'Feature',
-                            geometry: geom as GeoJSONFeature['geometry'],
-                            properties: {
-                                ...item,
-                                index
-                            }
-                        });
-                    }
-                });
-        }
-
-        if (features.length === 0) return null;
-
-        // Expand multi-geometries to single geometries
-        const expandedFeatures: GeoJSONFeature[] = [];
-        features.forEach(feature => {
-            expandedFeatures.push(...expandMultiGeometries(feature));
-        });
-
-        return {
-            type: 'FeatureCollection',
-            features: expandedFeatures
-        };
+    // Process GeoJSON data using service
+    const processedGeoJSON = useMemo<FeatureCollection | null>(() => {
+        return processGeoJSONData(geojsonData);
     }, [geojsonData]);
 
-    // Calculate bounds from GeoJSON data (format: [[minLon, minLat], [maxLon, maxLat]])
-    const bounds = useMemo<[[number, number], [number, number]] | null>(() => {
-        if (!processedGeoJSON || !fitBounds) return null;
-
-        try {
-            const lons: number[] = [];
-            const lats: number[] = [];
-            
-            const extractCoordinates = (coords: unknown): void => {
-                if (Array.isArray(coords)) {
-                    if (typeof coords[0] === 'number' && typeof coords[1] === 'number') {
-                        // Point: [lon, lat] in GeoJSON
-                        lons.push(coords[0]);
-                        lats.push(coords[1]);
-                    } else if (Array.isArray(coords[0])) {
-                        coords.forEach(coord => extractCoordinates(coord));
-                    }
-                }
-            };
-
-            processedGeoJSON.features.forEach(feature => {
-                if (feature.geometry && feature.geometry.coordinates) {
-                    extractCoordinates(feature.geometry.coordinates);
-                }
-            });
-
-            if (lons.length === 0 || lats.length === 0) return null;
-            return [
-                [Math.min(...lons), Math.min(...lats)],
-                [Math.max(...lons), Math.max(...lats)]
-            ];
-        } catch (err) {
-            console.error('Error calculating bounds:', err);
-            return null;
+    // Delay rendering Layers until Source is confirmed ready
+    useEffect(() => {
+        if (mapLoaded && processedGeoJSON) {
+            // Small delay to ensure Source is registered in MapLibre
+            const timer = setTimeout(() => {
+                setLayersReady(true);
+            }, 500);
+            return () => clearTimeout(timer);
+        } else {
+            setLayersReady(false);
         }
+    }, [mapLoaded, processedGeoJSON]);
+
+    // Calculate bounds from GeoJSON data using service
+    const bounds = useMemo<[[number, number], [number, number]] | null>(() => {
+        if (!fitBounds) return null;
+        return calculateBounds(processedGeoJSON);
     }, [processedGeoJSON, fitBounds]);
 
     // Fit bounds when GeoJSON changes
     useEffect(() => {
         if (bounds && mapRef.current && fitBounds) {
-            mapRef.current.fitBounds(bounds, {
-                padding: { top: 24, bottom: 24, left: 24, right: 24 },
-                duration: 500
-            });
+            try {
+                mapRef.current.fitBounds(bounds, {
+                    padding: { top: 24, bottom: 24, left: 24, right: 24 },
+                    duration: 500
+                });
+            } catch (err) {
+                // Ignore fitBounds errors
+            }
         }
     }, [bounds, fitBounds]);
 
@@ -265,19 +95,13 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
         };
     }, [style]);
 
-    // Determine geometry types in the GeoJSON
+    // Determine geometry types in the GeoJSON using service
     const hasLines = useMemo(() => {
-        if (!processedGeoJSON) return false;
-        return processedGeoJSON.features.some(f => 
-            f.geometry?.type === 'LineString'
-        );
+        return hasLineStrings(processedGeoJSON);
     }, [processedGeoJSON]);
 
-    const hasPolygons = useMemo(() => {
-        if (!processedGeoJSON) return false;
-        return processedGeoJSON.features.some(f => 
-            f.geometry?.type === 'Polygon'
-        );
+    const hasPolygonsValue = useMemo(() => {
+        return hasPolygons(processedGeoJSON);
     }, [processedGeoJSON]);
 
     if (!processedGeoJSON && markers.length === 0) {
@@ -295,8 +119,12 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
     const [viewState, setViewState] = useState<ViewState>({
         longitude: mapCenter[1],
         latitude: mapCenter[0],
-        zoom: zoom
+        zoom: zoom,
+        bearing: 0,
+        pitch: 0,
+        padding: { top: 0, bottom: 0, left: 0, right: 0 }
     });
+
 
     return (
         <div style={{ height, width: '100%', borderRadius: 6, overflow: 'hidden' }}>
@@ -304,6 +132,9 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                 ref={mapRef}
                 {...viewState}
                 onMove={evt => setViewState(evt.viewState)}
+                onLoad={() => {
+                    setMapLoaded(true);
+                }}
                 style={{ width: '100%', height: '100%' }}
                 mapStyle={{
                     version: 8,
@@ -323,25 +154,33 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                         maxzoom: 19
                     }]
                 }}
-                attributionControl={true}
+                attributionControl={{compact: true}}
             >
-                {processedGeoJSON && (
-                    <Source id="geojson-data" type="geojson" data={processedGeoJSON}>
-                        {hasLines && (
+                <NavigationControl position="top-right" />
+                <GeolocateControl position="top-right" />
+                {processedGeoJSON && mapLoaded && (
+                    <Source 
+                        key="geojson-source" 
+                        id="geojson-data" 
+                        type="geojson" 
+                        data={processedGeoJSON}
+                    >
+                        {hasLines && layersReady ? (
                             <Layer
+                                key="geojson-lines-layer"
                                 id="geojson-lines"
                                 type="line"
-                                filter={['==', '$type', 'LineString']}
                                 paint={{
                                     'line-color': layerPaint['line-color'] as string,
                                     'line-width': layerPaint['line-width'] as number,
                                     'line-opacity': layerPaint['line-opacity'] as number
                                 }}
                             />
-                        )}
-                        {hasPolygons && (
+                        ) : null}
+                        {hasPolygonsValue && layersReady ? (
                             <>
                                 <Layer
+                                    key="geojson-polygons-fill-layer"
                                     id="geojson-polygons-fill"
                                     type="fill"
                                     filter={['==', '$type', 'Polygon']}
@@ -351,6 +190,7 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                                     }}
                                 />
                                 <Layer
+                                    key="geojson-polygons-outline-layer"
                                     id="geojson-polygons-outline"
                                     type="line"
                                     filter={['==', '$type', 'Polygon']}
@@ -361,7 +201,7 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                                     }}
                                 />
                             </>
-                        )}
+                        ) : null}
                     </Source>
                 )}
                 {markers.map((marker, idx) => {
@@ -370,7 +210,7 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                     }
                     return (
                         <Marker
-                            key={idx}
+                            key={`marker-${idx}-${marker.lat}-${marker.lon}`}
                             longitude={marker.lon}
                             latitude={marker.lat}
                             anchor="bottom"
@@ -379,14 +219,27 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                             <div
                                 style={{
                                     backgroundColor: '#3273dc',
-                                    width: 20,
-                                    height: 20,
+                                    width: 32,
+                                    height: 32,
                                     borderRadius: '50%',
                                     border: '2px solid white',
                                     cursor: marker.popup || marker.name ? 'pointer' : 'default',
-                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)'
+                                    boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
                                 }}
-                            />
+                            >
+                                <svg 
+                                    width="18" 
+                                    height="18" 
+                                    viewBox="0 0 24 24" 
+                                    fill="white" 
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                            </div>
                         </Marker>
                     );
                 })}

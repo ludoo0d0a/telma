@@ -86,6 +86,23 @@ const Home: React.FC = () => {
         }
     ];
 
+    const sampleTrips: DashboardCard[] = [
+        {
+            title: 'Train SNCF 88769',
+            description: 'Exemple de trajet détaillé - 18 décembre 2025',
+            path: '/trip/dmVoaWNsZV9qb3VybmV5OlNOQ0Y6MjAyNS0xMi0xODo4ODc2OT',
+            icon: 'fa-train',
+            color: 'secondary'
+        },
+        {
+            title: 'Train SNCF 88786',
+            description: 'Exemple de trajet détaillé - 19 décembre 2025',
+            path: '/trip/dmVoaWNsZV9qb3VybmV5OlNOQ0Y6MjAyNS0xMi0xOTo4ODc4Nj',
+            icon: 'fa-train',
+            color: 'secondary'
+        }
+    ];
+
     const apiDocs: DashboardCard[] = [
         {
             title: 'API Documentation',
@@ -172,6 +189,43 @@ const Home: React.FC = () => {
                                                         </p>
                                                         <p className={`subtitle is-6 ${route.color === 'secondary' ? 'has-text-white' : 'has-text-secondary'}`}>
                                                             {route.description}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Sample Trips Section */}
+                    <div className='mb-6'>
+                        <h2 className='title is-3 mb-4'>
+                            <span className='icon mr-2'>
+                                <i className='fas fa-list-alt'></i>
+                            </span>
+                            Exemples de Trajets Détaillés
+                        </h2>
+                        <div className='columns is-multiline'>
+                            {sampleTrips.map((trip) => (
+                                <div key={trip.path} className='column is-half-tablet is-full-mobile'>
+                                    <Link to={trip.path} className='dashboard-card-link'>
+                                        <div className={`card dashboard-card ${trip.color === 'secondary' ? 'has-background-secondary' : ''}`}>
+                                            <div className='card-content'>
+                                                <div className='media'>
+                                                    <div className='media-left'>
+                                                        <span className={`icon is-large ${trip.color === 'secondary' ? 'has-text-white' : ''}`}>
+                                                            <i className={`fas ${trip.icon} fa-2x`}></i>
+                                                        </span>
+                                                    </div>
+                                                    <div className='media-content'>
+                                                        <p className={`title is-5 ${trip.color === 'secondary' ? 'has-text-white' : ''}`}>
+                                                            {trip.title}
+                                                        </p>
+                                                        <p className={`subtitle is-6 ${trip.color === 'secondary' ? 'has-text-white' : 'has-text-secondary'}`}>
+                                                            {trip.description}
                                                         </p>
                                                     </div>
                                                 </div>

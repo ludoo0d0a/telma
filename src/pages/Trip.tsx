@@ -59,8 +59,11 @@ const Trip: React.FC = () => {
     const loadingRef = React.useRef<boolean>(false); // Prevent concurrent loads
 
     const loadTripData = useCallback(async (forceRefresh: boolean = false): Promise<void> => {
+            console.log('[Trip] loadTripData called', { tripId, forceRefresh });
+            
             // Prevent concurrent loads
             if (loadingRef.current && !forceRefresh) {
+                console.log('[Trip] Already loading, skipping');
                 return;
             }
             
@@ -71,15 +74,19 @@ const Trip: React.FC = () => {
                 
                 // Retrieve journey data from sessionStorage
                 if (!tripId) {
+                    console.error('[Trip] Missing tripId');
                     setError('ID de trajet manquant');
                     setLoading(false);
                     return;
                 }
                 
+                console.log('[Trip] Processing tripId:', tripId);
+                
                 // Clear sessionStorage cache and reset state if force refresh (like page reload)
                 if (forceRefresh) {
                     const cacheKey = `trip_${tripId}`;
                     const hadCachedData = !!sessionStorage.getItem(cacheKey);
+                    console.log('[Trip] Force refresh, clearing cache', { cacheKey, hadCachedData });
                     sessionStorage.removeItem(cacheKey);
                     // Reset state to ensure clean reload
                     setTripData(null);
@@ -90,10 +97,13 @@ const Trip: React.FC = () => {
                 if (!forceRefresh) {
                     const storedData = sessionStorage.getItem(`trip_${tripId}`);
                     if (storedData) {
+                        console.log('[Trip] Found cached data in sessionStorage');
                         const data = JSON.parse(storedData) as TripData;
                         setTripData(data);
                         setLoading(false);
                         return;
+                    } else {
+                        console.log('[Trip] No cached data found');
                     }
                 }
 
@@ -102,43 +112,66 @@ const Trip: React.FC = () => {
                 try {
                     // Decode the trip ID
                     const decoded = decodeTripId(tripId);
+                    console.log('[Trip] Decoded tripId:', decoded);
                     
                     // Check if it contains vehicle_journey ID pattern
-                    // TripId format is: vehicleJourneyId_departureDateTime
-                    // We need to split on the LAST underscore to separate ID from datetime
+                    // TripId format can be:
+                    // 1. vehicle_journey:SNCF:2025-12-18:88769 (just the ID, no datetime)
+                    // 2. vehicle_journey:SNCF:2025-12-18:88769_20251218T123000 (ID with datetime suffix)
+                    // We need to split on the LAST underscore to separate ID from datetime if present
+                    
                     if (decoded.includes('vehicle_journey:')) {
-                        // Extract vehicle journey ID from decoded string
-                        // Format: vehicle_journey:SNCF:2025-12-18:88776_20251218T123000
-                        if (decoded.startsWith('vehicle_journey:') && !decoded.includes('_', decoded.indexOf('vehicle_journey:') + 16)) {
-                            // If it's just the vehicle journey ID without datetime, use it directly
-                            extractedVehicleJourneyId = decoded;
+                        console.log('[Trip] Found vehicle_journey: in decoded string');
+                        // Check if there's an underscore after the vehicle_journey: prefix
+                        // This would indicate a datetime suffix
+                        const vehicleJourneyPrefix = 'vehicle_journey:';
+                        const afterPrefix = decoded.substring(decoded.indexOf(vehicleJourneyPrefix) + vehicleJourneyPrefix.length);
+                        
+                        // Check if there's an underscore in the part after the prefix (likely datetime)
+                        // Format: vehicle_journey:SNCF:2025-12-18:88769_20251218T123000
+                        const lastUnderscoreIndex = decoded.lastIndexOf('_');
+                        const prefixIndex = decoded.indexOf(vehicleJourneyPrefix);
+                        
+                        if (lastUnderscoreIndex > prefixIndex + vehicleJourneyPrefix.length) {
+                            // There's an underscore after the prefix, likely a datetime suffix
+                            // Split on last underscore to get just the vehicle journey ID
+                            extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
+                            console.log('[Trip] Extracted vehicle journey ID (removed datetime suffix):', extractedVehicleJourneyId);
                         } else {
-                            // Format: vehicleJourneyId_departureDateTime
-                            // Split on last underscore (datetime is always at the end)
-                            const lastUnderscoreIndex = decoded.lastIndexOf('_');
-                            if (lastUnderscoreIndex > 0) {
-                                extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
-                            } else {
-                                extractedVehicleJourneyId = decoded;
-                            }
+                            // No underscore after prefix, use decoded as-is
+                            extractedVehicleJourneyId = decoded;
+                            console.log('[Trip] Using decoded as vehicle journey ID (no datetime suffix):', extractedVehicleJourneyId);
                         }
                     } else if (decoded.includes('_')) {
+                        console.log('[Trip] Found underscore in decoded string (no vehicle_journey: prefix), splitting');
                         // Format: vehicleJourneyId_departureDateTime (but ID might not start with vehicle_journey:)
                         // Split on last underscore
                         const lastUnderscoreIndex = decoded.lastIndexOf('_');
                         if (lastUnderscoreIndex > 0) {
                             extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
+                            console.log('[Trip] Extracted vehicle journey ID from underscore split:', extractedVehicleJourneyId);
                         } else {
                             extractedVehicleJourneyId = decoded;
+                            console.log('[Trip] Using full decoded as vehicle journey ID (underscore split):', extractedVehicleJourneyId);
                         }
-                    } else if (tripId.includes('vehicle_journey:')) {
-                        // If tripId itself contains vehicle_journey (shouldn't happen, but handle it)
+                    } else {
+                        // No vehicle_journey: prefix and no underscore - use decoded as-is
+                        extractedVehicleJourneyId = decoded;
+                        console.log('[Trip] Using decoded as-is (no vehicle_journey: or underscore):', extractedVehicleJourneyId);
+                    }
+                    
+                    // Fallback: if tripId itself contains vehicle_journey (shouldn't happen, but handle it)
+                    if (!extractedVehicleJourneyId && tripId.includes('vehicle_journey:')) {
+                        console.log('[Trip] Fallback: tripId itself contains vehicle_journey:, using tripId');
                         extractedVehicleJourneyId = tripId;
                     }
 
                     // Store for error message
                     if (extractedVehicleJourneyId) {
                         setVehicleJourneyId(extractedVehicleJourneyId);
+                        console.log('[Trip] Set vehicleJourneyId state:', extractedVehicleJourneyId);
+                    } else {
+                        console.warn('[Trip] Could not extract vehicle journey ID');
                     }
 
                     // If we found a vehicle journey ID, try to fetch it
@@ -150,14 +183,29 @@ const Trip: React.FC = () => {
                             // If it contains % encoding, decode it first
                             if (cleanVehicleJourneyId.includes('%')) {
                                 cleanVehicleJourneyId = decodeURIComponent(cleanVehicleJourneyId);
+                                console.log('[Trip] Decoded URL encoding:', cleanVehicleJourneyId);
                             }
                         } catch (e) {
+                            console.warn('[Trip] Failed to decode URL encoding, using as-is:', e);
                             // If decoding fails, use as-is
                         }
+                        
+                        console.log('[Trip] Calling getVehicleJourney API with:', cleanVehicleJourneyId);
                         let response;
                         try {
                             response = await getVehicleJourney(cleanVehicleJourneyId, 'sncf');
+                            console.log('[Trip] API response received:', {
+                                status: response.status,
+                                hasData: !!response.data,
+                                vehicleJourneysCount: response.data?.vehicle_journeys?.length || 0
+                            });
                         } catch (apiError: any) {
+                            console.error('[Trip] API error:', {
+                                message: apiError?.message,
+                                status: apiError?.response?.status,
+                                statusText: apiError?.response?.statusText,
+                                data: apiError?.response?.data
+                            });
                             // If 404, the vehicle journey might not exist or ID is wrong
                             // Continue to show error message below
                             throw apiError;
@@ -165,6 +213,7 @@ const Trip: React.FC = () => {
                         const vehicleJourneyData = response.data;
                         
                         if (vehicleJourneyData.vehicle_journeys && vehicleJourneyData.vehicle_journeys.length > 0) {
+                            console.log('[Trip] Found vehicle journey in response');
                             const vehicleJourney = vehicleJourneyData.vehicle_journeys[0] as VehicleJourney & {
                                 display_informations?: any;
                                 stop_times?: Array<{
@@ -178,16 +227,77 @@ const Trip: React.FC = () => {
                                 }>;
                             };
                             
+                            console.log('[Trip] Vehicle journey details:', {
+                                id: vehicleJourney.id,
+                                name: vehicleJourney.name,
+                                headsign: vehicleJourney.headsign,
+                                stopTimesCount: vehicleJourney.stop_times?.length || 0,
+                                hasDisplayInfo: !!vehicleJourney.display_informations,
+                                hasGeoJSON: !!(vehicleJourney as any).geojson
+                            });
+                            
                             // Try to reconstruct journey data from vehicle journey
                             // This is a fallback - we'll create minimal journey structure
                             const stopTimes = vehicleJourney.stop_times || [];
+                            console.log('[Trip] Stop times:', stopTimes.length);
+                            
                             if (stopTimes.length > 0) {
                                 const firstStop = stopTimes[0];
                                 const lastStop = stopTimes[stopTimes.length - 1];
                                 
+                                console.log('[Trip] First stop:', {
+                                    name: firstStop.stop_point?.name || firstStop.stop_point?.stop_area?.name,
+                                    departure: firstStop.departure_date_time || firstStop.base_departure_date_time || firstStop.utc_departure_time
+                                });
+                                console.log('[Trip] Last stop:', {
+                                    name: lastStop.stop_point?.name || lastStop.stop_point?.stop_area?.name,
+                                    arrival: lastStop.arrival_date_time || lastStop.base_arrival_date_time || lastStop.utc_arrival_time
+                                });
+                                
                                 // Use extended fields if available, otherwise fall back to utc_* fields
                                 const firstDeparture = firstStop.departure_date_time || firstStop.base_departure_date_time || firstStop.utc_departure_time || '';
                                 const lastArrival = lastStop.arrival_date_time || lastStop.base_arrival_date_time || lastStop.utc_arrival_time || '';
+                                
+                                console.log('[Trip] Journey times:', { firstDeparture, lastArrival });
+                                
+                                // Try to use geojson from vehicle journey first, otherwise build from stops
+                                let geojson = (vehicleJourney as any).geojson;
+                                
+                                // If no geojson in vehicle journey, generate from stop coordinates
+                                if (!geojson) {
+                                    const stopCoordinates: [number, number][] = [];
+                                    const coordExtractionDetails: any[] = [];
+                                    stopTimes.forEach((st: any, index: number) => {
+                                        const stopPoint = st.stop_point;
+                                        const coord = stopPoint?.coord || stopPoint?.stop_area?.coord;
+                                        const hasCoord = !!(coord && typeof coord.lat === 'number' && typeof coord.lon === 'number' && 
+                                            Number.isFinite(coord.lat) && Number.isFinite(coord.lon));
+                                        coordExtractionDetails.push({
+                                            index,
+                                            hasStopPoint: !!stopPoint,
+                                            hasCoord: !!coord,
+                                            coordValue: coord,
+                                            extracted: hasCoord
+                                        });
+                                        if (hasCoord) {
+                                            stopCoordinates.push([coord.lon, coord.lat]); // GeoJSON format: [lon, lat]
+                                        }
+                                    });
+                                    
+                                    // Remove duplicate consecutive coordinates
+                                    const uniqueCoords = stopCoordinates.filter((coord, idx, arr) => 
+                                        idx === 0 || coord[0] !== arr[idx - 1][0] || coord[1] !== arr[idx - 1][1]
+                                    );
+                                    
+                                    geojson = uniqueCoords.length >= 2 ? {
+                                        type: 'Feature' as const,
+                                        geometry: {
+                                            type: 'LineString' as const,
+                                            coordinates: uniqueCoords
+                                        },
+                                        properties: {}
+                                    } : undefined;
+                                }
                                 
                                 // Create a minimal section from vehicle journey
                                 const section: Section = {
@@ -209,6 +319,7 @@ const Trip: React.FC = () => {
                                         trip_short_name: vehicleJourney.name || ''
                                     },
                                     vehicle_journey: vehicleJourney.id || extractedVehicleJourneyId,
+                                    geojson: geojson,
                                     stop_date_times: stopTimes.map((st: any) => ({
                                         base_arrival_date_time: st.base_arrival_date_time || st.utc_arrival_time,
                                         arrival_date_time: st.arrival_date_time || st.utc_arrival_time,
@@ -238,45 +349,74 @@ const Trip: React.FC = () => {
                                     cleanLocationName(lastStop.stop_point?.name || lastStop.stop_point?.stop_area?.name)
                                 );
                                 
+                                console.log('[Trip] Journey info:', info);
+                                
                                 const tripData: TripData = {
                                     journey,
                                     info,
                                     disruptions: vehicleJourney.disruptions || []
                                 };
                                 
+                                console.log('[Trip] Trip data created successfully, saving to sessionStorage and setting state');
+                                
                                 // Save to sessionStorage (even on refresh, for next time)
                                 sessionStorage.setItem(`trip_${tripId}`, JSON.stringify(tripData));
                                 setTripData(tripData);
                                 setLoading(false);
                                 return;
+                            } else {
+                                console.warn('[Trip] Vehicle journey has no stop_times');
                             }
+                        } else {
+                            console.warn('[Trip] No vehicle journeys in response data');
                         }
+                    } else {
+                        console.warn('[Trip] No vehicle journey ID extracted, cannot fetch data');
                     }
                 } catch (apiErr) {
-                    console.error('Error fetching vehicle journey:', apiErr);
+                    console.error('[Trip] Error in try-catch block:', apiErr);
                 }
 
                 // If we couldn't load from API either, show error with helpful links
+                console.error('[Trip] Failed to load trip data, showing error message');
                 setError('Données du trajet non trouvées. Veuillez revenir à la recherche.');
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+                console.error('[Trip] Outer catch block error:', err);
                 setError('Erreur lors du chargement des données du trajet: ' + errorMessage);
                 console.error(err);
             } finally {
                 loadingRef.current = false;
                 setLoading(false);
+                console.log('[Trip] loadTripData finished, loading set to false');
             }
     }, [tripId]);
 
     useEffect(() => {
         // Only load on mount or when tripId changes, not when loadTripData changes
+        console.log('[Trip] useEffect triggered, calling loadTripData', { tripId });
         loadTripData();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tripId]); // Only depend on tripId, not loadTripData to avoid re-runs
 
     // Compute derived data - must be called before any early returns to maintain hook order
+    console.log('[Trip] Render - tripData state:', {
+        hasTripData: !!tripData,
+        hasJourney: !!tripData?.journey,
+        hasSections: !!tripData?.journey?.sections,
+        sectionsCount: tripData?.journey?.sections?.length || 0,
+        hasInfo: !!tripData?.info,
+        error,
+        loading
+    });
+    
     const sections = tripData?.journey?.sections || [];
     const publicTransportSections = sections.filter((s: Section) => s.type === 'public_transport');
+    
+    console.log('[Trip] Derived data:', {
+        sectionsCount: sections.length,
+        publicTransportSectionsCount: publicTransportSections.length
+    });
     
     // Get all stops from all sections
     const allStops: ExtendedStopTime[] = [];
@@ -298,14 +438,19 @@ const Trip: React.FC = () => {
             });
         }
     });
+    
+    console.log('[Trip] All stops count:', allStops.length);
 
     // Get sections with geojson for map display
     const sectionsWithGeoJSON = useMemo<Section[]>(() => {
-        return sections.filter((section: Section) => section.geojson);
+        const withGeoJSON = sections.filter((section: Section) => section.geojson);
+        console.log('[Trip] Sections with GeoJSON:', withGeoJSON.length);
+        return withGeoJSON;
     }, [sections]);
 
     // Get markers for all waypoints (stops) from stop_date_times
     const journeyMarkers = useMemo<JourneyMarker[]>(() => {
+        console.log('[Trip] Computing journey markers from', allStops.length, 'stops');
         const markers: JourneyMarker[] = [];
         
         // Convert all stops from stop_date_times to markers
@@ -338,10 +483,14 @@ const Trip: React.FC = () => {
             }
         });
         
+        console.log('[Trip] Journey markers computed:', markers.length);
         return markers;
     }, [allStops]);
 
+    console.log('[Trip] Render conditions:', { loading, error, hasTripData: !!tripData });
+
     if (loading) {
+        console.log('[Trip] Rendering loading state');
         return (
             <>
                 <section className='section'>
@@ -360,6 +509,7 @@ const Trip: React.FC = () => {
     }
 
     if (error || !tripData) {
+        console.log('[Trip] Rendering error state', { error, hasTripData: !!tripData });
         return (
             <>
                 <section className='section'>
@@ -392,10 +542,23 @@ const Trip: React.FC = () => {
     }
 
     const { journey, info, disruptions } = tripData;
+    console.log('[Trip] Rendering trip details:', {
+        hasJourney: !!journey,
+        hasInfo: !!info,
+        info: info ? {
+            departureStation: info.departureStation,
+            arrivalStation: info.arrivalStation,
+            trainNumber: info.trainNumber,
+            commercialMode: info.commercialMode
+        } : null,
+        disruptionsCount: disruptions?.length || 0
+    });
+    
     const transportInfo = getTransportIcon(info.commercialMode, info.network);
     const depDate = parseUTCDate(info.departureTime);
     const arrDate = parseUTCDate(info.arrivalTime);
 
+    console.log('[Trip] Rendering main trip view');
     return (
         <>
             <section className='section'>
@@ -479,7 +642,7 @@ const Trip: React.FC = () => {
                     </div>
 
                     {/* Journey Map */}
-                    {sectionsWithGeoJSON.length > 0 && (
+                    {(sectionsWithGeoJSON.length > 0 || journeyMarkers.length > 0) && (
                         <div className='box mb-5'>
                             <h2 className='title is-4 mb-4'>
                                 <span className='icon mr-2'>
@@ -488,7 +651,7 @@ const Trip: React.FC = () => {
                                 Carte de l'itinéraire
                             </h2>
                             <GeoJSONMap 
-                                geojsonData={sectionsWithGeoJSON}
+                                geojsonData={sectionsWithGeoJSON.length > 0 ? sectionsWithGeoJSON : undefined}
                                 markers={journeyMarkers}
                                 height={400}
                             />
@@ -668,4 +831,5 @@ const Trip: React.FC = () => {
 };
 
 export default Trip;
+
 
