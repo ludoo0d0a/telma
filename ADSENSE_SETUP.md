@@ -1,6 +1,6 @@
 # Google AdSense Setup Guide
 
-This app has been configured with Google AdSense integration. Follow these steps to start earning revenue:
+This app has been configured with Google AdSense integration using environment variables. Follow these steps to start earning revenue:
 
 ## Step 1: Get Your AdSense Account
 
@@ -10,13 +10,16 @@ This app has been configured with Google AdSense integration. Follow these steps
 
 ## Step 2: Configure Your Publisher ID
 
-1. Open `index.html`
-2. Find the AdSense script tag:
-   ```html
-   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1234567890123456"
-    crossorigin="anonymous"></script>
+1. Copy `.env.example` to `.env` (if it doesn't exist):
+   ```bash
+   cp .env.example .env
    ```
-3. Replace `ca-pub-1234567890123456` with your actual Publisher ID
+2. Open the `.env` file and set your Publisher ID:
+   ```env
+   VITE_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXXXXXXX
+   ```
+3. Replace `ca-pub-XXXXXXXXXXXXXXX` with your actual Publisher ID
+4. **Important**: The `.env` file is already in `.gitignore` - never commit your actual AdSense ID to version control
 
 ## Step 3: Submit Your Site for Review
 
@@ -52,12 +55,21 @@ The app uses responsive ads that automatically adjust to screen size:
 - `rectangle`: 300x250 style ads
 - `responsive`: Automatically sizes based on viewport
 
+## Environment Variables
+
+The app uses Vite environment variables. Important notes:
+- Variables must be prefixed with `VITE_` to be exposed to the client
+- The `.env` file is in `.gitignore` (never commit your actual AdSense ID)
+- Use `.env.example` to document required variables
+- **Restart your dev server** after changing `.env` file (Vite needs a restart to pick up new env vars)
+
 ## Testing
 
 Before going live:
 - Test on different screen sizes (mobile, tablet, desktop)
 - Verify ads don't interfere with user experience
 - Check that placeholder ads show when AdSense ID is not configured
+- Make sure to restart your dev server after setting up `.env`
 
 ## Revenue Optimization Tips
 
@@ -68,9 +80,13 @@ Before going live:
 
 ## Troubleshooting
 
-- **Ads not showing?**: Make sure your site is approved by AdSense
-- **Placeholder showing?**: Check that your Publisher ID is correctly set in `index.html`
+- **Ads not showing?**: Make sure your site is approved by AdSense and `.env` file has correct ID
+- **Placeholder showing?**: 
+  - Check that `VITE_GOOGLE_ADSENSE_ID` is set in `.env` file
+  - Make sure you restarted your dev server after creating/updating `.env`
+  - Verify the variable name is exactly `VITE_GOOGLE_ADSENSE_ID` (with `VITE_` prefix)
 - **Low revenue?**: Focus on increasing traffic and user engagement
+- **Environment variable not working?**: Remember that Vite requires the `VITE_` prefix and a server restart
 
 ## Support
 
