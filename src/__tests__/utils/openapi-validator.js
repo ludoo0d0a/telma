@@ -165,10 +165,6 @@ function getDefinitions() {
     }
     _definitionsCache = defs;
 
-    // #region agent log
-    (globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/__tests__/utils/openapi-validator.js:165',message:'openapi definitions built',data:{definitionCount:Object.keys(defs).length},timestamp:Date.now(),sessionId:'debug-session',runId:'validator',hypothesisId:'H7'})}) : Promise.resolve()).catch(()=>{});
-    // #endregion
-
     return _definitionsCache;
 }
 
@@ -224,16 +220,9 @@ export function validateResponse(path, method, statusCode, data) {
             const converted = convertOpenApiToJsonSchema(openApiSchema, ctx);
             const schema = { ...converted, definitions: getDefinitions() };
 
-            // #region agent log
-            (globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/__tests__/utils/openapi-validator.js:216',message:'compile validator',data:{cacheKey},timestamp:Date.now(),sessionId:'debug-session',runId:'validator',hypothesisId:'H8'})}) : Promise.resolve()).catch(()=>{});
-            // #endregion
-
             validate = ajv.compile(schema);
             _validatorCache.set(cacheKey, validate);
         } catch (e) {
-            // #region agent log
-            (globalThis.fetch ? globalThis.fetch('http://127.0.0.1:7242/ingest/9d3d7068-4952-4f99-89ae-6519e28eef00',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'src/__tests__/utils/openapi-validator.js:224',message:'validator compile failed',data:{cacheKey,errorName:e?.name||'Error',errorMessage:String(e?.message||e)},timestamp:Date.now(),sessionId:'debug-session',runId:'validator',hypothesisId:'H9'})}) : Promise.resolve()).catch(()=>{});
-            // #endregion
             throw e;
         }
     }

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import CurrentLocationWidget from '../components/CurrentLocationWidget';
 
 interface DashboardCard {
     title: string;
@@ -124,6 +125,21 @@ const Home: React.FC = () => {
                         <p className='subtitle is-4 has-text-secondary'>
                             Accédez rapidement aux principales fonctionnalités
                         </p>
+                    </div>
+
+                    {/* Current Location Widget */}
+                    <div className='mb-6'>
+                        <h2 className='title is-3 mb-4'>
+                            <span className='icon mr-2'>
+                                <i className='fas fa-crosshairs'></i>
+                            </span>
+                            Votre Position Actuelle
+                        </h2>
+                        <div className='columns'>
+                            <div className='column is-full'>
+                                <CurrentLocationWidget />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Main Pages Section */}

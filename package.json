@@ -71,5 +71,21 @@
     "vite": "^7.3.0",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.16"
+  },
+  "overrides": {
+    "swagger-ui-react": {
+      "react-copy-to-clipboard": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      },
+      "react-debounce-input": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      },
+      "react-inspector": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      }
+    }
   }
 }

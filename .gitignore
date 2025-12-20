@@ -30,5 +30,4 @@ yarn-error.log*
 npm_output.log
 *.log
 debug.log
-.cursor/debug.log
 

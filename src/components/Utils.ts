@@ -28,7 +28,7 @@ export const getFullMinutes = (date: Date): string => {
 // Format time from Date object
 // separator: 'h' (default) or ':' for different formats
 export const formatTime = (date: Date | null | undefined, separator: string = 'h'): string => {
-    if (!date) return 'N/A';
+    if (!date) return '-';
     if (separator === ':') {
         return `${date.getHours()}:${getFullMinutes(date)}`;
     }
@@ -38,7 +38,7 @@ export const formatTime = (date: Date | null | undefined, separator: string = 'h
 // Format date from Date object
 // format: 'full' (default) for full format, 'short' for abbreviated format
 export const formatDate = (date: Date | null | undefined, format: 'full' | 'short' = 'full'): string => {
-    if (!date) return 'N/A';
+    if (!date) return '-';
     
     if (format === 'short') {
         const days = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];

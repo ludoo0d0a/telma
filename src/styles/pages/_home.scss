@@ -55,6 +55,34 @@
     }
 }
 
+.current-location-widget {
+    border-left: 4px solid #3273dc;
+    
+    &.has-background-info {
+        background: linear-gradient(135deg, #3273dc 0%, #209cee 100%) !important;
+    }
+
+    &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(50, 115, 220, 0.3);
+    }
+
+    .card-content {
+        padding: 1.25rem 1.5rem;
+    }
+
+    .media-content {
+        .title {
+            margin-bottom: 0.25rem;
+        }
+
+        .subtitle {
+            margin-top: 0;
+            opacity: 0.95;
+        }
+    }
+}
+
 .home {
   display: flex;
   justify-content: center;
