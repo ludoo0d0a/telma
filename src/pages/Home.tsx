@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import CurrentLocationWidget from '../components/CurrentLocationWidget';
+import Ad from '../components/Ad';
+import { Icon } from '../utils/iconMapping';
 
 interface DashboardCard {
     title: string;

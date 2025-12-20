@@ -1,17 +1,3 @@
-// Animation for spinning icons
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
-}
-
 @use 'theme' as *;
 @use 'settings' as *;
 @use './pages/home' as *;
@@ -37,6 +23,20 @@
 @use './components/trainStation' as *;
 @use './components/stops' as *;
 @use './components/ad' as *;
+
+// Animation for spinning icons
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
 
 // Import statements must come after @use
 @import 'bulma/css/bulma.css';
