@@ -8,7 +8,7 @@ import { getTransportIcon } from '../services/transportService';
 import { getDelay } from '../services/delayService';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
 import { getJourneyInfo } from '../services/journeyService';
-import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId } from '../utils/uriUtils';
+import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId, encodeTripId } from '../utils/uriUtils';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { JourneyInfo } from '../services/journeyService';
 import type { Disruption } from '../client/models/disruption';
@@ -71,15 +71,25 @@ const Trip: React.FC = () => {
                 
                 // Retrieve journey data from sessionStorage
                 if (!tripId) {
+                    console.error('[Trip] Missing tripId');
                     setError('ID de trajet manquant');
                     setLoading(false);
+                    // Show samples section instead of error
                     return;
                 }
                 
-                // Clear sessionStorage cache and reset state if force refresh (like page reload)
+                // Backup cache before clearing if force refresh (like page reload)
+                let cachedDataBackup: TripData | null = null;
                 if (forceRefresh) {
                     const cacheKey = `trip_${tripId}`;
-                    const hadCachedData = !!sessionStorage.getItem(cacheKey);
+                    const cachedData = sessionStorage.getItem(cacheKey);
+                    if (cachedData) {
+                        try {
+                            cachedDataBackup = JSON.parse(cachedData) as TripData;
+                        } catch (e) {
+                            // Backup parse failed, continue without backup
+                        }
+                    }
                     sessionStorage.removeItem(cacheKey);
                     // Reset state to ensure clean reload
                     setTripData(null);
@@ -104,23 +114,29 @@ const Trip: React.FC = () => {
                     const decoded = decodeTripId(tripId);
                     
                     // Check if it contains vehicle_journey ID pattern
-                    // TripId format is: vehicleJourneyId_departureDateTime
-                    // We need to split on the LAST underscore to separate ID from datetime
+                    // TripId format can be:
+                    // 1. vehicle_journey:SNCF:2025-12-18:88769 (just the ID, no datetime)
+                    // 2. vehicle_journey:SNCF:2025-12-18:88769_20251218T123000 (ID with datetime suffix)
+                    // We need to split on the LAST underscore to separate ID from datetime if present
+                    
                     if (decoded.includes('vehicle_journey:')) {
-                        // Extract vehicle journey ID from decoded string
-                        // Format: vehicle_journey:SNCF:2025-12-18:88776_20251218T123000
-                        if (decoded.startsWith('vehicle_journey:') && !decoded.includes('_', decoded.indexOf('vehicle_journey:') + 16)) {
-                            // If it's just the vehicle journey ID without datetime, use it directly
-                            extractedVehicleJourneyId = decoded;
+                        // Check if there's an underscore after the vehicle_journey: prefix
+                        // This would indicate a datetime suffix
+                        const vehicleJourneyPrefix = 'vehicle_journey:';
+                        const afterPrefix = decoded.substring(decoded.indexOf(vehicleJourneyPrefix) + vehicleJourneyPrefix.length);
+                        
+                        // Check if there's an underscore in the part after the prefix (likely datetime)
+                        // Format: vehicle_journey:SNCF:2025-12-18:88769_20251218T123000
+                        const lastUnderscoreIndex = decoded.lastIndexOf('_');
+                        const prefixIndex = decoded.indexOf(vehicleJourneyPrefix);
+                        
+                        if (lastUnderscoreIndex > prefixIndex + vehicleJourneyPrefix.length) {
+                            // There's an underscore after the prefix, likely a datetime suffix
+                            // Split on last underscore to get just the vehicle journey ID
+                            extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
                         } else {
-                            // Format: vehicleJourneyId_departureDateTime
-                            // Split on last underscore (datetime is always at the end)
-                            const lastUnderscoreIndex = decoded.lastIndexOf('_');
-                            if (lastUnderscoreIndex > 0) {
-                                extractedVehicleJourneyId = decoded.substring(0, lastUnderscoreIndex);
-                            } else {
-                                extractedVehicleJourneyId = decoded;
-                            }
+                            // No underscore after prefix, use decoded as-is
+                            extractedVehicleJourneyId = decoded;
                         }
                     } else if (decoded.includes('_')) {
                         // Format: vehicleJourneyId_departureDateTime (but ID might not start with vehicle_journey:)
@@ -131,14 +147,32 @@ const Trip: React.FC = () => {
                         } else {
                             extractedVehicleJourneyId = decoded;
                         }
-                    } else if (tripId.includes('vehicle_journey:')) {
-                        // If tripId itself contains vehicle_journey (shouldn't happen, but handle it)
+                    } else {
+                        // No vehicle_journey: prefix and no underscore - use decoded as-is
+                        extractedVehicleJourneyId = decoded;
+                    }
+                    
+                    // Fallback: if tripId itself contains vehicle_journey (shouldn't happen, but handle it)
+                    if (!extractedVehicleJourneyId && tripId.includes('vehicle_journey:')) {
                         extractedVehicleJourneyId = tripId;
                     }
 
                     // Store for error message
                     if (extractedVehicleJourneyId) {
                         setVehicleJourneyId(extractedVehicleJourneyId);
+                    }
+
+                    // Extract datetime from decoded tripId if present (format: vehicleJourneyId_datetime)
+                    let extractedDateTime: string | null = null;
+                    if (decoded.includes('_')) {
+                        const lastUnderscoreIndex = decoded.lastIndexOf('_');
+                        if (lastUnderscoreIndex > 0) {
+                            const potentialDateTime = decoded.substring(lastUnderscoreIndex + 1);
+                            // Check if it looks like a datetime (YYYYMMDDTHHmmss format)
+                            if (/^\d{8}T\d{6}$/.test(potentialDateTime)) {
+                                extractedDateTime = potentialDateTime;
+                            }
+                        }
                     }
 
                     // If we found a vehicle journey ID, try to fetch it
@@ -154,10 +188,47 @@ const Trip: React.FC = () => {
                         } catch (e) {
                             // If decoding fails, use as-is
                         }
+                        
                         let response;
                         try {
                             response = await getVehicleJourney(cleanVehicleJourneyId, 'sncf');
                         } catch (apiError: any) {
+                            console.error('[Trip] API error:', {
+                                message: apiError?.message,
+                                status: apiError?.response?.status,
+                                statusText: apiError?.response?.statusText,
+                                data: apiError?.response?.data
+                            });
+                            
+                            // If 404, try to restore from cache backup (for forceRefresh) or current cache (for initial load)
+                            // This handles the case where the API doesn't have the vehicle journey but we have cached data
+                            if (apiError?.response?.status === 404) {
+                                let dataToRestore: TripData | null = null;
+                                
+                                if (forceRefresh && cachedDataBackup) {
+                                    // Restore from backup we saved before clearing cache
+                                    dataToRestore = cachedDataBackup;
+                                } else if (!forceRefresh) {
+                                    // Try to get from current cache
+                                    const cachedData = sessionStorage.getItem(`trip_${tripId}`);
+                                    if (cachedData) {
+                                        try {
+                                            dataToRestore = JSON.parse(cachedData) as TripData;
+                                        } catch (e) {
+                                            // Cache parse failed, continue to error
+                                        }
+                                    }
+                                }
+                                
+                                if (dataToRestore) {
+                                    // Restore cache and data
+                                    sessionStorage.setItem(`trip_${tripId}`, JSON.stringify(dataToRestore));
+                                    setTripData(dataToRestore);
+                                    setLoading(false);
+                                    return;
+                                }
+                            }
+                            
                             // If 404, the vehicle journey might not exist or ID is wrong
                             // Continue to show error message below
                             throw apiError;
@@ -181,6 +252,7 @@ const Trip: React.FC = () => {
                             // Try to reconstruct journey data from vehicle journey
                             // This is a fallback - we'll create minimal journey structure
                             const stopTimes = vehicleJourney.stop_times || [];
+                            
                             if (stopTimes.length > 0) {
                                 const firstStop = stopTimes[0];
                                 const lastStop = stopTimes[stopTimes.length - 1];
@@ -188,6 +260,45 @@ const Trip: React.FC = () => {
                                 // Use extended fields if available, otherwise fall back to utc_* fields
                                 const firstDeparture = firstStop.departure_date_time || firstStop.base_departure_date_time || firstStop.utc_departure_time || '';
                                 const lastArrival = lastStop.arrival_date_time || lastStop.base_arrival_date_time || lastStop.utc_arrival_time || '';
+                                
+                                // Try to use geojson from vehicle journey first, otherwise build from stops
+                                let geojson = (vehicleJourney as any).geojson;
+                                
+                                // If no geojson in vehicle journey, generate from stop coordinates
+                                if (!geojson) {
+                                    const stopCoordinates: [number, number][] = [];
+                                    const coordExtractionDetails: any[] = [];
+                                    stopTimes.forEach((st: any, index: number) => {
+                                        const stopPoint = st.stop_point;
+                                        const coord = stopPoint?.coord || stopPoint?.stop_area?.coord;
+                                        const hasCoord = !!(coord && typeof coord.lat === 'number' && typeof coord.lon === 'number' && 
+                                            Number.isFinite(coord.lat) && Number.isFinite(coord.lon));
+                                        coordExtractionDetails.push({
+                                            index,
+                                            hasStopPoint: !!stopPoint,
+                                            hasCoord: !!coord,
+                                            coordValue: coord,
+                                            extracted: hasCoord
+                                        });
+                                        if (hasCoord) {
+                                            stopCoordinates.push([coord.lon, coord.lat]); // GeoJSON format: [lon, lat]
+                                        }
+                                    });
+                                    
+                                    // Remove duplicate consecutive coordinates
+                                    const uniqueCoords = stopCoordinates.filter((coord, idx, arr) => 
+                                        idx === 0 || coord[0] !== arr[idx - 1][0] || coord[1] !== arr[idx - 1][1]
+                                    );
+                                    
+                                    geojson = uniqueCoords.length >= 2 ? {
+                                        type: 'Feature' as const,
+                                        geometry: {
+                                            type: 'LineString' as const,
+                                            coordinates: uniqueCoords
+                                        },
+                                        properties: {}
+                                    } : undefined;
+                                }
                                 
                                 // Create a minimal section from vehicle journey
                                 const section: Section = {
@@ -203,33 +314,56 @@ const Trip: React.FC = () => {
                                         coord: lastStop.stop_point?.coord
                                     },
                                     display_informations: vehicleJourney.display_informations || {
-                                        commercial_mode: vehicleJourney.journey_pattern?.commercial_mode || 'Train',
-                                        network: vehicleJourney.journey_pattern?.route?.line?.network?.name || 'SNCF',
+                                        commercial_mode: (vehicleJourney.journey_pattern as any)?.commercial_mode || 'Train',
+                                        network: (vehicleJourney.journey_pattern as any)?.route?.line?.network?.name || 'SNCF',
                                         headsign: vehicleJourney.headsign || '',
                                         trip_short_name: vehicleJourney.name || ''
                                     },
                                     vehicle_journey: vehicleJourney.id || extractedVehicleJourneyId,
-                                    stop_date_times: stopTimes.map((st: any) => ({
-                                        base_arrival_date_time: st.base_arrival_date_time || st.utc_arrival_time,
-                                        arrival_date_time: st.arrival_date_time || st.utc_arrival_time,
-                                        base_departure_date_time: st.base_departure_date_time || st.utc_departure_time,
-                                        departure_date_time: st.departure_date_time || st.utc_departure_time,
+                                    geojson: geojson,
+                                    stop_date_times: stopTimes.map((st: any, idx: number) => {
+                                        // Use primary field if it exists and is non-empty, otherwise fall back to utc_* field
+                                        // Only use fallback if primary is missing/empty
+                                        const baseArrival = (st.base_arrival_date_time && st.base_arrival_date_time.trim()) || (st.utc_arrival_time && st.utc_arrival_time.trim()) || undefined;
+                                        const arrival = (st.arrival_date_time && st.arrival_date_time.trim()) || (st.utc_arrival_time && st.utc_arrival_time.trim()) || undefined;
+                                        const baseDeparture = (st.base_departure_date_time && st.base_departure_date_time.trim()) || (st.utc_departure_time && st.utc_departure_time.trim()) || undefined;
+                                        const departure = (st.departure_date_time && st.departure_date_time.trim()) || (st.utc_departure_time && st.utc_departure_time.trim()) || undefined;
+                                        
+                                        return {
+                                            base_arrival_date_time: baseArrival,
+                                            arrival_date_time: arrival,
+                                            base_departure_date_time: baseDeparture,
+                                            departure_date_time: departure,
                                         stop_point: st.stop_point,
                                         stop_area: st.stop_point?.stop_area
-                                    })),
+                                        };
+                                    }),
                                     base_departure_date_time: firstStop.base_departure_date_time || firstStop.utc_departure_time,
                                     departure_date_time: firstStop.departure_date_time || firstStop.utc_departure_time,
                                     base_arrival_date_time: lastStop.base_arrival_date_time || lastStop.utc_arrival_time,
                                     arrival_date_time: lastStop.arrival_date_time || lastStop.utc_arrival_time
                                 };
                                 
+                                // Calculate duration properly using parseUTCDate
+                                let durationSeconds = 0;
+                                if (stopTimes.length > 0 && firstDeparture && lastArrival && firstDeparture.trim() && lastArrival.trim()) {
+                                    try {
+                                        const depDate = parseUTCDate(firstDeparture);
+                                        const arrDate = parseUTCDate(lastArrival);
+                                        if (!isNaN(depDate.getTime()) && !isNaN(arrDate.getTime())) {
+                                            durationSeconds = Math.floor((arrDate.getTime() - depDate.getTime()) / 1000);
+                                        }
+                                    } catch (e) {
+                                        durationSeconds = 0;
+                                    }
+                                }
+                                
                                 const journey: JourneyItem = {
                                     departure_date_time: firstDeparture,
                                     arrival_date_time: lastArrival,
                                     sections: [section],
                                     durations: {
-                                        total: stopTimes.length > 0 && firstDeparture && lastArrival ? 
-                                            (new Date(lastArrival).getTime() - new Date(firstDeparture).getTime()) / 1000 : 0
+                                        total: durationSeconds
                                     }
                                 };
                                 
@@ -253,7 +387,7 @@ const Trip: React.FC = () => {
                         }
                     }
                 } catch (apiErr) {
-                    console.error('Error fetching vehicle journey:', apiErr);
+                    // Error handling
                 }
 
                 // If we couldn't load from API either, show error with helpful links
@@ -261,7 +395,6 @@ const Trip: React.FC = () => {
             } catch (err) {
                 const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
                 setError('Erreur lors du chargement des données du trajet: ' + errorMessage);
-                console.error(err);
             } finally {
                 loadingRef.current = false;
                 setLoading(false);
@@ -279,25 +412,28 @@ const Trip: React.FC = () => {
     const publicTransportSections = sections.filter((s: Section) => s.type === 'public_transport');
     
     // Get all stops from all sections
-    const allStops: ExtendedStopTime[] = [];
-    publicTransportSections.forEach((section: Section) => {
-        if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
-            section.stop_date_times.forEach((stopTime, index) => {
-                const isFirst = index === 0;
-                const isLast = index === section.stop_date_times!.length - 1;
-                const stop = {
-                    ...(stopTime as ExtendedStopTime),
-                    section,
-                    isFirst,
-                    isLast,
-                    commercialMode: section.display_informations?.commercial_mode,
-                    network: section.display_informations?.network,
-                    trainNumber: section.display_informations?.headsign || section.display_informations?.trip_short_name
-                };
-                allStops.push(stop);
-            });
-        }
-    });
+    const allStops = useMemo<ExtendedStopTime[]>(() => {
+        const stops: ExtendedStopTime[] = [];
+        publicTransportSections.forEach((section: Section) => {
+            if (section.stop_date_times && Array.isArray(section.stop_date_times)) {
+                section.stop_date_times.forEach((stopTime, index) => {
+                    const isFirst = index === 0;
+                    const isLast = index === section.stop_date_times!.length - 1;
+                    const stop = {
+                        ...(stopTime as ExtendedStopTime),
+                        section,
+                        isFirst,
+                        isLast,
+                        commercialMode: section.display_informations?.commercial_mode,
+                        network: section.display_informations?.network,
+                        trainNumber: section.display_informations?.headsign || section.display_informations?.trip_short_name
+                    };
+                    stops.push(stop);
+                });
+            }
+        });
+        return stops;
+    }, [publicTransportSections]);
 
     // Get sections with geojson for map display
     const sectionsWithGeoJSON = useMemo<Section[]>(() => {
@@ -306,11 +442,17 @@ const Trip: React.FC = () => {
 
     // Get markers for all waypoints (stops) from stop_date_times
     const journeyMarkers = useMemo<JourneyMarker[]>(() => {
+        if (!allStops || allStops.length === 0) {
+            console.log('[Trip] No stops available for markers');
+            return [];
+        }
+        
+        console.log('[Trip] Computing journey markers from', allStops.length, 'stops');
         const markers: JourneyMarker[] = [];
         
         // Convert all stops from stop_date_times to markers
         allStops.forEach((stop, index) => {
-            const stopPoint = stop.stop_point as { coord?: { lat?: number; lon?: number }; name?: string | null } | undefined;
+            const stopPoint = stop.stop_point as { coord?: { lat?: number; lon?: number }; name?: string | null; stop_area?: { coord?: { lat?: number; lon?: number }; name?: string | null } } | undefined;
             const stopArea = stopPoint?.stop_area as { coord?: { lat?: number; lon?: number }; name?: string | null } | undefined;
             const coord = stopPoint?.coord || stopArea?.coord;
             
@@ -338,6 +480,11 @@ const Trip: React.FC = () => {
             }
         });
         
+        console.log('[Trip] Journey markers computed:', {
+            totalStops: allStops.length,
+            markersCreated: markers.length,
+            markersWithCoords: markers.filter(m => m.lat && m.lon).length
+        });
         return markers;
     }, [allStops]);
 
@@ -360,6 +507,63 @@ const Trip: React.FC = () => {
     }
 
     if (error || !tripData) {
+        // Show samples if no tripId
+        if (!tripId) {
+            const sampleTripIds = [
+                {
+                    id: 'vehicle_journey:SNCF:2025-12-20:88507:1187:Train_20251220T113300',
+                    label: 'Train 88507 - 20/12/2025 11:33'
+                }
+            ];
+            
+            return (
+                <>
+                    <section className='section'>
+                        <div className='container'>
+                            <h1 className='title is-2 mb-5'>Détails du trajet</h1>
+                            <div className='box has-text-centered mb-5'>
+                                <span className='icon is-large has-text-info'>
+                                    <i className='fas fa-route fa-3x'></i>
+                                </span>
+                                <p className='mt-4'>Sélectionnez un exemple de trajet ci-dessous</p>
+                            </div>
+                            
+                            {/* Samples Section */}
+                            <div className='mt-6'>
+                                <h3 className='title is-4 mb-4'>Exemples</h3>
+                                <div className='columns is-multiline'>
+                                    {sampleTripIds.map((sample) => (
+                                        <div key={sample.id} className='column is-half'>
+                                            <Link 
+                                                to={`/trip/${encodeTripId(sample.id)}`}
+                                                className='box is-clickable'
+                                                style={{ textDecoration: 'none' }}
+                                            >
+                                                <div className='is-flex is-align-items-center'>
+                                                    <span className='icon is-large has-text-primary mr-3'>
+                                                        <i className='fas fa-route fa-2x'></i>
+                                                    </span>
+                                                    <div>
+                                                        <p className='title is-5 mb-1'>
+                                                            {sample.label}
+                                                        </p>
+                                                        <p className='subtitle is-6 has-text-grey'>
+                                                            Cliquez pour voir les détails
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </Link>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <Footer />
+                </>
+            );
+        }
+        
         return (
             <>
                 <section className='section'>
@@ -393,8 +597,55 @@ const Trip: React.FC = () => {
 
     const { journey, info, disruptions } = tripData;
     const transportInfo = getTransportIcon(info.commercialMode, info.network);
-    const depDate = parseUTCDate(info.departureTime);
-    const arrDate = parseUTCDate(info.arrivalTime);
+    
+    // Parse dates safely
+    let depDate: Date | null = null;
+    let arrDate: Date | null = null;
+    try {
+        if (info.departureTime && info.departureTime.trim()) {
+            depDate = parseUTCDate(info.departureTime);
+            if (isNaN(depDate.getTime())) {
+                depDate = null;
+            }
+        }
+    } catch (e) {
+        depDate = null;
+    }
+    try {
+        if (info.arrivalTime && info.arrivalTime.trim()) {
+            arrDate = parseUTCDate(info.arrivalTime);
+            if (isNaN(arrDate.getTime())) {
+                arrDate = null;
+            }
+        }
+    } catch (e) {
+        arrDate = null;
+    }
+    
+    // Format duration in human-readable format (days, hours and minutes)
+    const formatDuration = (durationSeconds: number): string => {
+        if (!durationSeconds || durationSeconds <= 0) return '-';
+        const days = Math.floor(durationSeconds / 86400); // 86400 seconds = 24 hours
+        const hours = Math.floor((durationSeconds % 86400) / 3600);
+        const minutes = Math.floor((durationSeconds % 3600) / 60);
+        
+        const parts: string[] = [];
+        if (days > 0) {
+            parts.push(`${days}j`);
+        }
+        if (hours > 0) {
+            parts.push(`${hours}h`);
+        }
+        if (minutes > 0) {
+            parts.push(`${minutes}min`);
+        }
+        
+        if (parts.length > 0) {
+            return parts.join(' ');
+        } else {
+            return '< 1min';
+        }
+    };
 
     return (
         <>
@@ -468,8 +719,8 @@ const Trip: React.FC = () => {
                                 <div className='content'>
                                     <p><strong>Gare de départ:</strong> {info.departureStation}</p>
                                     <p><strong>Gare d'arrivée:</strong> {info.arrivalStation}</p>
-                                    <p><strong>Date:</strong> {formatDate(depDate)}</p>
-                                    <p><strong>Durée totale:</strong> {Math.floor(info.duration / 60)} minutes</p>
+                                    <p><strong>Date:</strong> {depDate ? formatDate(depDate) : '-'}</p>
+                                    <p><strong>Durée totale:</strong> {formatDuration(info.duration)}</p>
                                     {info.wagonCount && (
                                         <p><strong>Nombre de wagons:</strong> {info.wagonCount}</p>
                                     )}
@@ -479,7 +730,7 @@ const Trip: React.FC = () => {
                     </div>
 
                     {/* Journey Map */}
-                    {sectionsWithGeoJSON.length > 0 && (
+                    {(sectionsWithGeoJSON.length > 0 || journeyMarkers.length > 0) && (
                         <div className='box mb-5'>
                             <h2 className='title is-4 mb-4'>
                                 <span className='icon mr-2'>
@@ -488,8 +739,8 @@ const Trip: React.FC = () => {
                                 Carte de l'itinéraire
                             </h2>
                             <GeoJSONMap 
-                                geojsonData={sectionsWithGeoJSON}
-                                markers={journeyMarkers}
+                                geojsonData={sectionsWithGeoJSON.length > 0 ? sectionsWithGeoJSON : undefined}
+                                markers={journeyMarkers || []}
                                 height={400}
                             />
                         </div>
@@ -554,8 +805,8 @@ const Trip: React.FC = () => {
                                                 <ul>
                                                     {disruption.application_periods.map((period, periodIndex) => (
                                                         <li key={periodIndex}>
-                                                            Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : 'N/A'} 
-                                                            {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : 'N/A'}
+                                                            Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : '-'} 
+                                                            {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : '-'}
                                                         </li>
                                                     ))}
                                                 </ul>
@@ -591,17 +842,46 @@ const Trip: React.FC = () => {
                                             stop.stop_area?.name || 
                                             'Gare inconnue'
                                         );
-                                        const platform = stop.stop_point?.label || 'N/A';
+                                        const platform = stop.stop_point?.label || '-';
                                         const baseArrival = stop.base_arrival_date_time;
                                         const realArrival = stop.arrival_date_time;
                                         const baseDeparture = stop.base_departure_date_time;
                                         const realDeparture = stop.departure_date_time;
                                         
                                         // Use arrival for intermediate stops, departure for last stop
-                                        const baseTime = stop.isLast ? baseDeparture : baseArrival;
-                                        const realTime = stop.isLast ? realDeparture : realArrival;
+                                        // Filter out empty strings - only use truthy non-empty values
+                                        const baseTime = stop.isLast ? (baseDeparture || undefined) : (baseArrival || undefined);
+                                        const realTime = stop.isLast ? (realDeparture || undefined) : (realArrival || undefined);
                                         const delay = getDelay(baseTime, realTime);
                                         const hasDelay = delay && delay !== 'À l\'heure';
+                                        
+                                        // Parse dates safely - only parse if we have a non-empty string
+                                        let parsedBaseTime: Date | null = null;
+                                        let parsedRealTime: Date | null = null;
+                                        
+                                        if (baseTime && baseTime.trim()) {
+                                            try {
+                                                parsedBaseTime = parseUTCDate(baseTime);
+                                                // Validate the parsed date
+                                                if (isNaN(parsedBaseTime.getTime())) {
+                                                    parsedBaseTime = null;
+                                                }
+                                            } catch (e: any) {
+                                                parsedBaseTime = null;
+                                            }
+                                        }
+                                        
+                                        if (realTime && realTime.trim()) {
+                                            try {
+                                                parsedRealTime = parseUTCDate(realTime);
+                                                // Validate the parsed date
+                                                if (isNaN(parsedRealTime.getTime())) {
+                                                    parsedRealTime = null;
+                                                }
+                                            } catch (e: any) {
+                                                parsedRealTime = null;
+                                            }
+                                        }
                                         
                                         return (
                                             <tr key={index}>
@@ -616,17 +896,17 @@ const Trip: React.FC = () => {
                                                 </td>
                                                 <td>{platform}</td>
                                                 <td>
-                                                    {baseTime ? (
+                                                    {parsedBaseTime ? (
                                                         <div>
                                                             <div className='is-flex is-align-items-center'>
                                                                 <span className='is-size-5 has-text-weight-semibold'>
-                                                                    {formatTime(parseUTCDate(baseTime))}
+                                                                    {formatTime(parsedBaseTime)}
                                                                 </span>
-                                                                {hasDelay && realTime && (
+                                                                {hasDelay && parsedRealTime && (
                                                                     <>
                                                                         <span className='mx-2 has-text-grey'>→</span>
                                                                         <span className='is-size-5 has-text-danger has-text-weight-semibold'>
-                                                                            {formatTime(parseUTCDate(realTime))}
+                                                                            {formatTime(parsedRealTime)}
                                                                         </span>
                                                                     </>
                                                                 )}
@@ -668,4 +948,5 @@ const Trip: React.FC = () => {
 };
 
 export default Trip;
+
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
 import LocationAutocomplete from '../components/LocationAutocomplete';
@@ -34,6 +34,13 @@ const Trajet: React.FC = () => {
     const [disruptions, setDisruptions] = useState<Disruption[]>([]);
     const [showDisruptionsSection, setShowDisruptionsSection] = useState<boolean>(false);
     
+    // Track if we should auto-search on initial load
+    const hasAutoSearchedRef = useRef<boolean>(false);
+    const isInitialLoadFromUrlRef = useRef<boolean>(Boolean(from && to));
+    const userHasChangedValuesRef = useRef<boolean>(false);
+    const initialFromNameRef = useRef<string>(decodeLocationName(from) || '');
+    const initialToNameRef = useRef<string>(decodeLocationName(to) || '');
+    
     const [fromName, setFromName] = useState<string>(() => decodeLocationName(from) || '');
     const [toName, setToName] = useState<string>(() => decodeLocationName(to) || '');
     
@@ -61,33 +68,80 @@ const Trajet: React.FC = () => {
         if (from) {
             const decodedFrom = decodeLocationName(from);
             setFromName(decodedFrom);
+            initialFromNameRef.current = decodedFrom;
         }
         if (to) {
             const decodedTo = decodeLocationName(to);
             setToName(decodedTo);
+            initialToNameRef.current = decodedTo;
         }
+        // Reset auto-search flag when URL params change (user navigated to new URL)
+        hasAutoSearchedRef.current = false;
+        isInitialLoadFromUrlRef.current = Boolean(from && to);
+        userHasChangedValuesRef.current = false;
     }, [from, to]);
 
-    // Clear itinerary when stations change (don't auto-search)
+    // Auto-search when both stations are resolved from URL params on initial load
     useEffect(() => {
-        // Clear current results when stations change
-        setTerTrains([]);
-        setDisruptions([]);
-        setError(null);
+        // Only auto-search if:
+        // 1. We have URL params (initial load from URL)
+        // 2. Both IDs are set
+        // 3. We haven't auto-searched yet
+        // 4. User hasn't manually changed values
+        if (
+            isInitialLoadFromUrlRef.current &&
+            fromId &&
+            toId &&
+            !hasAutoSearchedRef.current &&
+            !userHasChangedValuesRef.current
+        ) {
+            hasAutoSearchedRef.current = true;
+            fetchTerTrains(fromId, toId);
+        }
+    }, [fromId, toId]);
+
+    // Clear itinerary when stations change (don't auto-search on manual changes)
+    useEffect(() => {
+        // Only clear if user manually changed values (not on initial load auto-search)
+        if (userHasChangedValuesRef.current) {
+            setTerTrains([]);
+            setDisruptions([]);
+            setError(null);
+        }
     }, [fromId, toId]);
 
     const handleFromStationFound = (station: Place & { name?: string | null }): void => {
         if (!station.id) return;
+        
+        const cleanedName = cleanLocationName(station.name) || '';
+        const normalizedCleanedName = cleanedName.toLowerCase().trim();
+        const normalizedInitialFrom = initialFromNameRef.current.toLowerCase().trim();
+        
+        // Determine if this is a manual change:
+        // 1. If user has already manually changed values (flag set from onValueChange)
+        // 2. If we've already auto-searched (any change after that is manual)
+        // 3. If the name doesn't match initial URL param (user selected different station)
+        const isManualChange = 
+            userHasChangedValuesRef.current ||
+            hasAutoSearchedRef.current ||
+            (normalizedCleanedName !== normalizedInitialFrom && isInitialLoadFromUrlRef.current);
+        
+        if (isManualChange) {
+            userHasChangedValuesRef.current = true;
+            // Clear current itinerary on manual change (but not on initial auto-selection)
+            if (hasAutoSearchedRef.current) {
+                setTerTrains([]);
+                setDisruptions([]);
+            }
+        }
+        
         setFromId(station.id);
-        const cleanedName = cleanLocationName(station.name);
-        setFromName(cleanedName || '');
+        setFromName(cleanedName);
         setError(null);
-        // Clear current itinerary
-        setTerTrains([]);
-        setDisruptions([]);
+        
         // Update URL if toId is also set
         if (toId && toName) {
-            const fromSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
+            const fromSlug = encodeURIComponent(cleanedName.toLowerCase().replace(/\s+/g, '-'));
             const toSlug = encodeURIComponent(toName.toLowerCase().replace(/\s+/g, '-'));
             navigate(`/itinerary/${fromSlug}/${toSlug}`, { replace: true });
         }
@@ -95,17 +149,37 @@ const Trajet: React.FC = () => {
 
     const handleToStationFound = (station: Place & { name?: string | null }): void => {
         if (!station.id) return;
+        
+        const cleanedName = cleanLocationName(station.name) || '';
+        const normalizedCleanedName = cleanedName.toLowerCase().trim();
+        const normalizedInitialTo = initialToNameRef.current.toLowerCase().trim();
+        
+        // Determine if this is a manual change:
+        // 1. If user has already manually changed values (flag set from onValueChange)
+        // 2. If we've already auto-searched (any change after that is manual)
+        // 3. If the name doesn't match initial URL param (user selected different station)
+        const isManualChange = 
+            userHasChangedValuesRef.current ||
+            hasAutoSearchedRef.current ||
+            (normalizedCleanedName !== normalizedInitialTo && isInitialLoadFromUrlRef.current);
+        
+        if (isManualChange) {
+            userHasChangedValuesRef.current = true;
+            // Clear current itinerary on manual change (but not on initial auto-selection)
+            if (hasAutoSearchedRef.current) {
+                setTerTrains([]);
+                setDisruptions([]);
+            }
+        }
+        
         setToId(station.id);
-        const cleanedName = cleanLocationName(station.name);
-        setToName(cleanedName || '');
+        setToName(cleanedName);
         setError(null);
-        // Clear current itinerary
-        setTerTrains([]);
-        setDisruptions([]);
+        
         // Update URL if fromId is also set
         if (fromId && fromName) {
             const fromSlug = encodeURIComponent(fromName.toLowerCase().replace(/\s+/g, '-'));
-            const toSlug = encodeURIComponent((cleanedName || '').toLowerCase().replace(/\s+/g, '-'));
+            const toSlug = encodeURIComponent(cleanedName.toLowerCase().replace(/\s+/g, '-'));
             navigate(`/itinerary/${fromSlug}/${toSlug}`, { replace: true });
         }
     };
@@ -532,7 +606,13 @@ const Trajet: React.FC = () => {
                                 <LocationAutocomplete
                                     label='Gare de départ'
                                     value={fromName}
-                                    onValueChange={setFromName}
+                                    onValueChange={(value) => {
+                                        setFromName(value);
+                                        // Mark as user change if they typed something different
+                                        if (hasAutoSearchedRef.current || value !== initialFromNameRef.current) {
+                                            userHasChangedValuesRef.current = true;
+                                        }
+                                    }}
                                     onChange={(id: string | undefined) => setFromId(id)}
                                     defaultSearchTerm={fromName || 'Metz'}
                                     onStationFound={handleFromStationFound}
@@ -560,7 +640,13 @@ const Trajet: React.FC = () => {
                                 <LocationAutocomplete
                                     label="Gare d'arrivée"
                                     value={toName}
-                                    onValueChange={setToName}
+                                    onValueChange={(value) => {
+                                        setToName(value);
+                                        // Mark as user change if they typed something different
+                                        if (hasAutoSearchedRef.current || value !== initialToNameRef.current) {
+                                            userHasChangedValuesRef.current = true;
+                                        }
+                                    }}
                                     onChange={(id: string | undefined) => setToId(id)}
                                     defaultSearchTerm={toName || 'Thionville'}
                                     onStationFound={handleToStationFound}

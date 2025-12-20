@@ -22,6 +22,8 @@ import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObj
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
 // @ts-ignore
+import type { CompaniesResponse } from '../models';
+// @ts-ignore
 import type { CoverageCoverageNetworksGet200Response } from '../models';
 // @ts-ignore
 import type { CoverageCoverageRoutesGet200Response } from '../models';
@@ -40,6 +42,48 @@ import type { VehicleJourneysResponse } from '../models';
  */
 export const PublicTransportObjectsApiAxiosParamCreator = function (configuration?: Configuration) {
     return {
+        /**
+         * 
+         * @summary List all companies
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        coverageCoverageCompaniesGet: async (coverage: string, depth?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'coverage' is not null or undefined
+            assertParamExists('coverageCoverageCompaniesGet', 'coverage', coverage)
+            const localVarPath = `/coverage/{coverage}/companies`
+                .replace(`{${"coverage"}}`, encodeURIComponent(String(coverage)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (depth !== undefined) {
+                localVarQueryParameter['depth'] = depth;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
         /**
          * 
          * @summary List all lines
@@ -275,6 +319,68 @@ export const PublicTransportObjectsApiAxiosParamCreator = function (configuratio
             };
         },
         /**
+         * Get a list of vehicle journeys. Can be filtered by headsign, since/until dates, and data_freshness.
+         * @summary List vehicle journeys
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {string} [headsign] Filter by headsign
+         * @param {string} [since] Filter journeys since this datetime (YYYYMMDDTHHmmss)
+         * @param {string} [until] Filter journeys until this datetime (YYYYMMDDTHHmmss)
+         * @param {CoverageCoverageVehicleJourneysGetDataFreshnessEnum} [dataFreshness] Data freshness filter
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        coverageCoverageVehicleJourneysGet: async (coverage: string, headsign?: string, since?: string, until?: string, dataFreshness?: CoverageCoverageVehicleJourneysGetDataFreshnessEnum, depth?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'coverage' is not null or undefined
+            assertParamExists('coverageCoverageVehicleJourneysGet', 'coverage', coverage)
+            const localVarPath = `/coverage/{coverage}/vehicle_journeys`
+                .replace(`{${"coverage"}}`, encodeURIComponent(String(coverage)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (headsign !== undefined) {
+                localVarQueryParameter['headsign'] = headsign;
+            }
+
+            if (since !== undefined) {
+                localVarQueryParameter['since'] = since;
+            }
+
+            if (until !== undefined) {
+                localVarQueryParameter['until'] = until;
+            }
+
+            if (dataFreshness !== undefined) {
+                localVarQueryParameter['data_freshness'] = dataFreshness;
+            }
+
+            if (depth !== undefined) {
+                localVarQueryParameter['depth'] = depth;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * 
          * @summary Get vehicle journey details
          * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -324,6 +430,20 @@ export const PublicTransportObjectsApiAxiosParamCreator = function (configuratio
 export const PublicTransportObjectsApiFp = function(configuration?: Configuration) {
     const localVarAxiosParamCreator = PublicTransportObjectsApiAxiosParamCreator(configuration)
     return {
+        /**
+         * 
+         * @summary List all companies
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async coverageCoverageCompaniesGet(coverage: string, depth?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<CompaniesResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.coverageCoverageCompaniesGet(coverage, depth, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PublicTransportObjectsApi.coverageCoverageCompaniesGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
         /**
          * 
          * @summary List all lines
@@ -405,6 +525,24 @@ export const PublicTransportObjectsApiFp = function(configuration?: Configuratio
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Get a list of vehicle journeys. Can be filtered by headsign, since/until dates, and data_freshness.
+         * @summary List vehicle journeys
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {string} [headsign] Filter by headsign
+         * @param {string} [since] Filter journeys since this datetime (YYYYMMDDTHHmmss)
+         * @param {string} [until] Filter journeys until this datetime (YYYYMMDDTHHmmss)
+         * @param {CoverageCoverageVehicleJourneysGetDataFreshnessEnum} [dataFreshness] Data freshness filter
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async coverageCoverageVehicleJourneysGet(coverage: string, headsign?: string, since?: string, until?: string, dataFreshness?: CoverageCoverageVehicleJourneysGetDataFreshnessEnum, depth?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<VehicleJourneysResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.coverageCoverageVehicleJourneysGet(coverage, headsign, since, until, dataFreshness, depth, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PublicTransportObjectsApi.coverageCoverageVehicleJourneysGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * 
          * @summary Get vehicle journey details
          * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -427,6 +565,17 @@ export const PublicTransportObjectsApiFp = function(configuration?: Configuratio
 export const PublicTransportObjectsApiFactory = function (configuration?: Configuration, basePath?: string, axios?: AxiosInstance) {
     const localVarFp = PublicTransportObjectsApiFp(configuration)
     return {
+        /**
+         * 
+         * @summary List all companies
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        coverageCoverageCompaniesGet(coverage: string, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<CompaniesResponse> {
+            return localVarFp.coverageCoverageCompaniesGet(coverage, depth, options).then((request) => request(axios, basePath));
+        },
         /**
          * 
          * @summary List all lines
@@ -490,6 +639,21 @@ export const PublicTransportObjectsApiFactory = function (configuration?: Config
             return localVarFp.coverageCoverageStopPointsGet(coverage, options).then((request) => request(axios, basePath));
         },
         /**
+         * Get a list of vehicle journeys. Can be filtered by headsign, since/until dates, and data_freshness.
+         * @summary List vehicle journeys
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {string} [headsign] Filter by headsign
+         * @param {string} [since] Filter journeys since this datetime (YYYYMMDDTHHmmss)
+         * @param {string} [until] Filter journeys until this datetime (YYYYMMDDTHHmmss)
+         * @param {CoverageCoverageVehicleJourneysGetDataFreshnessEnum} [dataFreshness] Data freshness filter
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        coverageCoverageVehicleJourneysGet(coverage: string, headsign?: string, since?: string, until?: string, dataFreshness?: CoverageCoverageVehicleJourneysGetDataFreshnessEnum, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<VehicleJourneysResponse> {
+            return localVarFp.coverageCoverageVehicleJourneysGet(coverage, headsign, since, until, dataFreshness, depth, options).then((request) => request(axios, basePath));
+        },
+        /**
          * 
          * @summary Get vehicle journey details
          * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -507,6 +671,16 @@ export const PublicTransportObjectsApiFactory = function (configuration?: Config
  * PublicTransportObjectsApi - interface
  */
 export interface PublicTransportObjectsApiInterface {
+    /**
+     * 
+     * @summary List all companies
+     * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+     * @param {number} [depth] Depth of detail in response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    coverageCoverageCompaniesGet(coverage: string, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<CompaniesResponse>;
+
     /**
      * 
      * @summary List all lines
@@ -564,6 +738,20 @@ export interface PublicTransportObjectsApiInterface {
     coverageCoverageStopPointsGet(coverage: string, options?: RawAxiosRequestConfig): AxiosPromise<CoverageCoverageStopPointsGet200Response>;
 
     /**
+     * Get a list of vehicle journeys. Can be filtered by headsign, since/until dates, and data_freshness.
+     * @summary List vehicle journeys
+     * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+     * @param {string} [headsign] Filter by headsign
+     * @param {string} [since] Filter journeys since this datetime (YYYYMMDDTHHmmss)
+     * @param {string} [until] Filter journeys until this datetime (YYYYMMDDTHHmmss)
+     * @param {CoverageCoverageVehicleJourneysGetDataFreshnessEnum} [dataFreshness] Data freshness filter
+     * @param {number} [depth] Depth of detail in response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    coverageCoverageVehicleJourneysGet(coverage: string, headsign?: string, since?: string, until?: string, dataFreshness?: CoverageCoverageVehicleJourneysGetDataFreshnessEnum, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<VehicleJourneysResponse>;
+
+    /**
      * 
      * @summary Get vehicle journey details
      * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -579,6 +767,18 @@ export interface PublicTransportObjectsApiInterface {
  * PublicTransportObjectsApi - object-oriented interface
  */
 export class PublicTransportObjectsApi extends BaseAPI implements PublicTransportObjectsApiInterface {
+    /**
+     * 
+     * @summary List all companies
+     * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+     * @param {number} [depth] Depth of detail in response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public coverageCoverageCompaniesGet(coverage: string, depth?: number, options?: RawAxiosRequestConfig) {
+        return PublicTransportObjectsApiFp(this.configuration).coverageCoverageCompaniesGet(coverage, depth, options).then((request) => request(this.axios, this.basePath));
+    }
+
     /**
      * 
      * @summary List all lines
@@ -648,6 +848,22 @@ export class PublicTransportObjectsApi extends BaseAPI implements PublicTranspor
     }
 
     /**
+     * Get a list of vehicle journeys. Can be filtered by headsign, since/until dates, and data_freshness.
+     * @summary List vehicle journeys
+     * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+     * @param {string} [headsign] Filter by headsign
+     * @param {string} [since] Filter journeys since this datetime (YYYYMMDDTHHmmss)
+     * @param {string} [until] Filter journeys until this datetime (YYYYMMDDTHHmmss)
+     * @param {CoverageCoverageVehicleJourneysGetDataFreshnessEnum} [dataFreshness] Data freshness filter
+     * @param {number} [depth] Depth of detail in response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public coverageCoverageVehicleJourneysGet(coverage: string, headsign?: string, since?: string, until?: string, dataFreshness?: CoverageCoverageVehicleJourneysGetDataFreshnessEnum, depth?: number, options?: RawAxiosRequestConfig) {
+        return PublicTransportObjectsApiFp(this.configuration).coverageCoverageVehicleJourneysGet(coverage, headsign, since, until, dataFreshness, depth, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
      * 
      * @summary Get vehicle journey details
      * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -660,3 +876,8 @@ export class PublicTransportObjectsApi extends BaseAPI implements PublicTranspor
     }
 }
 
+export const CoverageCoverageVehicleJourneysGetDataFreshnessEnum = {
+    BaseSchedule: 'base_schedule',
+    Realtime: 'realtime'
+} as const;
+export type CoverageCoverageVehicleJourneysGetDataFreshnessEnum = typeof CoverageCoverageVehicleJourneysGetDataFreshnessEnum[keyof typeof CoverageCoverageVehicleJourneysGetDataFreshnessEnum];

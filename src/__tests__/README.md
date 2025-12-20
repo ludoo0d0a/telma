@@ -33,9 +33,16 @@ npm test
 
 Run a specific test file:
 ```bash
-npm test -- coverage.test.js
-npm test -- journeys.test.js
-npm test -- places.test.js
+npm test -- coverage.test.ts
+npm test -- journeys.test.ts
+npm test -- places.test.ts
+npm test -- datasets.test.ts
+npm test -- contributors.test.ts
+npm test -- isochrones.test.ts
+npm test -- companies.test.ts
+npm test -- vehicle-journeys.test.ts
+npm test -- disruptions.test.ts
+npm test -- poi-types.test.ts
 ```
 
 Run tests in watch mode:
@@ -47,14 +54,21 @@ npm test -- --watch
 
 ### Test Files
 
-- `api/coverage.test.js` - Tests for coverage endpoints
-- `api/journeys.test.js` - Tests for journey planning endpoints
-- `api/places.test.js` - Tests for place search endpoints
-- `api/departures-arrivals.test.js` - Tests for departures and arrivals
-- `api/schedules.test.js` - Tests for schedule endpoints
-- `api/transport-modes.test.js` - Tests for transport mode endpoints
-- `api/public-transport-objects.test.js` - Tests for PT objects endpoints
-- `api/reports.test.js` - Tests for reports endpoints
+- `api/coverage.test.ts` - Tests for coverage endpoints
+- `api/journeys.test.ts` - Tests for journey planning endpoints
+- `api/places.test.ts` - Tests for place search endpoints
+- `api/departures-arrivals.test.ts` - Tests for departures and arrivals
+- `api/schedules.test.ts` - Tests for schedule endpoints
+- `api/transport-modes.test.ts` - Tests for transport mode endpoints
+- `api/public-transport-objects.test.ts` - Tests for PT objects endpoints
+- `api/reports.test.ts` - Tests for reports endpoints
+- `api/datasets.test.ts` - Tests for datasets endpoints
+- `api/contributors.test.ts` - Tests for contributors endpoints
+- `api/isochrones.test.ts` - Tests for isochrones endpoints (Beta)
+- `api/companies.test.ts` - Tests for companies endpoints
+- `api/vehicle-journeys.test.ts` - Tests for vehicle journeys list endpoints
+- `api/disruptions.test.ts` - Tests for disruptions endpoints
+- `api/poi-types.test.ts` - Tests for POI types and POIs endpoints
 
 ### Utilities
 

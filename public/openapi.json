@@ -1532,6 +1532,44 @@
           }
         }
       },
+      "Company": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Company ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Company name"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "POIType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "POI type ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "POI type name"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
       "Error": {
         "type": "object",
         "properties": {
@@ -1996,29 +2034,6 @@
           }
         }
       },
-      "VehicleJourneysResponse": {
-        "type": "object",
-        "properties": {
-          "vehicle_journeys": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/VehicleJourney"
-            }
-          },
-          "disruptions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Disruption"
-            }
-          },
-          "links": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Link"
-            }
-          }
-        }
-      },
       "DatasetsResponse": {
         "type": "object",
         "properties": {
@@ -2046,6 +2061,128 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Contributor"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "CoordsResponse": {
+        "type": "object",
+        "properties": {
+          "regions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "List of coverage region IDs that contain these coordinates"
+          },
+          "address": {
+            "$ref": "#/components/schemas/Geocode",
+            "description": "Address information for the coordinates"
+          }
+        }
+      },
+      "CompaniesResponse": {
+        "type": "object",
+        "properties": {
+          "companies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Company"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "POITypesResponse": {
+        "type": "object",
+        "properties": {
+          "poi_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/POIType"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "POIsResponse": {
+        "type": "object",
+        "properties": {
+          "pois": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Place"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "VehicleJourneysResponse": {
+        "type": "object",
+        "properties": {
+          "vehicle_journeys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/VehicleJourney"
+            }
+          },
+          "pagination": {
+            "$ref": "#/components/schemas/Pagination"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          },
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
+            }
+          }
+        }
+      },
+      "DisruptionsResponse": {
+        "type": "object",
+        "properties": {
+          "disruptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Disruption"
             }
           },
           "pagination": {
@@ -2117,6 +2254,70 @@
           },
           "404": {
             "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coords/{coord}": {
+      "get": {
+        "tags": ["Inverted Geocoding"],
+        "summary": "Inverted geocoding - get address and coverage regions from coordinates",
+        "description": "Given coordinates, returns the detailed postal address and the Navitia coverage regions that contain these coordinates. The coordinate format is 'lon;lat' (longitude;latitude).",
+        "parameters": [
+          {
+            "name": "coord",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[+-]?\\d+\\.?\\d*;[+-]?\\d+\\.?\\d*$"
+            },
+            "description": "Coordinates in format 'lon;lat' (longitude;latitude), e.g., '2.37705;48.84675'",
+            "example": "2.37705;48.84675"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address and coverage regions information",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoordsResponse"
+                },
+                "example": {
+                  "regions": ["sandbox"],
+                  "address": {
+                    "id": "2.37705;48.84675",
+                    "label": "20 Rue Hector Malot (Paris)",
+                    "name": "20 Rue Hector Malot",
+                    "coord": {
+                      "lat": "48.84675",
+                      "lon": "2.37705"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid coordinates format)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
             "content": {
               "application/json": {
                 "schema": {
@@ -2492,7 +2693,7 @@
         }
       }
     },
-    "/coverage/{coverage}/places_nearby": {
+    "/coverage/{coverage}/coord/{coord}/places_nearby": {
       "get": {
         "tags": ["Places"],
         "summary": "Find places nearby coordinates",
@@ -2503,7 +2704,7 @@
           },
           {
             "name": "coord",
-            "in": "query",
+            "in": "path",
             "required": true,
             "schema": {
               "type": "string",
@@ -3480,6 +3681,336 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TerminusSchedulesResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/companies": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List all companies",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of companies",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompaniesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/vehicle_journeys": {
+      "get": {
+        "tags": ["Public Transport Objects"],
+        "summary": "List vehicle journeys",
+        "description": "Get a list of vehicle journeys. Can be filtered by headsign, since/until dates, and data_freshness.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "headsign",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by headsign"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "Filter journeys since this datetime (YYYYMMDDTHHmmss)"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "Filter journeys until this datetime (YYYYMMDDTHHmmss)"
+          },
+          {
+            "name": "data_freshness",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": ["base_schedule", "realtime"],
+              "default": "base_schedule"
+            },
+            "description": "Data freshness filter"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of vehicle journeys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VehicleJourneysResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/disruptions": {
+      "get": {
+        "tags": ["Disruptions"],
+        "summary": "List disruptions",
+        "description": "Get a list of disruptions. Can be filtered by since/until dates.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "Filter disruptions since this datetime (YYYYMMDDTHHmmss)"
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "pattern": "^\\d{8}T\\d{6}$"
+            },
+            "description": "Filter disruptions until this datetime (YYYYMMDDTHHmmss)"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of disruptions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisruptionsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/poi_types": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "List POI types",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of POI types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/POITypesResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/coverage/{coverage}/coord/{coord}/pois": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "Get POIs nearby coordinates",
+        "description": "Get points of interest within a certain distance from coordinates",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "coord",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[+-]?\\d+\\.?\\d*;[+-]?\\d+\\.?\\d*$"
+            },
+            "description": "Coordinates in format 'lon;lat'",
+            "example": "2.377310;48.847002"
+          },
+          {
+            "name": "distance",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 500
+            },
+            "description": "Distance in meters"
+          },
+          {
+            "name": "poi_types",
+            "in": "query",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "description": "Filter by POI type IDs (e.g., poi_type:amenity:bicycle_rental)",
+            "style": "form",
+            "explode": true
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of POIs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/POIsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid coordinates format)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Coverage not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
                 }
               }
             }

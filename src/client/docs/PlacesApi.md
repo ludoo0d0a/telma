@@ -6,8 +6,10 @@ All URIs are relative to *https://api.sncf.com/v1*
 |------------- | ------------- | -------------|
 |[**coverageCoverageCoordCoordAddressesGet**](#coveragecoveragecoordcoordaddressesget) | **GET** /coverage/{coverage}/coord/{coord}/addresses | Inverted geocoding - get address from coordinates|
 |[**coverageCoverageCoordCoordFreefloatingsGet**](#coveragecoveragecoordcoordfreefloatingsget) | **GET** /coverage/{coverage}/coord/{coord}/freefloatings | Get freefloatings nearby coordinates|
+|[**coverageCoverageCoordCoordPlacesNearbyGet**](#coveragecoveragecoordcoordplacesnearbyget) | **GET** /coverage/{coverage}/coord/{coord}/places_nearby | Find places nearby coordinates|
+|[**coverageCoverageCoordCoordPoisGet**](#coveragecoveragecoordcoordpoisget) | **GET** /coverage/{coverage}/coord/{coord}/pois | Get POIs nearby coordinates|
 |[**coverageCoveragePlacesGet**](#coveragecoverageplacesget) | **GET** /coverage/{coverage}/places | Search for places (geographical autocomplete)|
-|[**coverageCoveragePlacesNearbyGet**](#coveragecoverageplacesnearbyget) | **GET** /coverage/{coverage}/places_nearby | Find places nearby coordinates|
+|[**coverageCoveragePoiTypesGet**](#coveragecoveragepoitypesget) | **GET** /coverage/{coverage}/poi_types | List POI types|
 
 # **coverageCoverageCoordCoordAddressesGet**
 > PlacesResponse coverageCoverageCoordCoordAddressesGet()
@@ -118,6 +120,139 @@ const { status, data } = await apiInstance.coverageCoverageCoordCoordFreefloatin
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
+# **coverageCoverageCoordCoordPlacesNearbyGet**
+> PlacesResponse coverageCoverageCoordCoordPlacesNearbyGet()
+
+Find places (stop areas, stop points, addresses, POIs) within a certain distance from coordinates
+
+### Example
+
+```typescript
+import {
+    PlacesApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new PlacesApi(configuration);
+
+let coverage: string; //Coverage area (e.g., \'sncf\') (default to undefined)
+let coord: string; //Coordinates in format \'lon;lat\' (default to undefined)
+let distance: number; //Distance in meters (default: 200) (optional) (default to 200)
+let type: Array<'stop_area' | 'stop_point' | 'address' | 'poi' | 'administrative_region'>; //Filter by place types (optional) (default to undefined)
+let count: number; //Number of results to return (optional) (default to 10)
+let depth: number; //Depth of detail in response (optional) (default to 1)
+
+const { status, data } = await apiInstance.coverageCoverageCoordCoordPlacesNearbyGet(
+    coverage,
+    coord,
+    distance,
+    type,
+    count,
+    depth
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **coverage** | [**string**] | Coverage area (e.g., \&#39;sncf\&#39;) | defaults to undefined|
+| **coord** | [**string**] | Coordinates in format \&#39;lon;lat\&#39; | defaults to undefined|
+| **distance** | [**number**] | Distance in meters (default: 200) | (optional) defaults to 200|
+| **type** | **Array<&#39;stop_area&#39; &#124; &#39;stop_point&#39; &#124; &#39;address&#39; &#124; &#39;poi&#39; &#124; &#39;administrative_region&#39;>** | Filter by place types | (optional) defaults to undefined|
+| **count** | [**number**] | Number of results to return | (optional) defaults to 10|
+| **depth** | [**number**] | Depth of detail in response | (optional) defaults to 1|
+
+
+### Return type
+
+**PlacesResponse**
+
+### Authorization
+
+[ApiKeyAuth](../README.md#ApiKeyAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | List of nearby places |  -  |
+|**400** | Bad request (e.g., invalid coordinates format) |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **coverageCoverageCoordCoordPoisGet**
+> POIsResponse coverageCoverageCoordCoordPoisGet()
+
+Get points of interest within a certain distance from coordinates
+
+### Example
+
+```typescript
+import {
+    PlacesApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new PlacesApi(configuration);
+
+let coverage: string; //Coverage area (e.g., \'sncf\') (default to undefined)
+let coord: string; //Coordinates in format \'lon;lat\' (default to undefined)
+let distance: number; //Distance in meters (optional) (default to 500)
+let poiTypes: Array<string>; //Filter by POI type IDs (e.g., poi_type:amenity:bicycle_rental) (optional) (default to undefined)
+let depth: number; //Depth of detail in response (optional) (default to 1)
+
+const { status, data } = await apiInstance.coverageCoverageCoordCoordPoisGet(
+    coverage,
+    coord,
+    distance,
+    poiTypes,
+    depth
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **coverage** | [**string**] | Coverage area (e.g., \&#39;sncf\&#39;) | defaults to undefined|
+| **coord** | [**string**] | Coordinates in format \&#39;lon;lat\&#39; | defaults to undefined|
+| **distance** | [**number**] | Distance in meters | (optional) defaults to 500|
+| **poiTypes** | **Array&lt;string&gt;** | Filter by POI type IDs (e.g., poi_type:amenity:bicycle_rental) | (optional) defaults to undefined|
+| **depth** | [**number**] | Depth of detail in response | (optional) defaults to 1|
+
+
+### Return type
+
+**POIsResponse**
+
+### Authorization
+
+[ApiKeyAuth](../README.md#ApiKeyAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | List of POIs |  -  |
+|**400** | Bad request (invalid coordinates format) |  -  |
+|**401** | Unauthorized |  -  |
+|**404** | Coverage not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
 # **coverageCoveragePlacesGet**
 > PlacesResponse coverageCoveragePlacesGet()
 
@@ -182,10 +317,9 @@ const { status, data } = await apiInstance.coverageCoveragePlacesGet(
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
-# **coverageCoveragePlacesNearbyGet**
-> PlacesResponse coverageCoveragePlacesNearbyGet()
+# **coverageCoveragePoiTypesGet**
+> POITypesResponse coverageCoveragePoiTypesGet()
 
-Find places (stop areas, stop points, addresses, POIs) within a certain distance from coordinates
 
 ### Example
 
@@ -199,18 +333,10 @@ const configuration = new Configuration();
 const apiInstance = new PlacesApi(configuration);
 
 let coverage: string; //Coverage area (e.g., \'sncf\') (default to undefined)
-let coord: string; //Coordinates in format \'lon;lat\' (default to undefined)
-let distance: number; //Distance in meters (default: 200) (optional) (default to 200)
-let type: Array<'stop_area' | 'stop_point' | 'address' | 'poi' | 'administrative_region'>; //Filter by place types (optional) (default to undefined)
-let count: number; //Number of results to return (optional) (default to 10)
 let depth: number; //Depth of detail in response (optional) (default to 1)
 
-const { status, data } = await apiInstance.coverageCoveragePlacesNearbyGet(
+const { status, data } = await apiInstance.coverageCoveragePoiTypesGet(
     coverage,
-    coord,
-    distance,
-    type,
-    count,
     depth
 );
 ```
@@ -220,16 +346,12 @@ const { status, data } = await apiInstance.coverageCoveragePlacesNearbyGet(
 |Name | Type | Description  | Notes|
 |------------- | ------------- | ------------- | -------------|
 | **coverage** | [**string**] | Coverage area (e.g., \&#39;sncf\&#39;) | defaults to undefined|
-| **coord** | [**string**] | Coordinates in format \&#39;lon;lat\&#39; | defaults to undefined|
-| **distance** | [**number**] | Distance in meters (default: 200) | (optional) defaults to 200|
-| **type** | **Array<&#39;stop_area&#39; &#124; &#39;stop_point&#39; &#124; &#39;address&#39; &#124; &#39;poi&#39; &#124; &#39;administrative_region&#39;>** | Filter by place types | (optional) defaults to undefined|
-| **count** | [**number**] | Number of results to return | (optional) defaults to 10|
 | **depth** | [**number**] | Depth of detail in response | (optional) defaults to 1|
 
 
 ### Return type
 
-**PlacesResponse**
+**POITypesResponse**
 
 ### Authorization
 
@@ -244,8 +366,9 @@ const { status, data } = await apiInstance.coverageCoveragePlacesNearbyGet(
 ### HTTP response details
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
-|**200** | List of nearby places |  -  |
-|**400** | Bad request (e.g., invalid coordinates format) |  -  |
+|**200** | List of POI types |  -  |
+|**401** | Unauthorized |  -  |
+|**404** | Coverage not found |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

@@ -15,21 +15,17 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Disruption } from './disruption';
+import type { Company } from './company';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Pagination } from './pagination';
-// May contain unused imports in some cases
-// @ts-ignore
-import type { VehicleJourney } from './vehicle-journey';
 
-export interface VehicleJourneysResponse {
-    'vehicle_journeys'?: Array<VehicleJourney>;
+export interface CompaniesResponse {
+    'companies'?: Array<Company>;
     'pagination'?: Pagination;
     'links'?: Array<Link>;
-    'disruptions'?: Array<Disruption>;
 }
 

@@ -57,6 +57,7 @@
   },
   "devDependencies": {
     "@openapitools/openapi-generator-cli": "^2.25.2",
+    "@types/geojson": "^7946.0.16",
     "@types/node": "^25.0.3",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
@@ -71,5 +72,21 @@
     "vite": "^7.3.0",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.16"
+  },
+  "overrides": {
+    "swagger-ui-react": {
+      "react-copy-to-clipboard": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      },
+      "react-debounce-input": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      },
+      "react-inspector": {
+        "react": "$react",
+        "react-dom": "$react-dom"
+      }
+    }
   }
 }

@@ -9,6 +9,7 @@
 
 import { NavitiaClient } from '../client/client';
 import type { AxiosPromise } from 'axios';
+import axios from 'axios';
 import type {
     Journey,
     JourneyItem,
@@ -281,6 +282,8 @@ export const autocompleteGeo = (
 
 /**
  * Find places nearby coordinates
+ * Uses the path-based endpoint format: /coverage/{coverage}/coord/{coord}/places_nearby
+ * This is the correct format according to Navitia documentation
  */
 export const getPlacesNearby = (
     coord: string | null,
@@ -289,42 +292,38 @@ export const getPlacesNearby = (
     coverageOrDistance: string | number = 200,
     paramsOrType: string | null = null
 ): AxiosPromise<PlacesResponse> => {
+    let coverage: string;
+    let coordStr: string;
+    let params: PlacesNearbyParams;
+
     if (typeof coord === 'string' && coord.includes(';')) {
-        const params = lonOrParams as PlacesNearbyParams;
-        return getClient().places.coverageCoveragePlacesNearbyGet(
-            latOrCoverage as string,
-            coord,
-            params.distance || undefined,
-            params.type ? (Array.isArray(params.type) ? params.type as CoverageCoveragePlacesNearbyGetTypeEnum[] : [params.type] as CoverageCoveragePlacesNearbyGetTypeEnum[]) : undefined,
-            params.count || undefined,
-            params.depth || undefined
-        );
+        coverage = latOrCoverage as string;
+        coordStr = coord;
+        params = lonOrParams as PlacesNearbyParams;
     } else if (typeof latOrCoverage === 'number' && typeof lonOrParams === 'number') {
         const lat = latOrCoverage;
         const lon = lonOrParams;
-        const coverage = typeof coverageOrDistance === 'string' ? coverageOrDistance : DEFAULT_COVERAGE;
+        coverage = typeof coverageOrDistance === 'string' ? coverageOrDistance : DEFAULT_COVERAGE;
+        coordStr = `${lon};${lat}`;
         const distance = typeof coverageOrDistance === 'number' ? coverageOrDistance : 200;
         const type = typeof paramsOrType === 'string' ? paramsOrType : null;
-        const coordStr = `${lon};${lat}`;
-        return getClient().places.coverageCoveragePlacesNearbyGet(
-            coverage,
-            coordStr,
-            distance || undefined,
-            type ? [type] as CoverageCoveragePlacesNearbyGetTypeEnum[] : undefined,
-            undefined,
-            undefined
-        );
+        params = { distance };
+        if (type) params.type = type;
     } else {
-        const params = lonOrParams as PlacesNearbyParams;
-        return getClient().places.coverageCoveragePlacesNearbyGet(
-            latOrCoverage as string,
-            coord as string,
-            params.distance || undefined,
-            params.type ? (Array.isArray(params.type) ? params.type as CoverageCoveragePlacesNearbyGetTypeEnum[] : [params.type] as CoverageCoveragePlacesNearbyGetTypeEnum[]) : undefined,
-            params.count || undefined,
-            params.depth || undefined
-        );
+        coverage = latOrCoverage as string;
+        coordStr = coord as string;
+        params = lonOrParams as PlacesNearbyParams;
     }
+
+    // Use the generated client method with the correct path-based endpoint format
+    return getClient().places.coverageCoverageCoordCoordPlacesNearbyGet(
+        coverage,
+        coordStr,
+        params.distance || undefined,
+        params.type ? (Array.isArray(params.type) ? params.type as any[] : [params.type] as any[]) : undefined,
+        params.count || undefined,
+        params.depth || undefined
+    );
 };
 
 /**

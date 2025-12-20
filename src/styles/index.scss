@@ -19,6 +19,7 @@
 @use './pages/isochrones' as *;
 @use './pages/metzBettembourg' as *;
 @use './pages/about' as *;
+@use './pages/locationDetection' as *;
 @use './components/cityCards' as *;
 @use './components/trainCard' as *;
 @use './components/bottomNavbar' as *;

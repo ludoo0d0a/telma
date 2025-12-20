@@ -1,0 +1,8 @@
+.location-detection-page {
+    min-height: calc(100vh - 220px);
+
+    @media (max-width: 768px) {
+        min-height: calc(100vh - 180px);
+    }
+}
+

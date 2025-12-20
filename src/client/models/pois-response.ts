@@ -15,21 +15,17 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import type { Disruption } from './disruption';
-// May contain unused imports in some cases
-// @ts-ignore
 import type { Link } from './link';
 // May contain unused imports in some cases
 // @ts-ignore
 import type { Pagination } from './pagination';
 // May contain unused imports in some cases
 // @ts-ignore
-import type { VehicleJourney } from './vehicle-journey';
+import type { Place } from './place';
 
-export interface VehicleJourneysResponse {
-    'vehicle_journeys'?: Array<VehicleJourney>;
+export interface POIsResponse {
+    'pois'?: Array<Place>;
     'pagination'?: Pagination;
     'links'?: Array<Link>;
-    'disruptions'?: Array<Disruption>;
 }
 

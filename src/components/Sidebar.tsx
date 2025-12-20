@@ -49,6 +49,12 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               </NavLink>
             </li>
             <li>
+              <NavLink to='/location-detection' className="sidebar-link" onClick={onClose}>
+                <span className='icon'><i className='fas fa-crosshairs'></i></span>
+                <span>Détection de localisation</span>
+              </NavLink>
+            </li>
+            <li>
               <NavLink to='/favorites' className="sidebar-link" onClick={onClose}>
                 <span className='icon'><i className='fas fa-star'></i></span>
                 <span>Favoris</span>
