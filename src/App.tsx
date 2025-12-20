@@ -16,6 +16,7 @@ import Favorites from './pages/Favorites'
 import Train from './pages/Train'
 import Trip from './pages/Trip'
 import About from './pages/About'
+import LocationDetection from './pages/LocationDetection'
 import Snowfall from 'react-snowfall'
 import { trackPageView } from './utils/analytics'
 import BottomNavbar from './components/BottomNavbar'
@@ -59,6 +60,7 @@ const AppContent: React.FC = () => {
                 <Route path='/train' element={<Train />} />
                 <Route path='/trip/:tripId' element={<Trip />} />
                 <Route path='/favorites' element={<Favorites />} />
+                <Route path='/location-detection' element={<LocationDetection />} />
                 <Route path='/city/:city' element={<City />}>
                     <Route path=':codeStation' element={<TrainStation />} />
                 </Route>
