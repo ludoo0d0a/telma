@@ -29,7 +29,7 @@ const Sample1: React.FC = () => {
                     <div className="form">
                         <div className="input-group">
                             <label>From</label>
-                            <input type="text" value="United Arab Amiret" readOnly />
+                            <input type="text" defaultValue="United Arab Amiret" />
                             <span>Dubai</span>
                         </div>
 
@@ -39,23 +39,23 @@ const Sample1: React.FC = () => {
 
                         <div className="input-group">
                             <label>To</label>
-                            <input type="text" value="United Stated" readOnly />
+                            <input type="text" defaultValue="United Stated" />
                             <span>USA</span>
                         </div>
 
                         <div className="input-group">
                             <label>Departure Date</label>
-                            <input type="text" value="Wednesday. Dec 27 2023" readOnly />
+                            <input type="text" defaultValue="Wednesday. Dec 27 2023" />
                         </div>
 
                         <div className="inline-inputs">
                             <div className="input-group">
                                 <label>Passengers</label>
-                                <input type="text" value="1 Seat" readOnly />
+                                <input type="text" defaultValue="1 Seat" />
                             </div>
                             <div className="input-group">
                                 <label>Class</label>
-                                <input type="text" value="Economy" readOnly />
+                                <input type="text" defaultValue="Economy" />
                             </div>
                         </div>
 
