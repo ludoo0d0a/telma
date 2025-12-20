@@ -6,6 +6,7 @@
   "homepage": "https://ludooo0d0a.github.io/telma/",
   "dependencies": {
     "@lottiefiles/react-lottie-player": "^3.6.0",
+    "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
     "@testing-library/user-event": "^14.6.1",

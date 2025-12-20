@@ -206,8 +206,28 @@ const CurrentLocationWidget: React.FC = () => {
                 }
             }
 
-            if (!closestStation || minDistance > 200) {
+            if (!closestStation) {
                 setLocationInfo({
+                    loading: false,
+                    error: null,
+                    station: undefined,
+                    train: undefined
+                });
+                return;
+            }
+
+            // If the closest station is more than 200m away, we're not inside, so don't check for trains
+            if (minDistance > 200) {
+                setLocationInfo({
+                    station: {
+                        name: cleanLocationName(
+                            closestStation.stop_area?.name ||
+                            closestStation.stop_point?.name ||
+                            closestStation.name
+                        ) || 'Gare inconnue',
+                        distance: Math.round(minDistance)
+                    },
+                    train: undefined,
                     loading: false,
                     error: null
                 });
