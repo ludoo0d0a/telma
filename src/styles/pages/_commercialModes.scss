@@ -1,112 +1,14 @@
-.commercial-modes {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: calc(100vh - 220px);
-
-    &__content-wrapper {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 80%;
-        margin-top: 5rem;
-        border-radius: 10px;
-        
-        @media (max-width: 768px) {
-            width: 95%;
-            margin-top: 1rem;
-            padding: 0 0.5rem;
-        }
-    }
-
-    &__title {
-        text-align: center;
-        font-family: 'Roboto Mono', monospace;
-        margin-top: 1rem;
-        margin-bottom: 2rem;
-        color: #009eff;
-        font-size: 2rem;
-
-        span {
-            color: #fd9a00;
-        }
-        
-        @media (max-width: 768px) {
-            font-size: 1.5rem;
-            margin-top: 0.5rem;
-            margin-bottom: 1rem;
-        }
-    }
-}
-
-.modes-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1.5rem;
-    width: 100%;
-    margin-top: 2rem;
-    padding: 1rem;
-}
-
-.mode-card {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 1.5rem;
-    border: 2px solid #009eff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-
-    &:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0, 158, 255, 0.3);
-    }
-
-    &__name {
-        font-family: 'Roboto Mono', monospace;
-        color: #009eff;
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    &__id {
-        color: #ccc;
-        font-size: 0.9rem;
-        font-family: 'Roboto Mono', monospace;
-    }
-}
-
-.loading,
-.error,
-.no-results {
-    text-align: center;
-    padding: 2rem;
-    color: #009eff;
-    font-size: 1.2rem;
-    font-family: 'Roboto Mono', monospace;
-}
-
-.error {
-    color: #ff4444;
-}
-
 @media (max-width: 768px) {
-    .commercial-modes {
-        min-height: calc(100vh - 180px);
-        
-        &__title {
-            font-size: 1.5rem;
-        }
+  .box {
+    .media {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
     }
 
-    .modes-list {
-        grid-template-columns: 1fr;
-        padding: 0.5rem;
-        gap: 1rem;
-        margin-top: 1rem;
+    .media-left {
+      margin: 0 0 1rem 0;
     }
-    
-    .mode-card {
-        padding: 1rem;
-    }
+  }
 }
-

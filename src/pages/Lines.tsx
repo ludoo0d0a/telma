@@ -69,7 +69,7 @@ const Lines: React.FC = () => {
                             </h2>
                             <div className='columns is-multiline'>
                                 {lines.map((line) => (
-                                    <div key={line.id} className='column is-half-tablet is-one-third-desktop'>
+                                    <div key={line.id} className='column is-half-tablet is-one-third-desktop is-half-mobile'>
                                         <div className='box'>
                                             <h3 className='title is-5 mb-3'>
                                                 {line.name || line.code || 'Sans nom'}
