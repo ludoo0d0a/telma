@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Map, { Marker, Popup, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import type { MapRef, ViewState } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { GeoJSONMapProps } from '../types/geojsonMap';
-import { processGeoJSONData, calculateBounds, hasLineStrings, hasPolygons } from '../services/geojsonService';
+import type { GeoJSONMapProps, LayerPaintProperties } from '../types/geojsonMap';
+import { processGeoJSONData, calculateBoundsWithMarkers, hasLineStrings, hasPolygons } from '../services/geojsonService';
 import type { FeatureCollection } from 'geojson';
 
 /**
@@ -21,48 +21,63 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
     const mapRef = useRef<MapRef>(null);
     const [selectedMarker, setSelectedMarker] = useState<number | null>(null);
     const [mapLoaded, setMapLoaded] = useState(false);
-    const [layersReady, setLayersReady] = useState(false);
 
     // Process GeoJSON data using service
     const processedGeoJSON = useMemo<FeatureCollection | null>(() => {
         return processGeoJSONData(geojsonData);
     }, [geojsonData]);
 
-    // Delay rendering Layers until Source is confirmed ready
-    useEffect(() => {
-        if (mapLoaded && processedGeoJSON) {
-            // Small delay to ensure Source is registered in MapLibre
-            const timer = setTimeout(() => {
-                setLayersReady(true);
-            }, 500);
-            return () => clearTimeout(timer);
-        } else {
-            setLayersReady(false);
-        }
-    }, [mapLoaded, processedGeoJSON]);
+    // Determine if Source and Layers should be rendered (map loaded and data ready)
+    const isDataReady = mapLoaded && processedGeoJSON !== null;
 
-    // Calculate bounds from GeoJSON data using service
+    // Log when markers are added
+    useEffect(() => {
+        if (markers.length > 0) {
+            console.log('[GeoJSONMap] Markers added:', {
+                count: markers.length,
+                markers: markers.map((m, idx) => ({
+                    index: idx,
+                    name: m.name,
+                    lat: m.lat,
+                    lon: m.lon,
+                    hasPopup: !!m.popup
+                }))
+            });
+        }
+    }, [markers]);
+
+    // Calculate bounds from GeoJSON data and markers using service
     const bounds = useMemo<[[number, number], [number, number]] | null>(() => {
         if (!fitBounds) return null;
-        return calculateBounds(processedGeoJSON);
-    }, [processedGeoJSON, fitBounds]);
+        return calculateBoundsWithMarkers(processedGeoJSON, markers);
+    }, [processedGeoJSON, markers, fitBounds]);
 
-    // Fit bounds when GeoJSON changes
+    // Create a stable bounds key for dependency tracking
+    const boundsKey = useMemo(() => {
+        if (!bounds) return null;
+        return JSON.stringify(bounds);
+    }, [bounds]);
+
+    // Fit bounds when map is loaded and GeoJSON data is ready
     useEffect(() => {
-        if (bounds && mapRef.current && fitBounds) {
-            try {
-                mapRef.current.fitBounds(bounds, {
-                    padding: { top: 24, bottom: 24, left: 24, right: 24 },
-                    duration: 500
-                });
-            } catch (err) {
-                // Ignore fitBounds errors
-            }
+        if (bounds && mapRef.current && fitBounds && mapLoaded && isDataReady) {
+            // Small delay to ensure Source is fully loaded before fitting bounds
+            const timer = setTimeout(() => {
+                try {
+                    mapRef.current?.fitBounds(bounds, {
+                        padding: { top: 24, bottom: 24, left: 24, right: 24 },
+                        duration: 500
+                    });
+                } catch (err) {
+                    // Ignore fitBounds errors
+                }
+            }, 100);
+            return () => clearTimeout(timer);
         }
-    }, [bounds, fitBounds]);
+    }, [boundsKey, fitBounds, mapLoaded, isDataReady]);
 
     // Convert style to MapLibre layer paint properties
-    const layerPaint = useMemo(() => {
+    const layerPaint = useMemo<LayerPaintProperties>(() => {
         if (typeof style === 'function') {
             // For function-based styles, we'll use default for now
             // MapLibre doesn't support per-feature styling easily, would need data-driven styling
@@ -97,11 +112,11 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
 
     // Determine geometry types in the GeoJSON using service
     const hasLines = useMemo(() => {
-        return hasLineStrings(processedGeoJSON);
+        return processedGeoJSON ? hasLineStrings(processedGeoJSON) : false;
     }, [processedGeoJSON]);
 
     const hasPolygonsValue = useMemo(() => {
-        return hasPolygons(processedGeoJSON);
+        return processedGeoJSON ? hasPolygons(processedGeoJSON) : false;
     }, [processedGeoJSON]);
 
     if (!processedGeoJSON && markers.length === 0) {
@@ -158,26 +173,26 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
             >
                 <NavigationControl position="top-right" />
                 <GeolocateControl position="top-right" />
-                {processedGeoJSON && mapLoaded && (
+                {isDataReady && (
                     <Source 
                         key="geojson-source" 
                         id="geojson-data" 
                         type="geojson" 
-                        data={processedGeoJSON}
+                        data={processedGeoJSON!}
                     >
-                        {hasLines && layersReady ? (
+                        {hasLines && (
                             <Layer
                                 key="geojson-lines-layer"
                                 id="geojson-lines"
                                 type="line"
                                 paint={{
-                                    'line-color': layerPaint['line-color'] as string,
-                                    'line-width': layerPaint['line-width'] as number,
-                                    'line-opacity': layerPaint['line-opacity'] as number
+                                    'line-color': layerPaint['line-color'],
+                                    'line-width': layerPaint['line-width'],
+                                    'line-opacity': layerPaint['line-opacity']
                                 }}
                             />
-                        ) : null}
-                        {hasPolygonsValue && layersReady ? (
+                        )}
+                        {hasPolygonsValue && (
                             <>
                                 <Layer
                                     key="geojson-polygons-fill-layer"
@@ -185,8 +200,8 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                                     type="fill"
                                     filter={['==', '$type', 'Polygon']}
                                     paint={{
-                                        'fill-color': layerPaint['fill-color'] as string,
-                                        'fill-opacity': layerPaint['fill-opacity'] as number
+                                        'fill-color': layerPaint['fill-color'],
+                                        'fill-opacity': layerPaint['fill-opacity']
                                     }}
                                 />
                                 <Layer
@@ -195,13 +210,13 @@ const GeoJSONMap: React.FC<GeoJSONMapProps> = ({
                                     type="line"
                                     filter={['==', '$type', 'Polygon']}
                                     paint={{
-                                        'line-color': layerPaint['line-color'] as string,
-                                        'line-width': (layerPaint['line-width'] as number) / 2,
-                                        'line-opacity': layerPaint['line-opacity'] as number
+                                        'line-color': layerPaint['line-color'],
+                                        'line-width': layerPaint['line-width'] / 2,
+                                        'line-opacity': layerPaint['line-opacity']
                                     }}
                                 />
                             </>
-                        ) : null}
+                        )}
                     </Source>
                 )}
                 {markers.map((marker, idx) => {

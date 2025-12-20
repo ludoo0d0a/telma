@@ -190,6 +190,49 @@ export function calculateBounds(processedGeoJSON: FeatureCollection | null): [[n
 }
 
 /**
+ * Calculate bounds from GeoJSON data and markers
+ * Returns format: [[minLon, minLat], [maxLon, maxLat]]
+ */
+export function calculateBoundsWithMarkers(
+    processedGeoJSON: FeatureCollection | null,
+    markers: Array<{ lat: number; lon: number }> = []
+): [[number, number], [number, number]] | null {
+    const lons: number[] = [];
+    const lats: number[] = [];
+
+    // Add coordinates from GeoJSON
+    if (processedGeoJSON) {
+        processedGeoJSON.features.forEach(feature => {
+            if (feature.geometry && 'coordinates' in feature.geometry) {
+                extractCoordinates(feature.geometry.coordinates, lons, lats);
+            }
+        });
+    }
+
+    // Add coordinates from markers
+    markers.forEach(marker => {
+        if (typeof marker.lat === 'number' && typeof marker.lon === 'number' && 
+            Number.isFinite(marker.lat) && Number.isFinite(marker.lon)) {
+            lons.push(marker.lon);
+            lats.push(marker.lat);
+        }
+    });
+
+    if (lons.length === 0 || lats.length === 0) {
+        return null;
+    }
+
+    try {
+        return [
+            [Math.min(...lons), Math.min(...lats)],
+            [Math.max(...lons), Math.max(...lats)]
+        ];
+    } catch (err) {
+        return null;
+    }
+}
+
+/**
  * Check if FeatureCollection contains LineString geometries
  */
 export function hasLineStrings(processedGeoJSON: FeatureCollection | null): boolean {

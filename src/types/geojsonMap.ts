@@ -22,3 +22,14 @@ export interface ProcessedGeoJSON extends FeatureCollection {
     features: Feature[];
 }
 
+/**
+ * MapLibre layer paint properties for GeoJSON layers
+ */
+export interface LayerPaintProperties {
+    'line-color': string;
+    'line-width': number;
+    'line-opacity': number;
+    'fill-color': string;
+    'fill-opacity': number;
+}
+
