@@ -70,7 +70,7 @@ const CommercialModes: React.FC = () => {
                             ) : (
                                 <div className='columns is-multiline'>
                                     {modes.map((mode) => (
-                                        <div key={mode.id} className='column is-half-tablet is-one-third-desktop'>
+                                        <div key={mode.id} className='column is-half-tablet is-one-third-desktop is-half-mobile'>
                                             <div className='box'>
                                                 <h3 className='title is-5 mb-3'>
                                                     {mode.name || 'Non spécifié'}

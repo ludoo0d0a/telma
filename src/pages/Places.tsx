@@ -174,7 +174,7 @@ const Places: React.FC = () => {
                             </h2>
                             <div className='columns is-multiline'>
                                 {places.map((place, index) => (
-                                    <div key={place.id || index} className='column is-half'>
+                                    <div key={place.id || index} className='column is-half is-half-mobile'>
                                         <div className='box'>
                                             <h3 className='title is-5 mb-3'>{place.name || 'Sans nom'}</h3>
                                             <div className='content'>
