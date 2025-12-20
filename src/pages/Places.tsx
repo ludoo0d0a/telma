@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
+import Ad from '../components/Ad';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 import type { Place } from '../client/models/place';
+import { Icon } from '../utils/iconMapping';
 
 const Places: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -69,6 +71,9 @@ const Places: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Advertisement */}
+                    <Ad format="horizontal" size="responsive" className="mb-5" />
+
                     <div className='box mb-5'>
                         <h3 className='title is-5 mb-4'>Type de recherche</h3>
                         <div className='tabs is-boxed mb-4'>
@@ -79,7 +84,7 @@ const Places: React.FC = () => {
                                         setPlaces([]);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-search'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-search' size={16} /></span>
                                         <span>Recherche par texte</span>
                                     </a>
                                 </li>
@@ -89,7 +94,7 @@ const Places: React.FC = () => {
                                         setPlaces([]);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-map-marker-alt'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
                                         <span>Recherche par coordonnées</span>
                                     </a>
                                 </li>
@@ -115,7 +120,7 @@ const Places: React.FC = () => {
                                 <div className='field'>
                                     <div className='control'>
                                         <button type='submit' className='button is-primary' disabled={loading}>
-                                            <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`}></i></span>
+                                            <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-search'} size={16} spin={loading} /></span>
                                             <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
                                         </button>
                                     </div>
@@ -141,7 +146,7 @@ const Places: React.FC = () => {
                                 <div className='field'>
                                     <div className='control'>
                                         <button type='submit' className='button is-primary' disabled={loading}>
-                                            <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`}></i></span>
+                                            <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-search'} size={16} spin={loading} /></span>
                                             <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
                                         </button>
                                     </div>
@@ -168,10 +173,14 @@ const Places: React.FC = () => {
                     )}
 
                     {!loading && places.length > 0 && (
-                        <div className='box'>
-                            <h2 className='title is-4 mb-5'>
-                                Résultats <span className='tag is-primary is-medium'>{places.length}</span>
-                            </h2>
+                        <>
+                            {/* Advertisement */}
+                            <Ad format="auto" size="responsive" className="mb-5" />
+                            
+                            <div className='box'>
+                                <h2 className='title is-4 mb-5'>
+                                    Résultats <span className='tag is-primary is-medium'>{places.length}</span>
+                                </h2>
                             <div className='columns is-multiline'>
                                 {places.map((place, index) => (
                                     <div key={place.id || index} className='column is-half is-half-mobile'>
@@ -191,6 +200,10 @@ const Places: React.FC = () => {
                                 ))}
                             </div>
                         </div>
+                        
+                        {/* Advertisement */}
+                        <Ad format="rectangle" size="responsive" className="mb-5" />
+                        </>
                     )}
 
                     {!loading && places.length === 0 && !error && searchQuery && (

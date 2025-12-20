@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Footer from '../components/Footer';
+import { Icon } from '../utils/iconMapping';
 import { getLines } from '../services/navitiaApi';
 import type { Line } from '../client/models/line';
 
@@ -96,7 +97,7 @@ const Lines: React.FC = () => {
                                 className='button is-primary'
                                 onClick={() => setPage((prev) => prev + 1)}
                             >
-                                <span className='icon'><i className='fas fa-arrow-down'></i></span>
+                                <span className='icon'><Icon name='fa-arrow-down' size={20} /></span>
                                 <span>Charger plus</span>
                             </button>
                         </div>

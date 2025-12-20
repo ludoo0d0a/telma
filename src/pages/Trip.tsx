@@ -9,6 +9,7 @@ import { getDelay } from '../services/delayService';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
 import { getJourneyInfo } from '../services/journeyService';
 import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId, encodeTripId } from '../utils/uriUtils';
+import { Icon } from '../utils/iconMapping';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { JourneyInfo } from '../services/journeyService';
 import type { Disruption } from '../client/models/disruption';
@@ -495,7 +496,7 @@ const Trip: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large'>
-                                <i className='fas fa-spinner fa-spin fa-3x'></i>
+                                <Icon name='fa-spinner' size={48} spin={true} />
                             </span>
                             <p className='mt-4'>Chargement des détails du trajet...</p>
                         </div>
@@ -523,7 +524,7 @@ const Trip: React.FC = () => {
                             <h1 className='title is-2 mb-5'>Détails du trajet</h1>
                             <div className='box has-text-centered mb-5'>
                                 <span className='icon is-large has-text-info'>
-                                    <i className='fas fa-route fa-3x'></i>
+                                    <Icon name='fa-route' size={48} />
                                 </span>
                                 <p className='mt-4'>Sélectionnez un exemple de trajet ci-dessous</p>
                             </div>
@@ -541,7 +542,7 @@ const Trip: React.FC = () => {
                                             >
                                                 <div className='is-flex is-align-items-center'>
                                                     <span className='icon is-large has-text-primary mr-3'>
-                                                        <i className='fas fa-route fa-2x'></i>
+                                                        <Icon name='fa-route' size={32} />
                                                     </span>
                                                     <div>
                                                         <p className='title is-5 mb-1'>
@@ -570,7 +571,7 @@ const Trip: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large has-text-danger'>
-                                <i className='fas fa-exclamation-triangle fa-3x'></i>
+                                <Icon name='fa-exclamation-triangle' size={48} />
                             </span>
                             <p className='mt-4 has-text-danger'>{error || 'Trajet non trouvé'}</p>
                             <div className='buttons is-centered mt-4'>
@@ -582,7 +583,7 @@ const Trip: React.FC = () => {
                                         to={`/train/${encodeVehicleJourneyId(vehicleJourneyId)}`}
                                         className='button is-link'
                                     >
-                                        <span className='icon'><i className='fas fa-train'></i></span>
+                                        <span className='icon'><Icon name='fa-train' size={20} /></span>
                                         <span>Voir les détails du train</span>
                                     </Link>
                                 )}
@@ -669,7 +670,7 @@ const Trip: React.FC = () => {
                                     disabled={loading}
                                 >
                                     <span className='icon'>
-                                        <i className={`fas fa-sync-alt ${loading ? 'fa-spin' : ''}`}></i>
+                                        <Icon name='fa-sync-alt' size={20} spin={loading} />
                                     </span>
                                     <span>Actualiser</span>
                                 </button>
@@ -684,7 +685,7 @@ const Trip: React.FC = () => {
                             <div className='column'>
                                 <div className='is-flex is-align-items-center mb-3'>
                                     <span className={`icon ${transportInfo.color} mr-3`} style={{ fontSize: '2rem' }}>
-                                        <i className={`fas ${transportInfo.icon}`}></i>
+                                        <Icon name={transportInfo.icon} size={32} />
                                     </span>
                                     <div>
                                         <h3 className='title is-5 mb-1'>
@@ -709,7 +710,7 @@ const Trip: React.FC = () => {
                                             to={`/train/${encodeVehicleJourneyId(trainId)}`}
                                             className='button is-small is-link'
                                         >
-                                            <span className='icon'><i className='fas fa-train'></i></span>
+                                            <span className='icon'><Icon name='fa-train' size={20} /></span>
                                             <span>Voir les détails du train</span>
                                         </Link>
                                     ) : null;
@@ -734,7 +735,7 @@ const Trip: React.FC = () => {
                         <div className='box mb-5'>
                             <h2 className='title is-4 mb-4'>
                                 <span className='icon mr-2'>
-                                    <i className='fas fa-map'></i>
+                                    <Icon name='fa-map' size={20} />
                                 </span>
                                 Carte de l'itinéraire
                             </h2>
@@ -751,7 +752,7 @@ const Trip: React.FC = () => {
                         <div className='box mb-5'>
                             <h2 className='title is-4 mb-4'>
                                 <span className='icon has-text-warning mr-2'>
-                                    <i className='fas fa-exclamation-triangle'></i>
+                                    <Icon name='fa-exclamation-triangle' size={20} />
                                 </span>
                                 Perturbations ({disruptions.length})
                             </h2>
@@ -783,7 +784,7 @@ const Trip: React.FC = () => {
                                     <div key={index} className={`notification ${notificationClass} mb-3`}>
                                         <div className='is-flex is-align-items-center mb-2'>
                                             <span className='icon mr-2'>
-                                                <i className={`fas ${icon}`}></i>
+                                                <Icon name={icon} size={20} />
                                             </span>
                                             <strong>{severityText !== 'unknown' ? severityText : 'Perturbation'}</strong>
                                         </div>
@@ -916,7 +917,7 @@ const Trip: React.FC = () => {
                                                                     {hasDelay ? (
                                                                         <span className='tag is-danger is-small'>
                                                                             <span className='icon mr-1'>
-                                                                                <i className='fas fa-clock'></i>
+                                                                                <Icon name='fa-clock' size={16} />
                                                                             </span>
                                                                             {delay}
                                                                         </span>

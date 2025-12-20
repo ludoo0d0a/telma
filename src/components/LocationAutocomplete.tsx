@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Icon } from '../utils/iconMapping';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
 import { cleanLocationName } from '../services/locationService';
@@ -283,12 +284,12 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                     />
                     {loading && !geolocating && (
                         <span className='icon is-right'>
-                            <i className='fas fa-spinner fa-spin'></i>
+                            <Icon name='fa-spinner' size={20} spin={true} />
                         </span>
                     )}
                     {!loading && !geolocating && selectedStation && (
                         <span className='icon is-right has-text-success'>
-                            <i className='fas fa-check-circle'></i>
+                            <Icon name='fa-check-circle' size={20} />
                         </span>
                     )}
                 </div>
@@ -301,7 +302,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                         title='Utiliser ma position actuelle'
                     >
                         <span className='icon'>
-                            <i className='fas fa-location-arrow'></i>
+                            <Icon name='fa-location-arrow' size={20} />
                         </span>
                     </button>
                 </div>
@@ -335,7 +336,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                                             onClick={(e) => handleToggleFavorite(e, station)}
                                             style={{ cursor: 'pointer', marginLeft: 'auto' }}
                                         >
-                                            <i className={`fas fa-star ${isFav ? 'has-text-warning' : 'has-text-grey'}`}></i>
+                                            <Icon name='fa-star' size={16} className={isFav ? 'has-text-warning' : 'has-text-grey'} />
                                         </span>
                                     </a>
                                 );

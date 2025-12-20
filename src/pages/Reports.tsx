@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Icon } from '../utils/iconMapping';
 import Footer from '../components/Footer';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/navitiaApi';
 import type { 
@@ -73,7 +74,7 @@ const Reports: React.FC = () => {
                                         setReports(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-route'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-route' size={16} /></span>
                                         <span>Rapports de ligne</span>
                                     </a>
                                 </li>
@@ -83,7 +84,7 @@ const Reports: React.FC = () => {
                                         setReports(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-traffic-light'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-traffic-light' size={16} /></span>
                                         <span>Rapports de trafic</span>
                                     </a>
                                 </li>
@@ -93,7 +94,7 @@ const Reports: React.FC = () => {
                                         setReports(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-cog'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-cog' size={16} /></span>
                                         <span>Rapports d'équipement</span>
                                     </a>
                                 </li>

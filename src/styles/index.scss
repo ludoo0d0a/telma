@@ -1,10 +1,17 @@
-// Import Font Awesome Free (loaded via npm package)
-// Font Awesome is also loaded via CDN in index.html as a fallback
-// The CDN ensures fonts load quickly, while the npm package provides bundling
-// Configure font path to use webfonts from public directory
-@use '@fortawesome/fontawesome-free/scss/variables' with (
-  $font-path: '/webfonts'
-);
+// Animation for spinning icons
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
 @use 'theme' as *;
 @use 'settings' as *;
 @use './pages/home' as *;
@@ -29,8 +36,7 @@
 @use './components/trainStations' as *;
 @use './components/trainStation' as *;
 @use './components/stops' as *;
+@use './components/ad' as *;
 
 // Import statements must come after @use
-@use '@fortawesome/fontawesome-free/scss/fontawesome' as *;
-@use '@fortawesome/fontawesome-free/scss/solid' as *;
 @import 'bulma/css/bulma.css';

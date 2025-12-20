@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '../utils/iconMapping';
 import { Link } from 'react-router-dom';
 
 interface TrainCardProps {
@@ -13,7 +14,7 @@ const TrainCard: React.FC<TrainCardProps> = ({ city }) => {
                     <div className='media'>
                         <div className='media-left'>
                             <span className='icon is-medium has-text-primary'>
-                                <i className='fas fa-train fa-2x'></i>
+                                <Icon name='fa-train' size={32} />
                             </span>
                         </div>
                         <div className='media-content'>
@@ -22,7 +23,7 @@ const TrainCard: React.FC<TrainCardProps> = ({ city }) => {
                         </div>
                         <div className='media-right'>
                             <span className='icon has-text-grey-light'>
-                                <i className='fas fa-chevron-right'></i>
+                                <Icon name='fa-chevron-right' size={20} />
                             </span>
                         </div>
                     </div>

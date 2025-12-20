@@ -1,6 +1,7 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import packageJson from '../../package.json';
+import { Icon } from '../utils/iconMapping';
 
 const About: React.FC = () => {
     const functionalFeatures = [
@@ -152,7 +153,7 @@ const About: React.FC = () => {
                     <div className='has-text-centered mb-6'>
                         <h1 className='title is-1 mb-4'>
                             <span className='icon has-text-primary mr-3'>
-                                <i className='fas fa-info-circle'></i>
+                                <Icon name='fa-info-circle' size={24} />
                             </span>
                             About
                         </h1>
@@ -165,7 +166,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <i className='fas fa-tag'></i>
+                                <Icon name='fa-tag' size={24} />
                             </span>
                             Version & Author
                         </h2>
@@ -212,7 +213,7 @@ const About: React.FC = () => {
                                         >
                                             GitHub
                                             <span className='icon ml-2'>
-                                                <i className='fas fa-external-link-alt'></i>
+                                                <Icon name='fa-external-link-alt' size={16} />
                                             </span>
                                         </a>
                                     </p>
@@ -231,7 +232,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <i className='fas fa-star'></i>
+                                <Icon name='fa-star' size={24} />
                             </span>
                             Functional Features
                         </h2>
@@ -241,7 +242,7 @@ const About: React.FC = () => {
                                     <div className='media'>
                                         <div className='media-left'>
                                             <span className='icon is-medium has-text-primary'>
-                                                <i className={`fas ${feature.icon} fa-2x`}></i>
+                                                <Icon name={feature.icon} size={32} />
                                             </span>
                                         </div>
                                         <div className='media-content'>
@@ -258,7 +259,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <i className='fas fa-cog'></i>
+                                <Icon name='fa-cog' size={24} />
                             </span>
                             Technical Features
                         </h2>
@@ -268,7 +269,7 @@ const About: React.FC = () => {
                                     <div className='media'>
                                         <div className='media-left'>
                                             <span className='icon is-medium has-text-primary'>
-                                                <i className={`fas ${feature.icon} fa-2x`}></i>
+                                                <Icon name={feature.icon} size={32} />
                                             </span>
                                         </div>
                                         <div className='media-content'>
@@ -285,7 +286,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-warning mr-2'>
-                                <i className='fas fa-tasks'></i>
+                                <Icon name='fa-tasks' size={24} />
                             </span>
                             Todo
                         </h2>
@@ -308,7 +309,7 @@ const About: React.FC = () => {
                                                         >
                                                             Link
                                                             <span className='icon ml-1 is-small'>
-                                                                <i className='fas fa-external-link-alt'></i>
+                                                                <Icon name='fa-external-link-alt' size={16} />
                                                             </span>
                                                         </a>
                                                     </>
@@ -325,7 +326,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <i className='fas fa-history'></i>
+                                <Icon name='fa-history' size={24} />
                             </span>
                             Changelog
                         </h2>

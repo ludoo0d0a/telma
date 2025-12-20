@@ -131,7 +131,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <i className='fas fa-crosshairs'></i>
+                                <Icon name='fa-crosshairs' size={24} />
                             </span>
                             Votre Position Actuelle
                         </h2>
@@ -142,11 +142,14 @@ const Home: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Advertisement */}
+                    <Ad format="horizontal" size="responsive" className="mb-6" />
+
                     {/* Main Pages Section */}
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <i className='fas fa-th-large'></i>
+                                <Icon name='fa-th-large' size={24} />
                             </span>
                             Pages Principales
                         </h2>
@@ -183,7 +186,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <i className='fas fa-route'></i>
+                                <Icon name='fa-route' size={24} />
                             </span>
                             Exemples de Trajets
                         </h2>
@@ -220,7 +223,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <i className='fas fa-list-alt'></i>
+                                <Icon name='fa-list-alt' size={24} />
                             </span>
                             Exemples de Trajets Détaillés
                         </h2>
@@ -257,7 +260,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <i className='fas fa-code'></i>
+                                <Icon name='fa-code' size={24} />
                             </span>
                             Documentation
                         </h2>
@@ -270,7 +273,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${doc.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            <i className={`fas ${doc.icon} fa-2x`}></i>
+                                                            <Icon name={doc.icon} size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>
@@ -289,6 +292,9 @@ const Home: React.FC = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Advertisement */}
+                    <Ad format="auto" size="responsive" className="mb-6" />
                 </div>
             </section>
             <Footer />

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Icon } from '../utils/iconMapping';
 import Footer from '../components/Footer';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/navitiaApi';
 import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '../client/models';
@@ -72,7 +73,7 @@ const Schedules: React.FC = () => {
                                         setSchedules(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-map-marker-alt'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
                                         <span>Horaires d'arrêt</span>
                                     </a>
                                 </li>
@@ -82,7 +83,7 @@ const Schedules: React.FC = () => {
                                         setSchedules(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-route'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-route' size={16} /></span>
                                         <span>Horaires de ligne</span>
                                     </a>
                                 </li>
@@ -92,7 +93,7 @@ const Schedules: React.FC = () => {
                                         setSchedules(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><i className='fas fa-flag-checkered'></i></span>
+                                        <span className='icon is-small'><Icon name='fa-flag-checkered' size={16} /></span>
                                         <span>Horaires terminus</span>
                                     </a>
                                 </li>

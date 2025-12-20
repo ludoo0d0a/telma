@@ -7,6 +7,7 @@ import Footer from '../components/Footer';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '../services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService';
 import { encodeVehicleJourneyId } from '../utils/uriUtils';
+import { Icon } from '../utils/iconMapping';
 import { cleanLocationName } from '../services/locationService';
 import { parseUTCDate } from '../components/Utils';
 import type { Place } from '../client/models/place';
@@ -601,7 +602,7 @@ const LocationDetection: React.FC = () => {
                                 onClick={handleDetectLocation}
                                 disabled={loading || watchingLocation}
                             >
-                                <span className='icon'><i className='fas fa-map-marker-alt'></i></span>
+                                <span className='icon'><Icon name='fa-map-marker-alt' size={20} /></span>
                                 <span>Détecter maintenant</span>
                             </button>
                             {!watchingLocation ? (
@@ -610,7 +611,7 @@ const LocationDetection: React.FC = () => {
                                     onClick={handleStartWatching}
                                     disabled={loading}
                                 >
-                                    <span className='icon'><i className='fas fa-sync-alt'></i></span>
+                                    <span className='icon'><Icon name='fa-sync-alt' size={20} /></span>
                                     <span>Surveiller en continu</span>
                                 </button>
                             ) : (
@@ -618,7 +619,7 @@ const LocationDetection: React.FC = () => {
                                     className='button is-danger'
                                     onClick={handleStopWatching}
                                 >
-                                    <span className='icon'><i className='fas fa-stop'></i></span>
+                                    <span className='icon'><Icon name='fa-stop' size={20} /></span>
                                     <span>Arrêter la surveillance</span>
                                 </button>
                             )}
@@ -635,7 +636,7 @@ const LocationDetection: React.FC = () => {
                     {loading && !detectionResult && (
                         <div className='box has-text-centered'>
                             <span className='icon is-large'>
-                                <i className='fas fa-spinner fa-spin fa-3x'></i>
+                                <Icon name='fa-spinner' size={48} spin={true} />
                             </span>
                             <p className='mt-4'>Détection en cours...</p>
                         </div>
@@ -661,7 +662,7 @@ const LocationDetection: React.FC = () => {
                                     {detectionResult.station && (
                                         <div className='mb-4'>
                                             <p className='has-text-success'>
-                                                <span className='icon'><i className='fas fa-check-circle'></i></span>
+                                                <span className='icon'><Icon name='fa-check-circle' size={20} /></span>
                                                 <strong>Vous êtes dans une gare !</strong>
                                             </p>
                                             <p><strong>Gare :</strong> {detectionResult.station.name}</p>
@@ -679,7 +680,7 @@ const LocationDetection: React.FC = () => {
                                     {detectionResult.detectedTrain ? (
                                         <div className='mb-4'>
                                             <p className='has-text-info'>
-                                                <span className='icon'><i className='fas fa-train'></i></span>
+                                                <span className='icon'><Icon name='fa-train' size={20} /></span>
                                                 <strong>Train détecté !</strong>
                                             </p>
                                             <div className='box' style={{ backgroundColor: '#f5f5f5' }}>
@@ -694,7 +695,7 @@ const LocationDetection: React.FC = () => {
                                                         to={`/train/${encodeVehicleJourneyId(detectionResult.detectedTrain.vehicleJourneyId)}`}
                                                         className='button is-primary'
                                                     >
-                                                        <span className='icon'><i className='fas fa-info-circle'></i></span>
+                                                        <span className='icon'><Icon name='fa-info-circle' size={20} /></span>
                                                         <span>Voir les détails du train</span>
                                                     </Link>
                                                 </div>
@@ -703,7 +704,7 @@ const LocationDetection: React.FC = () => {
                                     ) : (
                                         <div className='mb-4'>
                                             <p className='has-text-warning'>
-                                                <span className='icon'><i className='fas fa-exclamation-triangle'></i></span>
+                                                <span className='icon'><Icon name='fa-exclamation-triangle' size={20} /></span>
                                                 Aucun train détecté à votre position actuelle.
                                             </p>
                                             <p className='is-size-7 mt-2'>
@@ -718,7 +719,7 @@ const LocationDetection: React.FC = () => {
                                 <>
                                     <div className='mb-4'>
                                         <p className='has-text-warning'>
-                                            <span className='icon'><i className='fas fa-exclamation-triangle'></i></span>
+                                            <span className='icon'><Icon name='fa-exclamation-triangle' size={16} /></span>
                                             Vous ne semblez pas être dans une gare.
                                         </p>
                                         <p className='is-size-7 mt-2'>
@@ -766,7 +767,7 @@ const LocationDetection: React.FC = () => {
                                                                     <div className='level-left'>
                                                                         <div className='level-item'>
                                                                             <span className='icon has-text-primary'>
-                                                                                <i className='fas fa-train'></i>
+                                                                                <Icon name='fa-train' size={16} />
                                                                             </span>
                                                                         </div>
                                                                         <div className='level-item'>
@@ -775,12 +776,12 @@ const LocationDetection: React.FC = () => {
                                                                     </div>
                                                                 </div>
                                                                 <p className='is-size-7 has-text-grey'>
-                                                                    <span className='icon is-small'><i className='fas fa-map-marker-alt'></i></span>
+                                                                    <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
                                                                     Distance: {station.distance}m
                                                                 </p>
                                                                 {selectedStation?.id === station.id && (
                                                                     <p className='has-text-info is-size-7 mt-2'>
-                                                                        <span className='icon'><i className='fas fa-check-circle'></i></span>
+                                                                        <span className='icon'><Icon name='fa-check-circle' size={20} /></span>
                                                                         Gare sélectionnée
                                                                     </p>
                                                                 )}
@@ -791,7 +792,7 @@ const LocationDetection: React.FC = () => {
                                             {detectingTrainForStation && (
                                                 <div className='box has-text-centered'>
                                                     <span className='icon is-large'>
-                                                        <i className='fas fa-spinner fa-spin fa-2x'></i>
+                                                        <Icon name='fa-spinner' size={32} spin={true} />
                                                     </span>
                                                     <p className='mt-3'>Détection des trains en cours...</p>
                                                 </div>
@@ -804,7 +805,7 @@ const LocationDetection: React.FC = () => {
                                             {detectionResult.detectedTrain ? (
                                                 <div className='mb-4'>
                                                     <p className='has-text-info'>
-                                                        <span className='icon'><i className='fas fa-train'></i></span>
+                                                        <span className='icon'><Icon name='fa-train' size={20} /></span>
                                                         <strong>Train détecté !</strong>
                                                     </p>
                                                     <div className='box' style={{ backgroundColor: '#f5f5f5' }}>
@@ -819,7 +820,7 @@ const LocationDetection: React.FC = () => {
                                                                 to={`/train/${encodeVehicleJourneyId(detectionResult.detectedTrain.vehicleJourneyId)}`}
                                                                 className='button is-primary'
                                                             >
-                                                                <span className='icon'><i className='fas fa-info-circle'></i></span>
+                                                                <span className='icon'><Icon name='fa-info-circle' size={20} /></span>
                                                                 <span>Voir les détails du train</span>
                                                             </Link>
                                                         </div>
@@ -828,7 +829,7 @@ const LocationDetection: React.FC = () => {
                                             ) : (
                                                 <div className='mb-4'>
                                                     <p className='has-text-warning'>
-                                                        <span className='icon'><i className='fas fa-exclamation-triangle'></i></span>
+                                                        <span className='icon'><Icon name='fa-exclamation-triangle' size={20} /></span>
                                                         Aucun train détecté à la gare sélectionnée.
                                                     </p>
                                                     <p className='is-size-7 mt-2'>
@@ -964,7 +965,7 @@ const LocationDetection: React.FC = () => {
                                                 </div>
                                                 {detectionResult.station?.id === detectionResult.nearbyStations[selectedStationIndex].id && (
                                                     <div className='has-text-success is-size-7 mt-1'>
-                                                        <i className='fas fa-check-circle'></i> Gare détectée
+                                                        <Icon name='fa-check-circle' size={16} /> Gare détectée
                                                     </div>
                                                 )}
                                             </div>

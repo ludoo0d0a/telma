@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import Ad from '../components/Ad';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
 import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
@@ -9,6 +10,7 @@ import { getDelay, getMaxDelay } from '../services/delayService';
 import { getJourneyInfo, type JourneyInfo } from '../services/journeyService';
 import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '../services/disruptionService';
 import { encodeTripId, encodeVehicleJourneyId } from '../utils/uriUtils';
+import { Icon } from '../utils/iconMapping';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { Disruption } from '../client/models/disruption';
 import type { Section } from '../client/models/section';
@@ -591,13 +593,16 @@ const Trajet: React.FC = () => {
                                     disabled={loading}
                                 >
                                     <span className='icon'>
-                                        <i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`}></i>
+                                        <Icon name={loading ? 'fa-spinner' : 'fa-sync-alt'} size={20} spin={loading} />
                                     </span>
                                     <span>Actualiser</span>
                                 </button>
                             </div>
                         </div>
                     </div>
+
+                    {/* Advertisement */}
+                    <Ad format="horizontal" size="responsive" className="mb-5" />
 
                     <div className='box mb-5'>
                         <h3 className='title is-5 mb-4'>Recherche d'itinéraire</h3>
@@ -630,7 +635,7 @@ const Trajet: React.FC = () => {
                                             title="Inverser l'itinéraire"
                                         >
                                             <span className='icon'>
-                                                <i className='fas fa-exchange-alt'></i>
+                                                <Icon name='fa-exchange-alt' size={20} />
                                             </span>
                                         </button>
                                     </div>
@@ -692,7 +697,7 @@ const Trajet: React.FC = () => {
                                             onClick={handleSearch}
                                             disabled={loading || !fromId || !toId}
                                         >
-                                            <span className='icon'><i className='fas fa-search'></i></span>
+                                            <span className='icon'><Icon name='fa-search' size={16} /></span>
                                             <span>Rechercher</span>
                                         </button>
                                     </div>
@@ -734,11 +739,11 @@ const Trajet: React.FC = () => {
                                 style={{ cursor: 'pointer' }}
                             >
                                 <span className='icon has-text-warning mr-2'>
-                                    <i className='fas fa-exclamation-triangle'></i>
+                                    <Icon name='fa-exclamation-triangle' size={20} />
                                 </span>
                                 Perturbations ({disruptions.length})
                                 <span className='icon ml-2'>
-                                    <i className={`fas fa-chevron-${showDisruptionsSection ? 'up' : 'down'}`}></i>
+                                    <Icon name={showDisruptionsSection ? 'fa-chevron-up' : 'fa-chevron-down'} size={20} />
                                 </span>
                             </h3>
                             {showDisruptionsSection && disruptions.map((disruption, index) => {
@@ -772,7 +777,7 @@ const Trajet: React.FC = () => {
                                     <div key={index} className={`notification ${notificationClass} mb-3`}>
                                         <div className='is-flex is-align-items-center mb-2'>
                                             <span className='icon mr-2'>
-                                                <i className={`fas ${icon}`}></i>
+                                                <Icon name={icon} size={20} />
                                             </span>
                                             <strong>
                                                 {severityText !== 'unknown' ? severityText : 'Perturbation'}
@@ -857,10 +862,14 @@ const Trajet: React.FC = () => {
                     )}
 
                     {!loading && !error && terTrains.length > 0 && (
-                        <div className='box'>
-                            <h2 className='title is-4 mb-5'>
-                                Trains disponibles <span className='tag is-primary is-medium'>{terTrains.length}</span>
-                            </h2>
+                        <>
+                            {/* Advertisement */}
+                            <Ad format="auto" size="responsive" className="mb-5" />
+                            
+                            <div className='box'>
+                                <h2 className='title is-4 mb-5'>
+                                    Trains disponibles <span className='tag is-primary is-medium'>{terTrains.length}</span>
+                                </h2>
                             <div className='table-container'>
                                 <table className='table is-fullwidth is-striped is-hoverable'>
                                     <thead>
@@ -912,7 +921,7 @@ const Trajet: React.FC = () => {
                                                         <div>
                                                             <div className='is-flex is-align-items-center mb-2'>
                                                                 <span className={`icon ${info.transportColor} mr-2`}>
-                                                                    <i className={`fas ${info.transportIcon}`}></i>
+                                                                    <Icon name={info.transportIcon} size={20} />
                                                                 </span>
                                                                 {info.vehicleJourneyId ? (() => {
                                                                     // Ensure we have a string ID, not an object
@@ -1028,7 +1037,7 @@ const Trajet: React.FC = () => {
                                                                             title={message}
                                                                         >
                                                                             <span className='icon mr-1'>
-                                                                                <i className='fas fa-exclamation-triangle'></i>
+                                                                                <Icon name='fa-exclamation-triangle' size={20} />
                                                                             </span>
                                                                             {message.length > 30 ? message.substring(0, 30) + '...' : message}
                                                                         </span>
@@ -1045,7 +1054,7 @@ const Trajet: React.FC = () => {
                                                     <td>
                                                         {info.wagonCount ? (
                                                             <span className='tag is-info is-dark'>
-                                                                <span className='icon mr-1'><i className='fas fa-train'></i></span>
+                                                                <span className='icon mr-1'><Icon name='fa-train' size={16} /></span>
                                                                 {info.wagonCount}
                                                             </span>
                                                         ) : (
@@ -1060,7 +1069,7 @@ const Trajet: React.FC = () => {
                                                             title='Voir les détails du trajet'
                                                         >
                                                             <span className='icon'>
-                                                                <i className='fas fa-info-circle'></i>
+                                                                <Icon name='fa-info-circle' size={16} />
                                                             </span>
                                                         </Link>
                                                     </td>
@@ -1071,6 +1080,10 @@ const Trajet: React.FC = () => {
                                 </table>
                             </div>
                         </div>
+                        
+                        {/* Advertisement */}
+                        <Ad format="rectangle" size="responsive" className="mb-5" />
+                        </>
                     )}
 
                     {!loading && !error && terTrains.length === 0 && (

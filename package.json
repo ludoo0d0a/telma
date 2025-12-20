@@ -5,7 +5,6 @@
   "private": true,
   "homepage": "https://ludooo0d0a.github.io/telma/",
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^7.1.0",
     "@lottiefiles/react-lottie-player": "^3.6.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
@@ -13,6 +12,7 @@
     "axios": "^1.13.2",
     "bulma": "^1.0.4",
     "gh-pages": "^6.3.0",
+    "lucide-react": "^0.562.0",
     "maplibre-gl": "^5.15.0",
     "prop-types": "^15.8.1",
     "react": "^19.2.3",

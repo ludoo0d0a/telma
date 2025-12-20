@@ -4,6 +4,7 @@ import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '../
 import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService';
 import { cleanLocationName } from '../services/locationService';
 import { parseUTCDate } from './Utils';
+import { Icon } from '../utils/iconMapping';
 
 interface CurrentLocationInfo {
     station?: {
@@ -275,7 +276,7 @@ const CurrentLocationWidget: React.FC = () => {
                     <div className='media'>
                         <div className='media-left'>
                             <span className='icon is-large has-text-primary'>
-                                <i className='fas fa-spinner fa-spin fa-2x'></i>
+                                <Icon name='fa-spinner' size={32} spin={true} />
                             </span>
                         </div>
                         <div className='media-content'>
@@ -295,7 +296,7 @@ const CurrentLocationWidget: React.FC = () => {
                     <div className='media'>
                         <div className='media-left'>
                             <span className='icon is-large has-text-warning'>
-                                <i className='fas fa-exclamation-triangle fa-2x'></i>
+                                <Icon name='fa-exclamation-triangle' size={32} />
                             </span>
                         </div>
                         <div className='media-content'>
@@ -315,7 +316,7 @@ const CurrentLocationWidget: React.FC = () => {
                     <div className='media'>
                         <div className='media-left'>
                             <span className='icon is-large has-text-grey'>
-                                <i className='fas fa-map-marker-alt fa-2x'></i>
+                                <Icon name='fa-map-marker-alt' size={32} />
                             </span>
                         </div>
                         <div className='media-content'>
@@ -335,9 +336,9 @@ const CurrentLocationWidget: React.FC = () => {
                     <div className='media-left'>
                         <span className='icon is-large has-text-white'>
                             {locationInfo.train ? (
-                                <i className='fas fa-train fa-2x'></i>
+                                <Icon name='fa-train' size={32} />
                             ) : (
-                                <i className='fas fa-map-marker-alt fa-2x'></i>
+                                <Icon name='fa-map-marker-alt' size={32} />
                             )}
                         </span>
                     </div>
@@ -348,7 +349,7 @@ const CurrentLocationWidget: React.FC = () => {
                                     Train {locationInfo.train.number}
                                 </p>
                                 <p className='subtitle is-6 has-text-white'>
-                                    <span className='icon is-small'><i className='fas fa-map-marker-alt'></i></span>
+                                    <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
                                     {locationInfo.station.name} • Destination: {locationInfo.train.destination}
                                 </p>
                             </>
@@ -358,7 +359,7 @@ const CurrentLocationWidget: React.FC = () => {
                                     {locationInfo.station.name}
                                 </p>
                                 <p className='subtitle is-6 has-text-white'>
-                                    <span className='icon is-small'><i className='fas fa-ruler'></i></span>
+                                    <span className='icon is-small'><Icon name='fa-ruler' size={16} /></span>
                                     À {locationInfo.station.distance}m • Cliquez pour plus d'infos
                                 </p>
                             </>

@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Icon } from '../utils/iconMapping';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import TrainWaypointsMap from '../components/TrainWaypointsMap';
+import Ad from '../components/Ad';
 import { autocompletePT } from '../services/navitiaApi';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
 import { encodeVehicleJourneyId, decodeVehicleJourneyId } from '../utils/uriUtils';
@@ -210,6 +212,9 @@ const Train: React.FC = () => {
                                 Recherchez un train par son numéro ou son type (TGV, TER, etc.)
                             </p>
                             
+                            {/* Advertisement */}
+                            <Ad format="horizontal" size="responsive" className="mb-5" />
+
                             <div className='field' ref={wrapperRef}>
                                 <label className='label'>Numéro ou type de train</label>
                                 <div className='control has-icons-right'>
@@ -227,12 +232,12 @@ const Train: React.FC = () => {
                                     />
                                     {searchLoading && (
                                         <span className='icon is-right'>
-                                            <i className='fas fa-spinner fa-spin'></i>
+                                            <Icon name='fa-spinner' size={20} spin={true} />
                                         </span>
                                     )}
                                     {!searchLoading && searchQuery && (
                                         <span className='icon is-right'>
-                                            <i className='fas fa-search'></i>
+                                            <Icon name='fa-search' size={20} />
                                         </span>
                                     )}
                                 </div>
@@ -303,7 +308,7 @@ const Train: React.FC = () => {
                                                 >
                                                     <div className='is-flex is-align-items-center'>
                                                         <span className='icon is-large has-text-primary mr-3'>
-                                                            <i className='fas fa-train fa-2x'></i>
+                                                            <Icon name='fa-train' size={32} />
                                                         </span>
                                                         <div>
                                                             <p className='title is-5 mb-1'>
@@ -342,7 +347,7 @@ const Train: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large'>
-                                <i className='fas fa-spinner fa-spin fa-3x'></i>
+                                <Icon name='fa-spinner' size={48} spin={true} />
                             </span>
                             <p className='mt-4'>Chargement des détails du train...</p>
                         </div>
@@ -360,7 +365,7 @@ const Train: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large has-text-danger'>
-                                <i className='fas fa-exclamation-triangle fa-3x'></i>
+                                <Icon name='fa-exclamation-triangle' size={48} />
                             </span>
                             <p className='mt-4 has-text-danger'>{error || 'Train non trouvé'}</p>
                             <div className='buttons is-centered mt-4'>
@@ -434,12 +439,15 @@ const Train: React.FC = () => {
                                         <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
                                     </button>
                                     <Link to='/train' className='button is-light'>
-                                        <span className='icon'><i className='fas fa-search'></i></span>
+                                        <span className='icon'><Icon name='fa-search' size={16} /></span>
                                         <span>Rechercher</span>
                                     </Link>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Advertisement */}
+                        <Ad format="horizontal" size="responsive" className="mb-5" />
 
                         {/* Train Header Info */}
                         <div className='box has-background-light mb-5'>
@@ -478,6 +486,9 @@ const Train: React.FC = () => {
                                 </p>
                             </div>
                         )}
+
+                        {/* Advertisement */}
+                        <Ad format="rectangle" size="responsive" className="mb-5" />
 
                         {/* Stop Times Table */}
                         {stopTimes.length > 0 && (
