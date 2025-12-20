@@ -245,9 +245,24 @@ const CurrentLocationWidget: React.FC = () => {
         }
     }, []);
 
+    // Initial detection on mount
     useEffect(() => {
         detectCurrentLocation();
     }, [detectCurrentLocation]);
+
+    // Retry detection every 30 seconds if station is not found
+    useEffect(() => {
+        // Only set up interval if station is not found and there's no error
+        if (!locationInfo.station && !locationInfo.error && !locationInfo.loading) {
+            const interval = setInterval(() => {
+                detectCurrentLocation();
+            }, 30000); // 30 seconds
+
+            return () => {
+                clearInterval(interval);
+            };
+        }
+    }, [locationInfo.station, locationInfo.error, locationInfo.loading, detectCurrentLocation]);
 
     const handleClick = () => {
         navigate('/location-detection');
