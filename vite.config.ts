@@ -50,6 +50,7 @@ export default defineConfig({
   base: BASE_URL,
   resolve: {
     alias: {
+      '\\.scss$': path.resolve(__dirname, './src/__mocks__/styleMock.js'),
       '@': path.resolve(__dirname, './src'),
     },
   },
@@ -68,6 +69,11 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.js'],
     testTimeout: 30000,
     hookTimeout: 30000,
+    css: {
+      modules: {
+        classNameStrategy: 'non-scoped',
+      },
+    },
     // Use happy-dom for UI tests (files matching *.ui.test.tsx)
     environmentMatchGlobs: [
       ['**/*.ui.test.{ts,tsx}', 'happy-dom'],

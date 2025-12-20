@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../components/Footer';
+import '../../styles/pages/home.scss';
 
 interface DashboardCard {
     title: string;
@@ -156,7 +157,7 @@ const Home: React.FC = () => {
                         </h2>
                         <div className='columns is-multiline'>
                             {sampleRoutes.map((route) => (
-                                <div key={route.path} className='column is-half-tablet is-full-mobile'>
+                                <div key={route.path} className='column is-half-tablet is-half-mobile'>
                                     <Link to={route.path} className='dashboard-card-link'>
                                         <div className={`card dashboard-card ${route.color === 'secondary' ? 'has-background-secondary' : ''}`}>
                                             <div className='card-content'>
@@ -193,7 +194,7 @@ const Home: React.FC = () => {
                         </h2>
                         <div className='columns'>
                             {apiDocs.map((doc) => (
-                                <div key={doc.path} className='column is-half-tablet is-full-mobile'>
+                                <div key={doc.path} className='column is-half-tablet is-half-mobile'>
                                     <Link to={doc.path} className='dashboard-card-link'>
                                         <div className={`card dashboard-card ${doc.color === 'primary' ? 'has-background-primary' : ''}`}>
                                             <div className='card-content'>
