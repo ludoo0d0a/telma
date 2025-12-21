@@ -124,7 +124,7 @@ const Reports: React.FC = () => {
                             <div className='field'>
                                 <div className='control'>
                                     <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-download'}`}></i></span>
+                                        <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-download'} spin={loading} size={16} /></span>
                                         <span>{loading ? 'Chargement...' : 'Récupérer les rapports'}</span>
                                     </button>
                                 </div>

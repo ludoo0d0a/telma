@@ -88,16 +88,23 @@ const Home: React.FC = () => {
             color: 'secondary'
         },
         {
-            title: 'Sample 1',
-            description: 'Sample 1 page',
+            title: 'Choose your trip',
+            description: 'Sample 1',
             path: '/sample1',
             icon: 'fa-arrow-right',
             color: 'secondary'
         },
         {
             title: 'Saved Flights',
-            description: 'Sample 2 page',
+            description: 'Sample 2',
             path: '/sample2',
+            icon: 'fa-bookmark',
+            color: 'secondary'
+        },
+        {
+            title: 'Select Flight',
+            description: 'Sample 3',
+            path: '/sample3',
             icon: 'fa-bookmark',
             color: 'secondary'
         }
@@ -178,7 +185,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${page.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            <i className={`fas ${page.icon} fa-2x`}></i>
+                                                            <Icon name={page.icon} size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>
@@ -215,7 +222,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${route.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            <i className={`fas ${route.icon} fa-2x`}></i>
+                                                            <Icon name={route.icon} size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>
@@ -252,7 +259,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${trip.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            <i className={`fas ${trip.icon} fa-2x`}></i>
+                                                            <Icon name={trip.icon} size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>

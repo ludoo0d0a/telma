@@ -14,7 +14,7 @@ const Sample1: React.FC = () => {
                     </div>
                 </div>
                 <button className="notification">
-                    <Icon name="fa-bell" />
+                    <Icon name="fa-bell" size={24} />
                 </button>
             </header>
 

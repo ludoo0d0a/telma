@@ -262,7 +262,7 @@ const Train: React.FC = () => {
                                                         >
                                                             <div className='is-flex is-align-items-center'>
                                                                 <span className={`icon ${transportInfo.color} mr-3`}>
-                                                                    <i className={`fas ${transportInfo.icon}`}></i>
+                                                                    <Icon name={transportInfo.icon} size={16} />
                                                                 </span>
                                                                 <div style={{ flex: 1 }}>
                                                                     <div className='is-flex is-align-items-center'>
@@ -434,7 +434,7 @@ const Train: React.FC = () => {
                                         disabled={refreshing}
                                     >
                                         <span className='icon'>
-                                            <i className={`fas ${refreshing ? 'fa-spinner fa-spin' : 'fa-sync-alt'}`}></i>
+                                            <Icon name={refreshing ? 'fa-spinner' : 'fa-sync-alt'} spin={refreshing} size={16} />
                                         </span>
                                         <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
                                     </button>
@@ -454,7 +454,7 @@ const Train: React.FC = () => {
                             <div className='columns is-vcentered'>
                                 <div className='column is-narrow'>
                                     <span className={`icon is-large ${transportInfo.color}`}>
-                                        <i className={`fas ${transportInfo.icon} fa-3x`}></i>
+                                        <Icon name={transportInfo.icon} size={48} />
                                     </span>
                                 </div>
                                 <div className='column'>

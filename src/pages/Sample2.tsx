@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { Icon } from '../utils/iconMapping';
 import '../styles/Sample2.scss';
 
 const Sample2: React.FC = () => {
@@ -7,11 +8,11 @@ const Sample2: React.FC = () => {
     <div className="sample2-page">
       <header className="sample2-header">
         <Link to="/" className="back-button">
-          <i className="fas fa-arrow-left"></i>
+          <Icon name="fa-arrow-left" size={20} />
         </Link>
         <h1>Saved Flights</h1>
         <button className="search-button">
-          <i className="fas fa-search"></i>
+          <Icon name="fa-search" size={20} />
         </button>
       </header>
       <main>
@@ -23,10 +24,10 @@ const Sample2: React.FC = () => {
           <div className="flight-card">
             <div className="card-header">
               <div className="airline">
-                <i className="fas fa-plane-departure"></i>
+                <Icon name="fa-plane-departure" size={20} />
                 <span>Cathay Pacific</span>
               </div>
-              <i className="fas fa-bookmark"></i>
+              <Icon name="fa-bookmark" size={20} />
             </div>
             <div className="card-body">
               <div className="flight-info">
@@ -38,7 +39,7 @@ const Sample2: React.FC = () => {
                 <div className="flight-path">
                     <span className="dot"></span>
                     <span className="line"></span>
-                    <i className="fas fa-plane"></i>
+                    <Icon name="fa-plane" size={20} />
                     <span className="line"></span>
                     <span className="dot"></span>
                     <div className="duration">12h 15m</div>
@@ -59,10 +60,10 @@ const Sample2: React.FC = () => {
           <div className="flight-card">
             <div className="card-header">
               <div className="airline">
-                <i className="fas fa-plane-departure"></i>
+                <Icon name="fa-plane-departure" size={20} />
                 <span>Cathay Pacific</span>
               </div>
-              <i className="fas fa-bookmark"></i>
+              <Icon name="fa-bookmark" size={20} />
             </div>
             <div className="card-body">
                 <div className="flight-info">
@@ -74,7 +75,7 @@ const Sample2: React.FC = () => {
                     <div className="flight-path">
                         <span className="dot"></span>
                         <span className="line"></span>
-                        <i className="fas fa-plane"></i>
+                        <Icon name="fa-plane" size={20} />
                         <span className="line"></span>
                         <span className="dot"></span>
                         <div className="duration">12h 15m</div>
@@ -95,10 +96,10 @@ const Sample2: React.FC = () => {
           <div className="flight-card">
             <div className="card-header">
               <div className="airline">
-                <i className="fas fa-plane-departure"></i>
+                <Icon name="fa-plane-departure" size={20} />
                 <span>Cathay Pacific</span>
               </div>
-              <i className="fas fa-bookmark"></i>
+              <Icon name="fa-bookmark" size={20} />
             </div>
             <div className="card-body">
               <div className="flight-info">
@@ -110,7 +111,7 @@ const Sample2: React.FC = () => {
                 <div className="flight-path">
                     <span className="dot"></span>
                     <span className="line"></span>
-                    <i className="fas fa-plane"></i>
+                    <Icon name="fa-plane" size={20} />
                     <span className="line"></span>
                     <span className="dot"></span>
                     <div className="duration">12h 15m</div>

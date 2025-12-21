@@ -6,6 +6,7 @@ import { parseUTCDate, getFullMinutes } from './Utils'
 import { encodeVehicleJourneyId } from '../utils/uriUtils'
 import { calculateDelay } from '../services/delayService'
 import { matchDisruptionsForDepartureArrival } from '../services/disruptionService'
+import { Icon } from '../utils/iconMapping'
 import Stops from './Stops'
 import type { Disruption } from '../client/models/disruption'
 import type { Departure } from '../client/models/departure'
@@ -177,7 +178,7 @@ const Departures: React.FC = () => {
                                     return (
                                         <span key={disIndex} className={`tag ${tagClass} is-small mr-1`} title={message}>
                                             <span className='icon is-small mr-1'>
-                                                <i className={`fas ${icon}`}></i>
+                                                <Icon name={icon} size={14} />
                                             </span>
                                             <span>{severityText !== 'unknown' ? severityText : 'Perturbation'}</span>
                                         </span>

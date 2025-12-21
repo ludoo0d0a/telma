@@ -10,6 +10,13 @@ A React-based web application for viewing real-time train schedules and informat
 
 ![Screenshot 3](https://github.com/ludoo0d0a/telma/assets/75996200/65a2739d-708a-4985-b887-8be8d811312c)
 
+## Design inspiration
+
+[Sky Trip - Flight Booking App](https://dribbble.com/shots/26215027-Sky-Trip-Flight-Booking-App)
+by Afzal Masud 🔥 for Kitify Studio
+
+![skytrip.webp](samples/skytrip.webp)
+
 ## 🌐 Live Demo
 
 Visit the live application: [https://ludoo0d0a.github.io/telma/](https://ludoo0d0a.github.io/telma/)

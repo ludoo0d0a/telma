@@ -1,0 +1,377 @@
+.sample3-page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: #f4f4f8;
+  min-height: 100vh;
+  color: #333;
+
+  .sample3-header {
+    background-color: #ff6f00;
+    color: white;
+    padding: 50px 20px 30px 20px;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
+    position: relative;
+    background-image: 
+      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+    background-size: 200% 200%;
+    background-position: 0% 0%, 100% 100%;
+
+    .header-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+
+      .back-button,
+      .menu-button {
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.3);
+        }
+
+        svg {
+          color: white;
+        }
+      }
+
+      h1 {
+        font-size: 22px;
+        font-weight: bold;
+        margin: 0;
+      }
+    }
+
+    .flight-route {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding: 0 10px;
+
+      .location {
+        text-align: center;
+        flex: 1;
+
+        h2 {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 0 0 5px 0;
+        }
+
+        .code {
+          font-size: 14px;
+          opacity: 0.9;
+          margin: 0;
+        }
+      }
+
+      .route-connector {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 15px;
+        position: relative;
+        min-height: 60px;
+
+        .dotted-line {
+          width: 100%;
+          height: 1px;
+          border-top: 2px dashed rgba(255, 255, 255, 0.5);
+          position: absolute;
+          top: 20px;
+          left: 0;
+          z-index: 1;
+        }
+
+        .plane-icon {
+          position: relative;
+          z-index: 2;
+          background: #ff6f00;
+          padding: 0 5px;
+          margin-top: 12px;
+
+          svg {
+            color: white;
+          }
+        }
+
+        .duration {
+          margin: 8px 0 0 0;
+          font-size: 13px;
+          opacity: 0.9;
+        }
+      }
+    }
+
+    .selected-date {
+      text-align: center;
+      margin-top: 15px;
+
+      p {
+        margin: 0;
+        font-size: 15px;
+        opacity: 0.95;
+      }
+    }
+  }
+
+  .sample3-main {
+    padding: 20px 15px;
+    margin-top: -20px;
+    position: relative;
+    z-index: 1;
+
+    .date-selection-card {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+      .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        h3 {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 0;
+          color: #333;
+        }
+
+        .see-all {
+          color: #ff6f00;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+
+      .date-cards {
+        display: flex;
+        gap: 12px;
+        overflow-x: auto;
+        padding-bottom: 5px;
+        -webkit-overflow-scrolling: touch;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+
+        .date-card {
+          min-width: 70px;
+          height: 80px;
+          border: none;
+          border-radius: 15px;
+          background: white;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+
+          .day {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 5px;
+          }
+
+          .date {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+          }
+
+          &.active {
+            background: #ff6f00;
+            box-shadow: 0 4px 12px rgba(255, 111, 0, 0.3);
+
+            .day,
+            .date {
+              color: white;
+            }
+          }
+
+          &:hover:not(.active) {
+            background: #f5f5f5;
+          }
+        }
+      }
+    }
+
+    .airlines-section {
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        h3 {
+          font-size: 18px;
+          font-weight: 600;
+          margin: 0;
+          color: #333;
+        }
+
+        .see-all {
+          color: #ff6f00;
+          text-decoration: none;
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+
+      .flight-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+
+        .flight-card {
+          background: white;
+          border-radius: 20px;
+          padding: 20px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+
+          .flight-route-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
+            .airport-code {
+              font-size: 20px;
+              font-weight: bold;
+              color: #333;
+            }
+
+            .flight-duration {
+              text-align: center;
+              flex: 1;
+
+              p {
+                margin: 0;
+                font-size: 12px;
+                color: #888;
+              }
+
+              .duration-text {
+                font-size: 14px;
+                font-weight: 600;
+                color: #333;
+                margin-top: 3px;
+              }
+            }
+          }
+
+          .flight-timeline {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
+            .time {
+              font-size: 14px;
+              color: #555;
+              font-weight: 500;
+              min-width: 80px;
+            }
+
+            .timeline-container {
+              flex: 1;
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              margin: 0 15px;
+              position: relative;
+              height: 20px;
+
+              .dot {
+                width: 8px;
+                height: 8px;
+                background-color: #ff6f00;
+                border-radius: 50%;
+                position: absolute;
+                z-index: 2;
+                top: 50%;
+                transform: translateY(-50%);
+
+                &.start-dot {
+                  left: 0;
+                }
+
+                &.end-dot {
+                  right: 0;
+                }
+              }
+
+              .dotted-line {
+                position: absolute;
+                width: 100%;
+                height: 1px;
+                border-top: 1px dashed #ddd;
+                top: 50%;
+                left: 0;
+                transform: translateY(-50%);
+                z-index: 1;
+              }
+
+              .plane-icon {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%) translateY(-50%);
+                top: 50%;
+                z-index: 3;
+                background: white;
+                padding: 0 5px;
+
+                svg {
+                  color: #ff6f00;
+                }
+              }
+            }
+          }
+
+          .airline-price {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+
+            .airline-name {
+              font-size: 15px;
+              color: #333;
+              margin: 0;
+              font-weight: 500;
+            }
+
+            .price {
+              font-size: 20px;
+              font-weight: bold;
+              color: #ff6f00;
+              margin: 0;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
