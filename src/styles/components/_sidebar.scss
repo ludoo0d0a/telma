@@ -9,6 +9,15 @@
   animation: fadeIn 0.3s ease-in-out;
 }
 
+.sidebar-toggle {
+  color: white !important;
+  
+  .icon,
+  svg {
+    color: white !important;
+  }
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -27,7 +36,7 @@
   background-color: var(--background-light);
   color: var(--text-primary);
   transition: left 0.3s ease-in-out;
-  z-index: 1000;
+  z-index: 1050;
   border-right: 1px solid var(--background-darker);
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
 

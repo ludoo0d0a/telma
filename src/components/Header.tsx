@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSidebar } from '../contexts/SidebarContext';
 import LoginButton from './LoginButton';
+import { X, Menu } from 'lucide-react';
 
 const Header: React.FC = () => {
-    const { toggleSidebar } = useSidebar();
+    const { toggleSidebar, isOpen } = useSidebar();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
@@ -15,17 +16,25 @@ const Header: React.FC = () => {
     return (
         <nav className='navbar is-primary' role='navigation' aria-label='main navigation'>
             <div className='navbar-brand'>
-                <a
-                    role='button'
-                    className={`navbar-burger ${isMenuOpen ? 'is-active' : ''}`}
+                <button
+                    type='button'
+                    className='navbar-burger sidebar-toggle'
                     aria-label='menu'
-                    aria-expanded={isMenuOpen}
-                    onClick={toggleMenu}
+                    aria-expanded={isOpen}
+                    onClick={toggleSidebar}
+                    style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        padding: '0.5rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        color: 'white'
+                    }}
                 >
-                    <span aria-hidden='true'></span>
-                    <span aria-hidden='true'></span>
-                    <span aria-hidden='true'></span>
-                </a>
+                    <Icon name={isOpen ? 'fa-times' : 'fa-bars'} size={24} style={{ color: 'white' }} />
+                </button>
                 <div className='navbar-item'>
                     <img 
                         src={`${import.meta.env.BASE_URL}favicons/favicon.svg`}
