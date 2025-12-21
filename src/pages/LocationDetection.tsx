@@ -64,6 +64,7 @@ interface SelectedStation {
 
 const LocationDetection: React.FC = () => {
     const [detectionResult, setDetectionResult] = useState<DetectionResult | null>(null);
+    const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [watchingLocation, setWatchingLocation] = useState<boolean>(false);
@@ -849,30 +850,14 @@ const LocationDetection: React.FC = () => {
                     {detectionResult && detectionResult.userLocation && (
                         <div className='box mt-5'>
                             <h3 className='title is-5 mb-4'>Carte des gares à proximité</h3>
-                            <div style={{ height: 500, width: '100%', borderRadius: 6, overflow: 'hidden' }}>
+                            <div className="map-container" data-map-loaded={isMapLoaded} style={{ height: 500, width: '100%', borderRadius: 6, overflow: 'hidden' }}>
                                 <Map
                                     ref={mapRef}
                                     {...viewState}
                                     onMove={evt => setViewState(evt.viewState)}
+                                    onLoad={() => setIsMapLoaded(true)}
                                     style={{ width: '100%', height: '100%' }}
-                                    mapStyle={{
-                                        version: 8,
-                                        sources: {
-                                            'osm-tiles': {
-                                                type: 'raster',
-                                                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                                                tileSize: 256,
-                                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                            }
-                                        },
-                                        layers: [{
-                                            id: 'osm-tiles-layer',
-                                            type: 'raster',
-                                            source: 'osm-tiles',
-                                            minzoom: 0,
-                                            maxzoom: 19
-                                        }]
-                                    }}
+                                    mapStyle={`https://api.maptiler.com/maps/streets/style.json?key=${import.meta.env.VITE_MAPTILER_KEY}`}
                                     attributionControl={{compact: true}}
                                 >
                                     <NavigationControl position="top-right" />
