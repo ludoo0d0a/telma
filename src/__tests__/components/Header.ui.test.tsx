@@ -4,16 +4,22 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import { AuthProvider } from '../../contexts/AuthContext';
 import Header from '../../components/Header';
 import { SidebarProvider } from '../../contexts/SidebarContext';
 
 const renderWithProviders = (component: React.ReactElement) => {
   return render(
-    <BrowserRouter>
-      <SidebarProvider>
-        {component}
-      </SidebarProvider>
-    </BrowserRouter>
+    <GoogleOAuthProvider clientId="test">
+      <BrowserRouter>
+        <SidebarProvider>
+          <AuthProvider>
+            {component}
+          </AuthProvider>
+        </SidebarProvider>
+      </BrowserRouter>
+    </GoogleOAuthProvider>
   );
 };
 

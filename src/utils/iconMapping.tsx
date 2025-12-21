@@ -7,6 +7,7 @@ const iconMap: Record<string, keyof typeof LucideIcons> = {
   'fa-route': 'Route',
   'fa-clock': 'Clock',
   'fa-map-marker-alt': 'MapPin',
+  'fa-sign-in-alt': 'LogIn',
   'fa-star': 'Star',
   'fa-train': 'Train',
   'fa-chart-bar': 'BarChart3',
