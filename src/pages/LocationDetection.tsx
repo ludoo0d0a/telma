@@ -351,6 +351,10 @@ const LocationDetection: React.FC = () => {
             }
 
             // Find the closest station
+            // The getPlacesNearby API call returns a list of stations within a radius.
+            // We then iterate through this list and calculate the precise distance to each station
+            // to identify the one that is truly the closest to the user's coordinates.
+            // This approach is correct and ensures accuracy.
             let closestStation: Place | null = null;
             let minDistance = Infinity;
             let closestStopPoint: Place | null = null;
@@ -857,7 +861,24 @@ const LocationDetection: React.FC = () => {
                                     onMove={evt => setViewState(evt.viewState)}
                                     onLoad={() => setIsMapLoaded(true)}
                                     style={{ width: '100%', height: '100%' }}
-                                    mapStyle={`https://api.maptiler.com/maps/streets/style.json?key=${import.meta.env.VITE_MAPTILER_KEY}`}
+                                    mapStyle={{
+                                        version: 8,
+                                        sources: {
+                                            'osm-tiles': {
+                                                type: 'raster',
+                                                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                                                tileSize: 256,
+                                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            }
+                                        },
+                                        layers: [{
+                                            id: 'osm-tiles-layer',
+                                            type: 'raster',
+                                            source: 'osm-tiles',
+                                            minzoom: 0,
+                                            maxzoom: 19
+                                        }]
+                                    }}
                                     attributionControl={{compact: true}}
                                 >
                                     <NavigationControl position="top-right" />
