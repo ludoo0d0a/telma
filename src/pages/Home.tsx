@@ -86,6 +86,20 @@ const Home: React.FC = () => {
             path: '/itinerary/metz/thionville',
             icon: 'fa-arrow-right',
             color: 'secondary'
+        },
+        {
+            title: 'Sample 1',
+            description: 'Sample 1 page',
+            path: '/sample1',
+            icon: 'fa-arrow-right',
+            color: 'secondary'
+        },
+        {
+            title: 'Saved Flights',
+            description: 'Sample 2 page',
+            path: '/sample2',
+            icon: 'fa-bookmark',
+            color: 'secondary'
         }
     ];
 
