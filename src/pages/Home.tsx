@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import LoginButton from '../components/LoginButton';
 import Footer from '../components/Footer';
 import CurrentLocationWidget from '../components/CurrentLocationWidget';
 import Ad from '../components/Ad';
@@ -148,6 +149,22 @@ const Home: React.FC = () => {
                         <p className='subtitle is-4 has-text-secondary'>
                             Accédez rapidement aux principales fonctionnalités
                         </p>
+                    </div>
+
+                    {/* Authentication Section */}
+                    <div className='mb-6'>
+                        <h2 className='title is-3 mb-4'>
+                            <span className='icon mr-2'>
+                                <Icon name='fa-sign-in-alt' size={24} />
+                            </span>
+                            Authentification
+                        </h2>
+                        <div className='columns is-centered'>
+                            <div className='column is-half has-text-centered'>
+                                <p className='mb-4'>Connectez-vous pour accéder à des fonctionnalités supplémentaires.</p>
+                                <LoginButton />
+                            </div>
+                        </div>
                     </div>
 
                     {/* Current Location Widget */}

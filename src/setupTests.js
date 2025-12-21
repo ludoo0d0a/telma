@@ -3,8 +3,9 @@
  * This file runs before all tests
  */
 
+import React from 'react';
 import '@testing-library/jest-dom';
-import { beforeEach, expect } from 'vitest';
+import { beforeEach, expect, vi } from 'vitest';
 import { installHttpArtifactsRecorder } from './__tests__/utils/http-artifacts';
 import { loadEnv } from 'vite';
 
@@ -55,3 +56,8 @@ beforeEach(() => {
 
 installHttpArtifactsRecorder({ runId: 'api-artifacts-pre' });
 
+// Mock the @react-oauth/google library to prevent errors in tests
+vi.mock('@react-oauth/google', () => ({
+  GoogleOAuthProvider: ({ children }) => children,
+  GoogleLogin: () => <button>Login with Google</button>,
+}));
