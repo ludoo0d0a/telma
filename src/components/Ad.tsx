@@ -1,6 +1,6 @@
 import React from 'react';
 import AdSense from 'react-adsense';
-import { Icon } from '../utils/iconMapping';
+import { Info } from 'lucide-react';
 
 interface AdProps {
     /**
@@ -54,7 +54,7 @@ const Ad: React.FC<AdProps> = ({
             >
                 <div className="ad-placeholder-content">
                     <p className="has-text-grey is-size-7">
-                        <Icon name="fa-info-circle" size={16} className="mr-2" />
+                        <Info size={16} className="mr-2" />
                         Ad space - Configure VITE_GOOGLE_ADSENSE_ID in .env file
                     </p>
                 </div>

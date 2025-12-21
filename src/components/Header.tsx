@@ -33,7 +33,7 @@ const Header: React.FC = () => {
                         color: 'white'
                     }}
                 >
-                    <Icon name={isOpen ? 'fa-times' : 'fa-bars'} size={24} style={{ color: 'white' }} />
+                    {isOpen ? <X size={24} style={{ color: 'white' }} /> : <Menu size={24} style={{ color: 'white' }} />}
                 </button>
                 <div className='navbar-item'>
                     <img 

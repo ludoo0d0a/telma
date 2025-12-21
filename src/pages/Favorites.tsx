@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from '../utils/iconMapping';
+import { Star, Trash2 } from 'lucide-react';
 import Footer from '../components/Footer';
 import { getFavorites, removeFavorite, type FavoriteLocation } from '../services/favoritesService';
 
@@ -47,7 +47,7 @@ const Favorites: React.FC = () => {
                         <div className='level-left'>
                             <div className='level-item'>
                                 <h1 className='title is-2'>
-                                    <span className='icon has-text-warning mr-3'><Icon name='fa-star' size={24} /></span>
+                                    <span className='icon has-text-warning mr-3'><Star size={24} /></span>
                                     Favoris
                                 </h1>
                             </div>
@@ -110,7 +110,7 @@ const Favorites: React.FC = () => {
                                                         title='Retirer des favoris'
                                                     >
                                                         <span className='icon'>
-                                                            <Icon name='fa-trash' size={16} />
+                                                            <Trash2 size={16} />
                                                         </span>
                                                         <span>Retirer</span>
                                                     </button>

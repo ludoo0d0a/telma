@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Footer from '../components/Footer';
 import GeoJSONMap from '../components/GeoJSONMap';
-import { Icon } from '../utils/iconMapping';
+import { Loader2, Calculator } from 'lucide-react';
 import { getIsochrones } from '../services/navitiaApi';
 import type { CoverageCoverageIsochronesGet200Response } from '../client/models';
 
@@ -97,7 +97,7 @@ const Isochrones: React.FC = () => {
                             <div className='field'>
                                 <div className='control'>
                                     <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-calculator'} spin={loading} size={16} /></span>
+                                        <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Calculator size={16} />}</span>
                                         <span>{loading ? 'Calcul...' : 'Calculer les isochrones'}</span>
                                     </button>
                                 </div>

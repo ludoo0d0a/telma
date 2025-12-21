@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon } from '../utils/iconMapping';
+import { MapPin, Route, Flag, Loader2, Search } from 'lucide-react';
 import Footer from '../components/Footer';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/navitiaApi';
 import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '../client/models';
@@ -73,7 +73,7 @@ const Schedules: React.FC = () => {
                                         setSchedules(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
+                                        <span className='icon is-small'><MapPin size={16} /></span>
                                         <span>Horaires d'arrêt</span>
                                     </a>
                                 </li>
@@ -83,7 +83,7 @@ const Schedules: React.FC = () => {
                                         setSchedules(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-route' size={16} /></span>
+                                        <span className='icon is-small'><Route size={16} /></span>
                                         <span>Horaires de ligne</span>
                                     </a>
                                 </li>
@@ -93,7 +93,7 @@ const Schedules: React.FC = () => {
                                         setSchedules(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-flag-checkered' size={16} /></span>
+                                        <span className='icon is-small'><Flag size={16} /></span>
                                         <span>Horaires terminus</span>
                                     </a>
                                 </li>
@@ -142,7 +142,7 @@ const Schedules: React.FC = () => {
                             <div className='field'>
                                 <div className='control'>
                                     <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-search'} spin={loading} size={16} /></span>
+                                        <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
                                         <span>{loading ? 'Chargement...' : 'Rechercher'}</span>
                                     </button>
                                 </div>

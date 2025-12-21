@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Icon } from '../utils/iconMapping';
+import { Loader2, CheckCircle2, Navigation, Star } from 'lucide-react';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
 import { cleanLocationName } from '../services/locationService';
@@ -284,12 +284,12 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                     />
                     {loading && !geolocating && (
                         <span className='icon is-right'>
-                            <Icon name='fa-spinner' size={20} spin={true} />
+                            <Loader2 size={20} className="animate-spin" />
                         </span>
                     )}
                     {!loading && !geolocating && selectedStation && (
                         <span className='icon is-right has-text-success'>
-                            <Icon name='fa-check-circle' size={20} />
+                            <CheckCircle2 size={20} />
                         </span>
                     )}
                 </div>
@@ -302,7 +302,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                         title='Utiliser ma position actuelle'
                     >
                         <span className='icon'>
-                            <Icon name='fa-location-arrow' size={20} />
+                            <Navigation size={20} />
                         </span>
                     </button>
                 </div>
@@ -336,7 +336,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                                             onClick={(e) => handleToggleFavorite(e, station)}
                                             style={{ cursor: 'pointer', marginLeft: 'auto' }}
                                         >
-                                            <Icon name='fa-star' size={16} className={isFav ? 'has-text-warning' : 'has-text-grey'} />
+                                            <Star size={16} className={isFav ? 'has-text-warning' : 'has-text-grey'} />
                                         </span>
                                     </a>
                                 );

@@ -1,3 +1,4 @@
+import React from 'react';
 import type { JourneyItem } from '../client/models/journey-item';
 import { getTransportIcon, getWagonCount } from './transportService';
 import { cleanLocationName } from './locationService';
@@ -7,7 +8,7 @@ export interface JourneyInfo {
     vehicleJourneyId: string | null;
     commercialMode: string;
     network: string;
-    transportIcon: string;
+    transportIcon: React.ComponentType<{ size?: number | string; className?: string }>;
     transportColor: string;
     transportTagColor: string;
     transportLabel: string;

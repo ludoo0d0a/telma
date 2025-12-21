@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Icon } from '../utils/iconMapping';
+import { Loader2, Search, Train as TrainIcon, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import TrainWaypointsMap from '../components/TrainWaypointsMap';
@@ -232,12 +232,12 @@ const Train: React.FC = () => {
                                     />
                                     {searchLoading && (
                                         <span className='icon is-right'>
-                                            <Icon name='fa-spinner' size={20} spin={true} />
+                                            <Loader2 size={20} className="animate-spin" />
                                         </span>
                                     )}
                                     {!searchLoading && searchQuery && (
                                         <span className='icon is-right'>
-                                            <Icon name='fa-search' size={20} />
+                                            <Search size={20} />
                                         </span>
                                     )}
                                 </div>
@@ -262,7 +262,7 @@ const Train: React.FC = () => {
                                                         >
                                                             <div className='is-flex is-align-items-center'>
                                                                 <span className={`icon ${transportInfo.color} mr-3`}>
-                                                                    <Icon name={transportInfo.icon} size={16} />
+                                                                    <transportInfo.icon size={16} />
                                                                 </span>
                                                                 <div style={{ flex: 1 }}>
                                                                     <div className='is-flex is-align-items-center'>
@@ -308,7 +308,7 @@ const Train: React.FC = () => {
                                                 >
                                                     <div className='is-flex is-align-items-center'>
                                                         <span className='icon is-large has-text-primary mr-3'>
-                                                            <Icon name='fa-train' size={32} />
+                                                            <TrainIcon size={32} />
                                                         </span>
                                                         <div>
                                                             <p className='title is-5 mb-1'>
@@ -347,7 +347,7 @@ const Train: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large'>
-                                <Icon name='fa-spinner' size={48} spin={true} />
+                                <Loader2 size={48} className="animate-spin" />
                             </span>
                             <p className='mt-4'>Chargement des détails du train...</p>
                         </div>
@@ -365,7 +365,7 @@ const Train: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large has-text-danger'>
-                                <Icon name='fa-exclamation-triangle' size={48} />
+                                <AlertTriangle size={48} />
                             </span>
                             <p className='mt-4 has-text-danger'>{error || 'Train non trouvé'}</p>
                             <div className='buttons is-centered mt-4'>
@@ -434,12 +434,12 @@ const Train: React.FC = () => {
                                         disabled={refreshing}
                                     >
                                         <span className='icon'>
-                                            <Icon name={refreshing ? 'fa-spinner' : 'fa-sync-alt'} spin={refreshing} size={16} />
+                                            {refreshing ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
                                         </span>
                                         <span>{refreshing ? 'Actualisation...' : 'Actualiser'}</span>
                                     </button>
                                     <Link to='/train' className='button is-light'>
-                                        <span className='icon'><Icon name='fa-search' size={16} /></span>
+                                        <span className='icon'><Search size={16} /></span>
                                         <span>Rechercher</span>
                                     </Link>
                                 </div>
@@ -454,7 +454,7 @@ const Train: React.FC = () => {
                             <div className='columns is-vcentered'>
                                 <div className='column is-narrow'>
                                     <span className={`icon is-large ${transportInfo.color}`}>
-                                        <Icon name={transportInfo.icon} size={48} />
+                                        <transportInfo.icon size={48} />
                                     </span>
                                 </div>
                                 <div className='column'>

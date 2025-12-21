@@ -7,7 +7,7 @@ import Origin from './Origin'
 import { getFullMinutes, parseUTCDate } from './Utils'
 import { calculateDelay } from '../services/delayService'
 import { matchDisruptionsForDepartureArrival } from '../services/disruptionService'
-import { Icon } from '../utils/iconMapping'
+import { AlertTriangle, Ban, Info, Clock } from 'lucide-react'
 import type { Disruption } from '../client/models/disruption'
 import type { Arrival } from '../client/models/arrival'
 
@@ -24,7 +24,7 @@ interface ProcessedArrival {
 
 interface DisruptionSeverityInfo {
     tagClass: string;
-    icon: string;
+    icon: React.ComponentType<{ size?: number | string; className?: string }>;
     severityText: string;
 }
 
@@ -123,20 +123,20 @@ const Arrivals: React.FC = () => {
     
     const severityLevel = severityText.toLowerCase();
     let tagClass = 'is-warning';
-    let icon = 'fa-exclamation-triangle';
+    let IconComponent = AlertTriangle;
     
     if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
         tagClass = 'is-danger';
-        icon = 'fa-ban';
+        IconComponent = Ban;
     } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
         tagClass = 'is-info';
-        icon = 'fa-info-circle';
+        IconComponent = Info;
     } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
         tagClass = 'is-warning';
-        icon = 'fa-clock';
+        IconComponent = Clock;
     }
     
-    return { tagClass, icon, severityText };
+    return { tagClass, icon: IconComponent, severityText };
   }
 
   return (
@@ -169,10 +169,11 @@ const Arrivals: React.FC = () => {
                                 ? disruption.messages[0].text || (disruption.messages[0] as { message?: string }).message 
                                 : disruption.message || 'Perturbation';
                             
+                            const IconComponent = icon;
                             return (
                                 <span key={disIndex} className={`tag ${tagClass} is-small mr-1`} title={message}>
                                     <span className='icon is-small mr-1'>
-                                        <Icon name={icon} size={14} />
+                                        <IconComponent size={14} />
                                     </span>
                                     <span>{severityText !== 'unknown' ? severityText : 'Perturbation'}</span>
                                 </span>

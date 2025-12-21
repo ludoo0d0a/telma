@@ -19,7 +19,7 @@ by Afzal Masud 🔥 for Kitify Studio
 
 ## 🌐 Live Demo
 
-Visit the live application: [https://ludoo0d0a.github.io/telma/](https://ludoo0d0a.github.io/telma/)
+Visit the live application: [https://telma.geoking.fr](https://telma.geoking.fr)
 
 ## ✨ Features
 

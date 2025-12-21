@@ -3,7 +3,7 @@ import Footer from '../components/Footer';
 import Ad from '../components/Ad';
 import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
 import type { Place } from '../client/models/place';
-import { Icon } from '../utils/iconMapping';
+import { Search, MapPin, Loader2 } from 'lucide-react';
 
 const Places: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -84,7 +84,7 @@ const Places: React.FC = () => {
                                         setPlaces([]);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-search' size={16} /></span>
+                                        <span className='icon is-small'><Search size={16} /></span>
                                         <span>Recherche par texte</span>
                                     </a>
                                 </li>
@@ -94,7 +94,7 @@ const Places: React.FC = () => {
                                         setPlaces([]);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
+                                        <span className='icon is-small'><MapPin size={16} /></span>
                                         <span>Recherche par coordonnées</span>
                                     </a>
                                 </li>
@@ -120,7 +120,7 @@ const Places: React.FC = () => {
                                 <div className='field'>
                                     <div className='control'>
                                         <button type='submit' className='button is-primary' disabled={loading}>
-                                            <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-search'} size={16} spin={loading} /></span>
+                                            <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
                                             <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
                                         </button>
                                     </div>
@@ -146,7 +146,7 @@ const Places: React.FC = () => {
                                 <div className='field'>
                                     <div className='control'>
                                         <button type='submit' className='button is-primary' disabled={loading}>
-                                            <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-search'} size={16} spin={loading} /></span>
+                                            <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
                                             <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
                                         </button>
                                     </div>

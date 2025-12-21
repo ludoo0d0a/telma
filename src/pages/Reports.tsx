@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon } from '../utils/iconMapping';
+import { Route, TrafficCone, Settings, Loader2, Download } from 'lucide-react';
 import Footer from '../components/Footer';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/navitiaApi';
 import type { 
@@ -74,7 +74,7 @@ const Reports: React.FC = () => {
                                         setReports(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-route' size={16} /></span>
+                                        <span className='icon is-small'><Route size={16} /></span>
                                         <span>Rapports de ligne</span>
                                     </a>
                                 </li>
@@ -84,7 +84,7 @@ const Reports: React.FC = () => {
                                         setReports(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-traffic-light' size={16} /></span>
+                                        <span className='icon is-small'><TrafficCone size={16} /></span>
                                         <span>Rapports de trafic</span>
                                     </a>
                                 </li>
@@ -94,7 +94,7 @@ const Reports: React.FC = () => {
                                         setReports(null);
                                         setError(null);
                                     }}>
-                                        <span className='icon is-small'><Icon name='fa-cog' size={16} /></span>
+                                        <span className='icon is-small'><Settings size={16} /></span>
                                         <span>Rapports d'équipement</span>
                                     </a>
                                 </li>
@@ -124,7 +124,7 @@ const Reports: React.FC = () => {
                             <div className='field'>
                                 <div className='control'>
                                     <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-download'} spin={loading} size={16} /></span>
+                                        <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}</span>
                                         <span>{loading ? 'Chargement...' : 'Récupérer les rapports'}</span>
                                     </button>
                                 </div>

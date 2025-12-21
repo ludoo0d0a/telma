@@ -4,13 +4,13 @@ import LoginButton from '../components/LoginButton';
 import Footer from '../components/Footer';
 import CurrentLocationWidget from '../components/CurrentLocationWidget';
 import Ad from '../components/Ad';
-import { Icon } from '../utils/iconMapping';
+import { LogIn, Crosshair, LayoutGrid, Route, List, Code, Train, MapPin, Clock, BarChart3, Map, Circle, Star, Bus, ArrowRight, Bookmark, Book } from 'lucide-react';
 
 interface DashboardCard {
     title: string;
     description: string;
     path: string;
-    icon: string;
+    icon: React.ComponentType<{ size?: number | string; className?: string }>;
     color?: 'primary' | 'secondary';
 }
 
@@ -20,56 +20,56 @@ const Home: React.FC = () => {
             title: 'Train',
             description: 'Rechercher et suivre les trains',
             path: '/train',
-            icon: 'fa-train',
+            icon: Train,
             color: 'primary'
         },
         {
             title: 'Places',
             description: 'Rechercher des lieux et gares',
             path: '/places',
-            icon: 'fa-map-marker-alt'
+            icon: MapPin
         },
         {
             title: 'Lignes',
             description: 'Explorer les lignes de transport',
             path: '/lines',
-            icon: 'fa-route'
+            icon: Route
         },
         {
             title: 'Horaires',
             description: 'Consulter les horaires',
             path: '/schedules',
-            icon: 'fa-clock'
+            icon: Clock
         },
         {
             title: 'Rapports',
             description: 'Voir les rapports et statistiques',
             path: '/reports',
-            icon: 'fa-chart-bar'
+            icon: BarChart3
         },
         {
             title: 'Couverture',
             description: 'Carte de couverture du réseau',
             path: '/coverage',
-            icon: 'fa-map'
+            icon: Map
         },
         {
             title: 'Isochrones',
             description: 'Visualiser les isochrones',
             path: '/isochrones',
-            icon: 'fa-circle'
+            icon: Circle
         },
         {
             title: 'Favoris',
             description: 'Vos favoris sauvegardés',
             path: '/favorites',
-            icon: 'fa-star'
+            icon: Star
         },
         {
             title: 'Modes Commerciaux',
             description: 'Types de transport disponibles',
             path: '/commercial-modes',
-            icon: 'fa-bus'
+            icon: Bus
         }
     ];
 
@@ -78,35 +78,35 @@ const Home: React.FC = () => {
             title: 'Bettembourg → Metz',
             description: 'Exemple de trajet',
             path: '/itinerary/bettembourg/metz',
-            icon: 'fa-arrow-right',
+            icon: ArrowRight,
             color: 'secondary'
         },
         {
             title: 'Metz → Thionville',
             description: 'Exemple de trajet',
             path: '/itinerary/metz/thionville',
-            icon: 'fa-arrow-right',
+            icon: ArrowRight,
             color: 'secondary'
         },
         {
             title: 'Choose your trip',
             description: 'Sample 1',
             path: '/sample1',
-            icon: 'fa-arrow-right',
+            icon: ArrowRight,
             color: 'secondary'
         },
         {
             title: 'Saved Flights',
             description: 'Sample 2',
             path: '/sample2',
-            icon: 'fa-bookmark',
+            icon: Bookmark,
             color: 'secondary'
         },
         {
             title: 'Select Flight',
             description: 'Sample 3',
             path: '/sample3',
-            icon: 'fa-bookmark',
+            icon: Bookmark,
             color: 'secondary'
         }
     ];
@@ -116,14 +116,14 @@ const Home: React.FC = () => {
             title: 'Train SNCF 88769',
             description: 'Exemple de trajet détaillé - 18 décembre 2025',
             path: '/trip/dmVoaWNsZV9qb3VybmV5OlNOQ0Y6MjAyNS0xMi0xODo4ODc2OT',
-            icon: 'fa-train',
+            icon: Train,
             color: 'secondary'
         },
         {
             title: 'Train SNCF 88786',
             description: 'Exemple de trajet détaillé - 19 décembre 2025',
             path: '/trip/dmVoaWNsZV9qb3VybmV5OlNOQ0Y6MjAyNS0xMi0xOTo4ODc4Nj',
-            icon: 'fa-train',
+            icon: Train,
             color: 'secondary'
         }
     ];
@@ -133,7 +133,7 @@ const Home: React.FC = () => {
             title: 'API Documentation',
             description: 'Documentation Swagger de l\'API',
             path: '/api-docs',
-            icon: 'fa-book',
+            icon: Book,
             color: 'primary'
         }
     ];
@@ -155,7 +155,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <Icon name='fa-sign-in-alt' size={24} />
+                                <LogIn size={24} />
                             </span>
                             Authentification
                         </h2>
@@ -171,7 +171,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <Icon name='fa-crosshairs' size={24} />
+                                <Crosshair size={24} />
                             </span>
                             Votre Position Actuelle
                         </h2>
@@ -189,7 +189,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <Icon name='fa-th-large' size={24} />
+                                <LayoutGrid size={24} />
                             </span>
                             Pages Principales
                         </h2>
@@ -202,7 +202,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${page.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            <Icon name={page.icon} size={32} />
+                                                            <page.icon size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>
@@ -226,7 +226,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <Icon name='fa-route' size={24} />
+                                <Route size={24} />
                             </span>
                             Exemples de Trajets
                         </h2>
@@ -239,7 +239,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${route.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            <Icon name={route.icon} size={32} />
+                                                            <route.icon size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>
@@ -263,7 +263,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <Icon name='fa-list-alt' size={24} />
+                                <List size={24} />
                             </span>
                             Exemples de Trajets Détaillés
                         </h2>
@@ -276,7 +276,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${trip.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            <Icon name={trip.icon} size={32} />
+                                                            <trip.icon size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>
@@ -300,7 +300,7 @@ const Home: React.FC = () => {
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon mr-2'>
-                                <Icon name='fa-code' size={24} />
+                                <Code size={24} />
                             </span>
                             Documentation
                         </h2>
@@ -313,7 +313,7 @@ const Home: React.FC = () => {
                                                 <div className='media'>
                                                     <div className='media-left'>
                                                         <span className={`icon is-large ${doc.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            <Icon name={doc.icon} size={32} />
+                                                            <doc.icon size={32} />
                                                         </span>
                                                     </div>
                                                     <div className='media-content'>

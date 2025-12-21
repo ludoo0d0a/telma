@@ -9,7 +9,7 @@ import { getDelay } from '../services/delayService';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
 import { getJourneyInfo } from '../services/journeyService';
 import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId, encodeTripId } from '../utils/uriUtils';
-import { Icon } from '../utils/iconMapping';
+import { Loader2, Route, AlertTriangle, Train as TrainIcon, Map, Ban, Info, Clock, RefreshCw } from 'lucide-react';
 import type { JourneyItem } from '../client/models/journey-item';
 import type { JourneyInfo } from '../services/journeyService';
 import type { Disruption } from '../client/models/disruption';
@@ -496,7 +496,7 @@ const Trip: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large'>
-                                <Icon name='fa-spinner' size={48} spin={true} />
+                                <Loader2 size={48} className="animate-spin" />
                             </span>
                             <p className='mt-4'>Chargement des détails du trajet...</p>
                         </div>
@@ -524,7 +524,7 @@ const Trip: React.FC = () => {
                             <h1 className='title is-2 mb-5'>Détails du trajet</h1>
                             <div className='box has-text-centered mb-5'>
                                 <span className='icon is-large has-text-info'>
-                                    <Icon name='fa-route' size={48} />
+                                    <Route size={48} />
                                 </span>
                                 <p className='mt-4'>Sélectionnez un exemple de trajet ci-dessous</p>
                             </div>
@@ -542,7 +542,7 @@ const Trip: React.FC = () => {
                                             >
                                                 <div className='is-flex is-align-items-center'>
                                                     <span className='icon is-large has-text-primary mr-3'>
-                                                        <Icon name='fa-route' size={32} />
+                                                        <Route size={32} />
                                                     </span>
                                                     <div>
                                                         <p className='title is-5 mb-1'>
@@ -571,7 +571,7 @@ const Trip: React.FC = () => {
                     <div className='container'>
                         <div className='box has-text-centered'>
                             <span className='icon is-large has-text-danger'>
-                                <Icon name='fa-exclamation-triangle' size={48} />
+                                <AlertTriangle size={48} />
                             </span>
                             <p className='mt-4 has-text-danger'>{error || 'Trajet non trouvé'}</p>
                             <div className='buttons is-centered mt-4'>
@@ -583,7 +583,7 @@ const Trip: React.FC = () => {
                                         to={`/train/${encodeVehicleJourneyId(vehicleJourneyId)}`}
                                         className='button is-link'
                                     >
-                                        <span className='icon'><Icon name='fa-train' size={20} /></span>
+                                        <span className='icon'><TrainIcon size={20} /></span>
                                         <span>Voir les détails du train</span>
                                     </Link>
                                 )}
@@ -670,7 +670,7 @@ const Trip: React.FC = () => {
                                     disabled={loading}
                                 >
                                     <span className='icon'>
-                                        <Icon name='fa-sync-alt' size={20} spin={loading} />
+                                        {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
                                     </span>
                                     <span>Actualiser</span>
                                 </button>
@@ -685,7 +685,7 @@ const Trip: React.FC = () => {
                             <div className='column'>
                                 <div className='is-flex is-align-items-center mb-3'>
                                     <span className={`icon ${transportInfo.color} mr-3`} style={{ fontSize: '2rem' }}>
-                                        <Icon name={transportInfo.icon} size={32} />
+                                        <transportInfo.icon size={32} />
                                     </span>
                                     <div>
                                         <h3 className='title is-5 mb-1'>
@@ -710,7 +710,7 @@ const Trip: React.FC = () => {
                                             to={`/train/${encodeVehicleJourneyId(trainId)}`}
                                             className='button is-small is-link'
                                         >
-                                            <span className='icon'><Icon name='fa-train' size={20} /></span>
+                                            <span className='icon'><TrainIcon size={20} /></span>
                                             <span>Voir les détails du train</span>
                                         </Link>
                                     ) : null;
@@ -735,7 +735,7 @@ const Trip: React.FC = () => {
                         <div className='box mb-5'>
                             <h2 className='title is-4 mb-4'>
                                 <span className='icon mr-2'>
-                                    <Icon name='fa-map' size={20} />
+                                    <Map size={20} />
                                 </span>
                                 Carte de l'itinéraire
                             </h2>
@@ -752,7 +752,7 @@ const Trip: React.FC = () => {
                         <div className='box mb-5'>
                             <h2 className='title is-4 mb-4'>
                                 <span className='icon has-text-warning mr-2'>
-                                    <Icon name='fa-exclamation-triangle' size={20} />
+                                    <AlertTriangle size={20} />
                                 </span>
                                 Perturbations ({disruptions.length})
                             </h2>

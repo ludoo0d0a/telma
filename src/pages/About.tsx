@@ -1,64 +1,64 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import packageJson from '../../package.json';
-import { Icon } from '../utils/iconMapping';
+import { Info, Tag, ExternalLink, Star, Settings, CheckSquare, History, Train, Route, MapPin, Bus, Map, Search, Circle, BarChart3, Book, Code, Sitemap, Network, Palette, BookOpen, Wrench, Smartphone, TrendingUp, FlaskConical } from 'lucide-react';
 
 const About: React.FC = () => {
     const functionalFeatures = [
         {
             title: 'Real-time Train Information',
             description: 'View departures and arrivals for any train station',
-            icon: 'fa-train'
+            icon: Train
         },
         {
             title: 'Journey Planning',
             description: 'Search for journeys between different locations',
-            icon: 'fa-route'
+            icon: Route
         },
         {
             title: 'Station Explorer',
             description: 'Browse train stations by city with detailed information',
-            icon: 'fa-map-marker-alt'
+            icon: MapPin
         },
         {
             title: 'Commercial Modes',
             description: 'Explore different transportation modes available',
-            icon: 'fa-bus'
+            icon: Bus
         },
         {
             title: 'Coverage Areas',
             description: 'View coverage information for different regions',
-            icon: 'fa-map'
+            icon: Map
         },
         {
             title: 'Places Search',
             description: 'Find train stations and places',
-            icon: 'fa-search'
+            icon: Search
         },
         {
             title: 'Lines Information',
             description: 'View train line details',
-            icon: 'fa-route'
+            icon: Route
         },
         {
             title: 'Isochrones',
             description: 'Visualize travel time zones from specific locations',
-            icon: 'fa-circle'
+            icon: Circle
         },
         {
             title: 'Reports',
             description: 'Access detailed train reports',
-            icon: 'fa-chart-bar'
+            icon: BarChart3
         },
         {
             title: 'Favorites',
             description: 'Save and manage your favorite train stations',
-            icon: 'fa-star'
+            icon: Star
         },
         {
             title: 'Interactive API Documentation',
             description: 'Built-in Swagger UI for API exploration',
-            icon: 'fa-book'
+            icon: Book
         }
     ];
 
@@ -66,52 +66,52 @@ const About: React.FC = () => {
         {
             title: 'Frontend Framework',
             description: 'React 19.2.3 with TypeScript for type-safe development',
-            icon: 'fa-code'
+            icon: Code
         },
         {
             title: 'Routing',
             description: 'React Router DOM 7.11.0 for client-side navigation',
-            icon: 'fa-sitemap'
+            icon: Sitemap
         },
         {
             title: 'HTTP Client',
             description: 'Axios for making API calls to SNCF Connect API',
-            icon: 'fa-network-wired'
+            icon: Network
         },
         {
             title: 'Styling',
             description: 'SCSS/Sass with Bulma CSS framework for responsive design',
-            icon: 'fa-paint-brush'
+            icon: Palette
         },
         {
             title: 'API Documentation',
             description: 'Swagger UI React for interactive API exploration',
-            icon: 'fa-book-open'
+            icon: BookOpen
         },
         {
             title: 'Maps',
             description: 'MapLibre GL and React Map GL for interactive maps',
-            icon: 'fa-map'
+            icon: Map
         },
         {
             title: 'Build Tool',
             description: 'Vite 7.3.0 for fast development and optimized builds',
-            icon: 'fa-tools'
+            icon: Wrench
         },
         {
             title: 'PWA Support',
             description: 'Progressive Web App capabilities with service workers',
-            icon: 'fa-mobile-alt'
+            icon: Smartphone
         },
         {
             title: 'Analytics',
             description: 'React GA4 for page view tracking',
-            icon: 'fa-chart-line'
+            icon: TrendingUp
         },
         {
             title: 'Testing',
             description: 'Vitest with React Testing Library',
-            icon: 'fa-vial'
+            icon: FlaskConical
         }
     ];
 
@@ -153,7 +153,7 @@ const About: React.FC = () => {
                     <div className='has-text-centered mb-6'>
                         <h1 className='title is-1 mb-4'>
                             <span className='icon has-text-primary mr-3'>
-                                <Icon name='fa-info-circle' size={24} />
+                                <Info size={24} />
                             </span>
                             About
                         </h1>
@@ -166,7 +166,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <Icon name='fa-tag' size={24} />
+                                <Tag size={24} />
                             </span>
                             Version & Author
                         </h2>
@@ -213,7 +213,7 @@ const About: React.FC = () => {
                                         >
                                             GitHub
                                             <span className='icon ml-2'>
-                                                <Icon name='fa-external-link-alt' size={16} />
+                                                <ExternalLink size={16} />
                                             </span>
                                         </a>
                                     </p>
@@ -232,7 +232,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <Icon name='fa-star' size={24} />
+                                <Star size={24} />
                             </span>
                             Functional Features
                         </h2>
@@ -242,7 +242,7 @@ const About: React.FC = () => {
                                     <div className='media'>
                                         <div className='media-left'>
                                             <span className='icon is-medium has-text-primary'>
-                                                <Icon name={feature.icon} size={32} />
+                                                <feature.icon size={32} />
                                             </span>
                                         </div>
                                         <div className='media-content'>
@@ -259,7 +259,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <Icon name='fa-cog' size={24} />
+                                <Settings size={24} />
                             </span>
                             Technical Features
                         </h2>
@@ -269,7 +269,7 @@ const About: React.FC = () => {
                                     <div className='media'>
                                         <div className='media-left'>
                                             <span className='icon is-medium has-text-primary'>
-                                                <Icon name={feature.icon} size={32} />
+                                                <feature.icon size={32} />
                                             </span>
                                         </div>
                                         <div className='media-content'>
@@ -286,7 +286,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-warning mr-2'>
-                                <Icon name='fa-tasks' size={24} />
+                                <CheckSquare size={24} />
                             </span>
                             Todo
                         </h2>
@@ -309,7 +309,7 @@ const About: React.FC = () => {
                                                         >
                                                             Link
                                                             <span className='icon ml-1 is-small'>
-                                                                <Icon name='fa-external-link-alt' size={16} />
+                                                                <ExternalLink size={16} />
                                                             </span>
                                                         </a>
                                                     </>
@@ -326,7 +326,7 @@ const About: React.FC = () => {
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>
                             <span className='icon has-text-primary mr-2'>
-                                <Icon name='fa-history' size={24} />
+                                <History size={24} />
                             </span>
                             Changelog
                         </h2>

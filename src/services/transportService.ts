@@ -1,7 +1,9 @@
+import React from 'react';
+import { Train, TramFront, Bus } from 'lucide-react';
 import type { Section } from '../client/models/section';
 
 export interface TransportIconInfo {
-    icon: string;
+    icon: React.ComponentType<{ size?: number | string; className?: string }>;
     color: string;
     tagColor: string;
     label: string;
@@ -15,30 +17,30 @@ export const getTransportIcon = (commercialMode: string | null | undefined, netw
     const net = (network || '').toLowerCase();
     
     if (mode.includes('tgv') || net.includes('tgv')) {
-        return { icon: 'fa-train', color: 'has-text-danger', tagColor: 'is-danger', label: 'TGV' };
+        return { icon: Train, color: 'has-text-danger', tagColor: 'is-danger', label: 'TGV' };
     }
     if (mode.includes('intercités') || net.includes('intercités') || mode.includes('intercity')) {
-        return { icon: 'fa-train', color: 'has-text-warning', tagColor: 'is-warning', label: 'Intercités' };
+        return { icon: Train, color: 'has-text-warning', tagColor: 'is-warning', label: 'Intercités' };
     }
     if (mode === 'ter' || net.includes('ter')) {
-        return { icon: 'fa-train', color: 'has-text-info', tagColor: 'is-info', label: 'TER' };
+        return { icon: Train, color: 'has-text-info', tagColor: 'is-info', label: 'TER' };
     }
     if (mode === 'fluo' || net.includes('fluo')) {
-        return { icon: 'fa-train', color: 'has-text-success', tagColor: 'is-success', label: 'FLUO' };
+        return { icon: Train, color: 'has-text-success', tagColor: 'is-success', label: 'FLUO' };
     }
     if (mode.includes('rer') || net.includes('rer')) {
-        return { icon: 'fa-subway', color: 'has-text-primary', tagColor: 'is-primary', label: 'RER' };
+        return { icon: Train, color: 'has-text-primary', tagColor: 'is-primary', label: 'RER' };
     }
     if (mode.includes('metro') || net.includes('metro')) {
-        return { icon: 'fa-subway', color: 'has-text-primary', tagColor: 'is-primary', label: 'Métro' };
+        return { icon: Train, color: 'has-text-primary', tagColor: 'is-primary', label: 'Métro' };
     }
     if (mode.includes('tram') || net.includes('tram')) {
-        return { icon: 'fa-tram', color: 'has-text-link', tagColor: 'is-link', label: 'Tram' };
+        return { icon: TramFront, color: 'has-text-link', tagColor: 'is-link', label: 'Tram' };
     }
     if (mode.includes('bus') || net.includes('bus')) {
-        return { icon: 'fa-bus', color: 'has-text-success', tagColor: 'is-success', label: 'Bus' };
+        return { icon: Bus, color: 'has-text-success', tagColor: 'is-success', label: 'Bus' };
     }
-    return { icon: 'fa-train', color: 'has-text-grey', tagColor: 'is-dark', label: commercialMode || 'Train' };
+    return { icon: Train, color: 'has-text-grey', tagColor: 'is-dark', label: commercialMode || 'Train' };
 };
 
 /**

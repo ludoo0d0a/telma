@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon } from '../utils/iconMapping';
+import { ArrowLeft } from 'lucide-react';
 import Footer from '../components/Footer';
 import { getCoverage, getCoverageDetails } from '../services/navitiaApi';
 import type { CoverageResponse, Coverage } from '../client/models';
@@ -223,7 +223,7 @@ const CoveragePage: React.FC = () => {
                                             className='button is-light'
                                             onClick={() => setSelectedCoverage(null)}
                                         >
-                                            <span className='icon'><Icon name='fa-arrow-left' size={20} /></span>
+                                            <span className='icon'><ArrowLeft size={20} /></span>
                                             <span>Retour à la liste</span>
                                         </button>
                                     </div>
