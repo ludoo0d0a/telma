@@ -62,6 +62,10 @@ export default defineConfig({
     hmr: {
       clientPort: 3000, // Use the same port for HMR WebSocket
     },
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+      'Cross-Origin-Embedder-Policy': 'unsafe-none',
+    },
   },
   build: {
     outDir: 'dist',

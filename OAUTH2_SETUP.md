@@ -61,14 +61,16 @@ The `@react-oauth/google` package should already be installed. Verify it's in yo
 ```json
 {
   "dependencies": {
-    "@react-oauth/google": "^0.13.0"
+    "@react-oauth/google": "0.13.0"
   }
 }
 ```
 
+**Important**: Use version `0.13.0` (exact version, not `^0.13.0` or `0.13.1`), as version `0.13.1` has a broken package publish missing the required `dist` folder.
+
 If it's not installed, run:
 ```bash
-npm install @react-oauth/google
+npm install @react-oauth/google@0.13.0
 ```
 
 ## Step 6: Implementation Overview
@@ -192,6 +194,19 @@ VITE_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXXXXXXX
 - Make sure you restarted your dev server after creating/updating `.env`
 - Verify the Client ID matches exactly what's in Google Cloud Console
 - Check that your domain/origin is added to **Authorized JavaScript origins**
+
+### "Cross-Origin-Opener-Policy policy would block the window.postMessage call" error
+
+This error occurs when the server's COOP headers block communication between the OAuth popup and the parent window.
+
+**Solution**: The project is already configured with the correct headers:
+- **Development**: Vite dev server is configured with `Cross-Origin-Opener-Policy: same-origin-allow-popups` in `vite.config.ts`
+- **Production**: Netlify is configured with the same headers in `netlify.toml`
+
+If you're still seeing this error:
+- Make sure you've restarted your dev server after any configuration changes
+- Check that your production server (if not using Netlify) has the correct headers set
+- Verify the headers are being sent by checking the Network tab in DevTools
 
 ### "redirect_uri_mismatch" error
 
