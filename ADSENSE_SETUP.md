@@ -63,6 +63,11 @@ The app uses Vite environment variables. Important notes:
 - Use `.env.example` to document required variables
 - **Restart your dev server** after changing `.env` file (Vite needs a restart to pick up new env vars)
 
+### Available Variables
+
+- `VITE_GOOGLE_ADSENSE_ID`: Your AdSense Publisher ID (e.g., `ca-pub-XXXXXXXXXXXXXXX`)
+- `VITE_SHOW_ADS`: Control whether ads are displayed. Set to `false` to hide all ads, or `true`/leave unset to show them (default: `true`)
+
 ## Testing
 
 Before going live:
@@ -80,11 +85,14 @@ Before going live:
 
 ## Troubleshooting
 
-- **Ads not showing?**: Make sure your site is approved by AdSense and `.env` file has correct ID
+- **Ads not showing?**: 
+  - Make sure your site is approved by AdSense and `.env` file has correct ID
+  - Check that `VITE_SHOW_ADS` is not set to `false` in your `.env` file
 - **Placeholder showing?**: 
   - Check that `VITE_GOOGLE_ADSENSE_ID` is set in `.env` file
   - Make sure you restarted your dev server after creating/updating `.env`
   - Verify the variable name is exactly `VITE_GOOGLE_ADSENSE_ID` (with `VITE_` prefix)
+- **Want to disable ads temporarily?**: Set `VITE_SHOW_ADS=false` in your `.env` file and restart the server
 - **Low revenue?**: Focus on increasing traffic and user engagement
 - **Environment variable not working?**: Remember that Vite requires the `VITE_` prefix and a server restart
 

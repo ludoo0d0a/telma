@@ -161,6 +161,7 @@ VITE_GOOGLE_CLIENT_ID=your_client_id_here.apps.googleusercontent.com
 VITE_API_KEY=your_sncf_api_key
 VITE_GA_TRACKING_ID=your_google_analytics_id
 VITE_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXXXXXXX
+VITE_SHOW_ADS=true  # Set to false to hide all ads
 ```
 
 ## Testing
