@@ -13,7 +13,7 @@ initGA();
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
     <React.StrictMode>
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GA_TRACKING_ID}>
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
             <BrowserRouter basename={import.meta.env.BASE_URL}>
                 <AuthProvider>
                     <App />

@@ -70,9 +70,10 @@ npm install
 touch .env
 ```
 
-4. Add your SNCF API key to the `.env` file:
+4. Add your environment variables to the `.env` file:
 ```env
 VITE_API_KEY=your_api_key_here
+VITE_GOOGLE_CLIENT_ID=your_google_oauth_client_id.apps.googleusercontent.com
 ```
 
 **Note**: The API key should be prefixed with your authentication method. For example:
@@ -83,6 +84,8 @@ or
 ```env
 VITE_API_KEY=Bearer your_token
 ```
+
+**For Google OAuth2 setup**, see [OAUTH2_SETUP.md](./OAUTH2_SETUP.md) for detailed instructions.
 
 ## 🎯 Usage
 
