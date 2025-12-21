@@ -285,7 +285,7 @@ const LocationDetection: React.FC = () => {
                 response = await getPlacesNearby(coordStr, 'sncf', {
                     type: ['stop_area', 'stop_point'],
                     count: 10,
-                    distance: 500, // Search within 500m
+                    distance: 2000, // Search within 2000m
                     depth: 2
                 });
             } catch (apiError: any) {
@@ -295,7 +295,7 @@ const LocationDetection: React.FC = () => {
                     try {
                         response = await getPlacesNearby(coordStr, 'sncf', {
                             count: 10,
-                            distance: 500,
+                            distance: 2000,
                             depth: 2
                         });
                     } catch (fallbackError: any) {
