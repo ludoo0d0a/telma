@@ -1,7 +1,7 @@
 import React from 'react';
 import Footer from '../components/Footer';
 import packageJson from '../../package.json';
-import { Info, Tag, ExternalLink, Star, Settings, CheckSquare, History, Train, Route, MapPin, Bus, Map, Search, Circle, BarChart3, Book, Code, Sitemap, Network, Palette, BookOpen, Wrench, Smartphone, TrendingUp, FlaskConical } from 'lucide-react';
+import { Info, Tag, ExternalLink, Star, Settings, CheckSquare, History, Train, Route, MapPin, Bus, Map, Search, Circle, BarChart3, Book, Code, Network, Palette, BookOpen, Wrench, Smartphone, TrendingUp, FlaskConical } from 'lucide-react';
 
 const About: React.FC = () => {
     const functionalFeatures = [
@@ -71,7 +71,7 @@ const About: React.FC = () => {
         {
             title: 'Routing',
             description: 'React Router DOM 7.11.0 for client-side navigation',
-            icon: Sitemap
+            icon: Route
         },
         {
             title: 'HTTP Client',
