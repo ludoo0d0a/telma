@@ -1,0 +1,53 @@
+.sample2-page {
+  background-color: #f4f4f8;
+  min-height: 100vh;
+  font-family: 'Helvetica Neue', sans-serif;
+
+  main {
+    padding: 20px 15px;
+  }
+
+  .flight-list {
+    .skytrip-flight-card.saved {
+      margin-bottom: 20px;
+
+      .card-header {
+        .airline {
+          display: flex;
+          align-items: center;
+          font-weight: 600;
+          font-size: 16px;
+
+          svg, i {
+            margin-right: 12px;
+            color: #1a73e8;
+          }
+        }
+
+        .fa-bookmark {
+          color: #ff8c00;
+          font-size: 20px;
+        }
+      }
+
+      .card-footer {
+        .date {
+          font-size: 15px;
+          color: #888;
+        }
+
+        .status-button {
+          background-color: #fff0e1;
+          border: none;
+          color: #ff8c00;
+          padding: 10px 18px;
+          border-radius: 15px;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+        }
+      }
+    }
+  }
+}
+

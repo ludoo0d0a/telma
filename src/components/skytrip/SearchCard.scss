@@ -1,0 +1,87 @@
+.skytrip-search-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin-top: -80px;
+    position: relative;
+    z-index: 1;
+
+    .form {
+        .input-group {
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+            padding: 10px;
+
+            label {
+                display: block;
+                font-size: 0.8em;
+                color: #aaa;
+                margin-bottom: 5px;
+            }
+
+            input {
+                border: none;
+                width: 100%;
+                font-size: 1.1em;
+                font-weight: bold;
+                background-color: transparent;
+                
+                &:focus {
+                    outline: none;
+                }
+            }
+
+            span {
+                font-size: 0.9em;
+                color: #777;
+            }
+        }
+
+        .swap-icon {
+            text-align: center;
+            margin: -25px 0;
+            position: relative;
+            z-index: 1;
+            cursor: pointer;
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 50%;
+            border: 2px solid white;
+            width: 40px;
+            height: 40px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+
+            svg {
+                background-color: transparent;
+                color: #777;
+            }
+        }
+
+        .inline-inputs {
+            display: flex;
+            gap: 15px;
+
+            .input-group {
+                flex: 1;
+            }
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #ff6f00;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.2em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    }
+}
+

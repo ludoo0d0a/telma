@@ -1,0 +1,107 @@
+.skytrip-flight-timeline {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+
+    .time {
+        font-size: 0.9em;
+        color: #555;
+        min-width: 80px;
+    }
+
+    .timeline-line {
+        flex: 1;
+        height: 1px;
+        background-color: #eee;
+        margin: 0 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ff6f00;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 2;
+            top: 50%;
+            transform: translateY(-50%);
+
+            &.start-dot {
+                left: 0;
+            }
+
+            &.end-dot {
+                right: 0;
+            }
+        }
+
+        .plane-icon {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%) translateY(-50%);
+            top: 50%;
+            z-index: 3;
+            background: transparent;
+            padding: 0 5px;
+
+            svg {
+                color: #ff6f00;
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        .duration-info {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: -25px;
+            text-align: center;
+            z-index: 1;
+
+            .duration {
+                font-size: 13px;
+                color: #888;
+                margin-bottom: 2px;
+            }
+
+            .type {
+                font-size: 13px;
+                color: #888;
+            }
+        }
+    }
+
+    &.compact {
+        margin: 0;
+
+        .time {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .timeline-line {
+            margin: 0 15px;
+
+            .dot {
+                background-color: #ff8c00;
+            }
+
+            .plane-icon svg {
+                color: #ff8c00;
+            }
+        }
+    }
+
+    &.detailed {
+        .timeline-line {
+            border-top: 1px dashed #ddd;
+            background: transparent;
+        }
+    }
+}
+
