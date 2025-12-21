@@ -13,9 +13,9 @@ const Sample1: React.FC = () => {
                         <h2>Andrew Ainsley</h2>
                     </div>
                 </div>
-                <div className="notification">
+                <button className="notification">
                     <Icon name="fa-bell" />
-                </div>
+                </button>
             </header>
 
             <main className="main-content">
