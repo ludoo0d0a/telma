@@ -30,7 +30,7 @@ import { SidebarProvider, useSidebar } from './contexts/SidebarContext'
 const AppContent: React.FC = () => {
     const location = useLocation()
     const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
-    const isSamplePage = location.pathname === '/sample1' || location.pathname === '/sample2' || location.pathname === '/sample3';
+    const useMobileView = location.pathname === '/sample1' || location.pathname === '/sample2' || location.pathname === '/sample3';
 
     useEffect(() => {
         // Track page view on route change
@@ -39,8 +39,8 @@ const AppContent: React.FC = () => {
 
     return (
         <div className='App'>
-            {!isSamplePage && <Sidebar isOpen={isOpen} onClose={closeSidebar} />}
-            {!isSamplePage && <Header />}
+            {!useMobileView && <Sidebar isOpen={isOpen} onClose={closeSidebar} />}
+            {!useMobileView && <Header />}
               { /*  <Snowfall
                 style={{
                     position: 'fixed',
@@ -74,7 +74,7 @@ const AppContent: React.FC = () => {
                 <Route path='/sample3' element={<Sample3 />} />
                 <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
-            {!isSamplePage && <BottomNavbar onMoreClick={toggleSidebar} />}
+            {!useMobileView && <BottomNavbar onMoreClick={toggleSidebar} />}
         </div>
     )
 }
