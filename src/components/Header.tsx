@@ -1,19 +1,26 @@
-import React from 'react';
+
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSidebar } from '../contexts/SidebarContext';
+import LoginButton from './LoginButton';
 
 const Header: React.FC = () => {
     const { toggleSidebar } = useSidebar();
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen(!isMenuOpen);
+    };
 
     return (
         <nav className='navbar is-primary' role='navigation' aria-label='main navigation'>
             <div className='navbar-brand'>
                 <a
                     role='button'
-                    className='navbar-burger'
+                    className={`navbar-burger ${isMenuOpen ? 'is-active' : ''}`}
                     aria-label='menu'
-                    aria-expanded='false'
-                    onClick={toggleSidebar}
+                    aria-expanded={isMenuOpen}
+                    onClick={toggleMenu}
                 >
                     <span aria-hidden='true'></span>
                     <span aria-hidden='true'></span>
@@ -31,7 +38,7 @@ const Header: React.FC = () => {
                 </Link>
             </div>
 
-            <div className='navbar-menu is-hidden-mobile'>
+            <div className={`navbar-menu ${isMenuOpen ? 'is-active' : ''}`}>
                 <div className='navbar-start'>
                     <Link to='/' className='navbar-item'>
                         Accueil
@@ -64,10 +71,16 @@ const Header: React.FC = () => {
                         Isochrones
                     </Link>
                 </div>
+                <div className="navbar-end">
+                    <div className="navbar-item">
+                        <div className="buttons">
+                            <LoginButton />
+                        </div>
+                    </div>
+                </div>
             </div>
         </nav>
     )
 }
 
 export default Header;
-

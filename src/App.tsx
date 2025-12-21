@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import LoginPopup from './components/LoginPopup'
 import TrainStation from './components/TrainStation'
 import City from './pages/City'
 import Home from './pages/Home'
@@ -27,14 +28,28 @@ import { SidebarProvider, useSidebar } from './contexts/SidebarContext'
 const AppContent: React.FC = () => {
     const location = useLocation()
     const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
+    const [showLoginPopup, setShowLoginPopup] = useState(false);
+
+    useEffect(() => {
+        const hasVisited = localStorage.getItem('hasVisited');
+        if (!hasVisited) {
+            setShowLoginPopup(true);
+            localStorage.setItem('hasVisited', 'true');
+        }
+    }, []);
 
     useEffect(() => {
         // Track page view on route change
         trackPageView(location.pathname + location.search)
     }, [location])
 
+    const handleClosePopup = () => {
+        setShowLoginPopup(false);
+    };
+
     return (
         <div className='App'>
+            {showLoginPopup && <LoginPopup onClose={handleClosePopup} />}
             <Sidebar isOpen={isOpen} onClose={closeSidebar} />
             <Header />
               { /*  <Snowfall
