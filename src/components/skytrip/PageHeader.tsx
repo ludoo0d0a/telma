@@ -35,7 +35,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     selectedDate
 }) => {
     const navigate = useNavigate();
-    
+
     const handleBack = () => {
         if (onBack) {
             onBack();
@@ -51,18 +51,18 @@ const PageHeader: React.FC<PageHeaderProps> = ({
             <div className="header-top">
                 {showBack && (
                     <button onClick={handleBack} className="back-button">
-                        <ArrowLeft size={20} color="white" />
+                        <ArrowLeft size={20} strokeWidth={2} />
                     </button>
                 )}
                 <h1>{title}</h1>
                 {showSearch && (
                     <button className="search-button" onClick={onSearch}>
-                        <Search size={20} color="white" />
+                        <Search size={20} strokeWidth={2} />
                     </button>
                 )}
                 {showMenu && (
                     <button className="menu-button" onClick={onMenu}>
-                        <MoreVertical size={20} color="white" />
+                        <MoreVertical size={20} strokeWidth={2} />
                     </button>
                 )}
             </div>
@@ -77,7 +77,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                         <div className="route-connector">
                             <div className="dotted-line"></div>
                             <div className="plane-icon">
-                                <Plane size={20} color="white" />
+                                <Plane size={20} strokeWidth={2} />
                             </div>
                             {route.duration && <p className="duration">{route.duration}</p>}
                         </div>
