@@ -1,5 +1,7 @@
 # API-SNCF - Horaires des trains en direct
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/bc12e890-b7b2-4d06-8312-4ad0e04be5d3/deploy-status)](https://app.netlify.com/projects/telma-train/deploys)
+
 A React-based web application for viewing real-time train schedules and information from the SNCF (French National Railway Company) API. This application provides an intuitive interface to explore train stations, departures, arrivals, journeys, and various other SNCF API endpoints.
 
 ![Screenshot 1](https://github.com/ludoo0d0a/telma/assets/75996200/02b43094-0dfa-4aea-ae8a-9af003d440c4)
@@ -7,6 +9,13 @@ A React-based web application for viewing real-time train schedules and informat
 ![Screenshot 2](https://github.com/ludoo0d0a/telma/assets/75996200/a136cab1-de45-4f2f-9bdc-ba851845e75a)
 
 ![Screenshot 3](https://github.com/ludoo0d0a/telma/assets/75996200/65a2739d-708a-4985-b887-8be8d811312c)
+
+## Design inspiration
+
+[Sky Trip - Flight Booking App](https://dribbble.com/shots/26215027-Sky-Trip-Flight-Booking-App)
+by Afzal Masud 🔥 for Kitify Studio
+
+![skytrip.webp](samples/skytrip.webp)
 
 ## 🌐 Live Demo
 
@@ -96,6 +105,30 @@ npm run build
 ### Deploy
 
 Deployment to GitHub Pages is automated. Every push to the `main` branch will trigger a new deployment.
+
+#### Netlify Deployment
+
+Netlify deployment is automated via GitHub Actions. To set it up:
+
+1. Create a Netlify account and create a new site
+2. **Disable Netlify's automatic builds** (since we're using GitHub Actions):
+   - Go to your site settings in Netlify
+   - Navigate to **Build & deploy > Continuous Deployment**
+   - Click **Stop auto publishing** or disable the build hook
+   - This ensures only GitHub Actions controls deployments
+3. Get your Netlify Auth Token:
+   - Go to [Netlify User Settings > Applications > New access token](https://app.netlify.com/user/applications)
+   - Create a new access token
+4. Get your Site ID:
+   - Go to your site settings in Netlify
+   - Under "Site details", copy the Site ID
+5. Add the following secrets to your GitHub repository:
+   - `NETLIFY_AUTH_TOKEN`: Your Netlify access token
+   - `NETLIFY_SITE_ID`: Your Netlify site ID
+
+The workflow will automatically:
+- Deploy to production on pushes to `main`
+- Create preview deployments for pull requests
 
 Deploy to Vercel:
 ```bash

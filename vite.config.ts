@@ -15,6 +15,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      base: BASE_URL,
       workbox: {
         maximumFileSizeToCacheInBytes: 3000000
       },
@@ -56,7 +57,11 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true, // Listen on all addresses
     open: true,
+    hmr: {
+      clientPort: 3000, // Use the same port for HMR WebSocket
+    },
   },
   build: {
     outDir: 'dist',

@@ -142,7 +142,7 @@ const Schedules: React.FC = () => {
                             <div className='field'>
                                 <div className='control'>
                                     <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'><i className={`fas ${loading ? 'fa-spinner fa-spin' : 'fa-search'}`}></i></span>
+                                        <span className='icon'><Icon name={loading ? 'fa-spinner' : 'fa-search'} spin={loading} size={16} /></span>
                                         <span>{loading ? 'Chargement...' : 'Rechercher'}</span>
                                     </button>
                                 </div>

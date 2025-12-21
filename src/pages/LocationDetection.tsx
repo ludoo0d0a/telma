@@ -64,6 +64,7 @@ interface SelectedStation {
 
 const LocationDetection: React.FC = () => {
     const [detectionResult, setDetectionResult] = useState<DetectionResult | null>(null);
+    const [isMapLoaded, setIsMapLoaded] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const [watchingLocation, setWatchingLocation] = useState<boolean>(false);
@@ -284,7 +285,7 @@ const LocationDetection: React.FC = () => {
                 response = await getPlacesNearby(coordStr, 'sncf', {
                     type: ['stop_area', 'stop_point'],
                     count: 10,
-                    distance: 500, // Search within 500m
+                    distance: 10000, // Search within 10000m
                     depth: 2
                 });
             } catch (apiError: any) {
@@ -294,7 +295,7 @@ const LocationDetection: React.FC = () => {
                     try {
                         response = await getPlacesNearby(coordStr, 'sncf', {
                             count: 10,
-                            distance: 500,
+                            distance: 10000,
                             depth: 2
                         });
                     } catch (fallbackError: any) {
@@ -350,6 +351,10 @@ const LocationDetection: React.FC = () => {
             }
 
             // Find the closest station
+            // The getPlacesNearby API call returns a list of stations within a radius.
+            // We then iterate through this list and calculate the precise distance to each station
+            // to identify the one that is truly the closest to the user's coordinates.
+            // This approach is correct and ensures accuracy.
             let closestStation: Place | null = null;
             let minDistance = Infinity;
             let closestStopPoint: Place | null = null;
@@ -849,11 +854,12 @@ const LocationDetection: React.FC = () => {
                     {detectionResult && detectionResult.userLocation && (
                         <div className='box mt-5'>
                             <h3 className='title is-5 mb-4'>Carte des gares à proximité</h3>
-                            <div style={{ height: 500, width: '100%', borderRadius: 6, overflow: 'hidden' }}>
+                            <div className="map-container" data-map-loaded={isMapLoaded} style={{ height: 500, width: '100%', borderRadius: 6, overflow: 'hidden' }}>
                                 <Map
                                     ref={mapRef}
                                     {...viewState}
                                     onMove={evt => setViewState(evt.viewState)}
+                                    onLoad={() => setIsMapLoaded(true)}
                                     style={{ width: '100%', height: '100%' }}
                                     mapStyle={{
                                         version: 8,

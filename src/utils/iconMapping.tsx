@@ -58,6 +58,13 @@ const iconMap: Record<string, keyof typeof LucideIcons> = {
   'fa-tram': 'TramFront',
   'fa-traffic-light': 'TrafficCone',
   'fa-ad': 'Info', // Using Info as fallback for ad icon
+  'fa-bell': 'Bell',
+  'fa-arrow-left-right': 'ArrowLeftRight',
+  'fa-plane': 'Plane',
+  'fa-plane-departure': 'PlaneTakeoff',
+  'fa-bookmark': 'Bookmark',
+  'fa-ellipsis-v': 'MoreVertical',
+  'fa-ellipsis-h': 'MoreHorizontal',
 };
 
 export interface IconProps {
