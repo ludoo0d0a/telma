@@ -18,6 +18,7 @@ import Trip from './pages/Trip'
 import About from './pages/About'
 import LocationDetection from './pages/LocationDetection'
 import Sample1 from './pages/Sample1'
+import Sample2 from './pages/Sample2'
 import Snowfall from 'react-snowfall'
 import { trackPageView } from './utils/analytics'
 import BottomNavbar from './components/BottomNavbar'
@@ -28,7 +29,7 @@ import { SidebarProvider, useSidebar } from './contexts/SidebarContext'
 const AppContent: React.FC = () => {
     const location = useLocation()
     const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
-    const isSamplePage = location.pathname === '/sample1';
+    const isSamplePage = location.pathname === '/sample1' || location.pathname === '/sample2';
 
     useEffect(() => {
         // Track page view on route change
@@ -68,6 +69,7 @@ const AppContent: React.FC = () => {
                 </Route>
                 <Route path='/about' element={<About />} />
                 <Route path='/sample1' element={<Sample1 />} />
+                <Route path='/sample2' element={<Sample2 />} />
             </Routes>
             {!isSamplePage && <BottomNavbar onMoreClick={toggleSidebar} />}
         </div>

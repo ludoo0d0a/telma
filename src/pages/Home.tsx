@@ -93,6 +93,13 @@ const Home: React.FC = () => {
             path: '/sample1',
             icon: 'fa-arrow-right',
             color: 'secondary'
+        },
+        {
+            title: 'Saved Flights',
+            description: 'Sample 2 page',
+            path: '/sample2',
+            icon: 'fa-bookmark',
+            color: 'secondary'
         }
     ];
 
