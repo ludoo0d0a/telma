@@ -9,7 +9,7 @@ import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJ
 import { encodeVehicleJourneyId } from '../utils/uriUtils';
 import { MapPin, RefreshCw, Square, Loader2, CheckCircle2, Train, Info, AlertTriangle } from 'lucide-react';
 import { cleanLocationName } from '../services/locationService';
-import { parseUTCDate } from '../components/Utils';
+import { parseUTCDate } from '../utils/dateUtils';
 import type { Place } from '../client/models/place';
 import type { Departure } from '../client/models/departure';
 import type { Arrival } from '../client/models/arrival';

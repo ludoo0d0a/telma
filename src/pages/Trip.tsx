@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import GeoJSONMap from '../components/GeoJSONMap';
-import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
+import { parseUTCDate, formatTime, formatDate } from '../utils/dateUtils';
 import { cleanLocationName } from '../services/locationService';
 import { getTransportIcon } from '../services/transportService';
 import { getDelay } from '../services/delayService';

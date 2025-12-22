@@ -7,7 +7,7 @@ import Ad from '../components/Ad';
 import { autocompletePT } from '../services/navitiaApi';
 import { getVehicleJourney } from '../services/vehicleJourneyService';
 import { encodeVehicleJourneyId, decodeVehicleJourneyId } from '../utils/uriUtils';
-import { parseUTCDate, formatTime } from '../components/Utils';
+import { parseUTCDate, formatTime } from '../utils/dateUtils';
 import { calculateDelay } from '../services/delayService';
 import { cleanLocationName } from '../services/locationService';
 import { getTransportIcon } from '../services/transportService';

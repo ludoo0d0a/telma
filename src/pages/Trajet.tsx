@@ -4,7 +4,7 @@ import Footer from '../components/Footer';
 import Ad from '../components/Ad';
 import LocationAutocomplete from '../components/LocationAutocomplete';
 import { getJourneys, formatDateTime } from '../services/navitiaApi';
-import { parseUTCDate, formatTime, formatDate } from '../components/Utils';
+import { parseUTCDate, formatTime, formatDate } from '../utils/dateUtils';
 import { cleanLocationName } from '../services/locationService';
 import { getDelay, getMaxDelay } from '../services/delayService';
 import { getJourneyInfo, type JourneyInfo } from '../services/journeyService';
