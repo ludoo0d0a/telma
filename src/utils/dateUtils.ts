@@ -52,4 +52,33 @@ export const formatDate = (date: Date | null | undefined, format: 'full' | 'shor
     return `${days[date.getDay()]} ${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
 }
 
+/**
+ * Format a date string from YYYYMMDD to DD/MM/YYYY
+ */
+export const formatDateString = (dateString: string | undefined): string => {
+    if (!dateString || dateString.length !== 8) return dateString || '';
+    const year = dateString.substring(0, 4);
+    const month = dateString.substring(4, 6);
+    const day = dateString.substring(6, 8);
+    return `${day}/${month}/${year}`;
+};
+
+/**
+ * Format a datetime string from YYYYMMDDTHHmmss to readable format (DD/MM/YYYY HH:mm:ss)
+ */
+export const formatDateTimeString = (dateTimeString: string | undefined): string => {
+    if (!dateTimeString) return 'N/A';
+    try {
+        const date = dateTimeString.substring(0, 8);
+        const time = dateTimeString.substring(9);
+        const formattedDate = formatDateString(date);
+        const hours = time.substring(0, 2);
+        const minutes = time.substring(2, 4);
+        const seconds = time.substring(4, 6);
+        return `${formattedDate} ${hours}:${minutes}:${seconds}`;
+    } catch (err) {
+        return dateTimeString;
+    }
+};
+
 

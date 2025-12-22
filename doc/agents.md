@@ -328,6 +328,7 @@ Size guidelines:
 5. **Styling**: Use SCSS modules for component-specific styles
 6. **TypeScript**: All components should be typed with proper interfaces
 7. **State Management**: Use React hooks for local state management
+8. **Date Management**: All date formatting and parsing utilities are centralized in `src/utils/dateUtils.ts`. Use functions like `formatDateString()`, `formatDateTimeString()`, `parseUTCDate()`, `formatDate()`, and `formatTime()` from this module instead of creating duplicate date handling code.
 
 ## API Client Architecture
 
