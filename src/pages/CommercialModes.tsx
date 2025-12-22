@@ -2,6 +2,10 @@ import React, { useState, useEffect } from 'react';
 import Footer from '@/components/Footer';
 import { getCommercialModes } from '@/services/navitiaApi';
 import type { CommercialMode } from '@/client/models/commercial-mode';
+import CommercialModesHeader from '@/components/commercialModes/CommercialModesHeader';
+import CommercialModesLoadingState from '@/components/commercialModes/CommercialModesLoadingState';
+import CommercialModesErrorState from '@/components/commercialModes/CommercialModesErrorState';
+import CommercialModesList from '@/components/commercialModes/CommercialModesList';
 
 const CommercialModes: React.FC = () => {
     const [modes, setModes] = useState<CommercialMode[]>([]);
@@ -30,60 +34,18 @@ const CommercialModes: React.FC = () => {
         <>
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Modes de transport <span>SNCF</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
+                    <CommercialModesHeader />
 
-                    {loading && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des modes de transport...</p>
-                        </div>
-                    )}
+                    {loading && <CommercialModesLoadingState />}
 
                     {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                        </div>
+                        <CommercialModesErrorState
+                            error={error}
+                            onDismiss={() => setError(null)}
+                        />
                     )}
 
-                    {!loading && !error && (
-                        <div className='box'>
-                            <h2 className='title is-4 mb-5'>
-                                Modes disponibles <span className='tag is-primary is-medium'>{modes.length}</span>
-                            </h2>
-                            {modes.length === 0 ? (
-                                <div className='has-text-centered'>
-                                    <p className='subtitle is-5'>Aucun mode de transport trouvé</p>
-                                </div>
-                            ) : (
-                                <div className='columns is-multiline'>
-                                    {modes.map((mode) => (
-                                        <div key={mode.id} className='column is-half-tablet is-one-third-desktop is-half-mobile'>
-                                            <div className='box'>
-                                                <h3 className='title is-5 mb-3'>
-                                                    {mode.name || 'Non spécifié'}
-                                                </h3>
-                                                <div className='content'>
-                                                    <p><strong>ID:</strong> <code>{mode.id}</code></p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    )}
+                    {!loading && !error && <CommercialModesList modes={modes} />}
                 </div>
             </section>
             <Footer />
