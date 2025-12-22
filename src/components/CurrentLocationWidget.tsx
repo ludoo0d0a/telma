@@ -6,6 +6,7 @@ import { cleanLocationName } from '@/services/locationService';
 import { parseUTCDate } from '@/utils/dateUtils';
 import { Loader2, AlertTriangle, MapPin, Train, Ruler } from 'lucide-react';
 import {DEFAULT_RADIUS_NEARBY, DEFAULT_RADIUS_NEARBY_LARGE} from "@/pages/LocationDetection";
+import {StopAreasResponse} from "@/client";
 
 interface CurrentLocationInfo {
     station?: {
@@ -56,8 +57,8 @@ const CurrentLocationWidget: React.FC = () => {
             ]);
 
             const allTrains = [
-                ...(departuresResponse.data.departures || []),
-                ...(arrivalsResponse.data.arrivals || [])
+                ...(departuresResponse.departures || []),
+                ...(arrivalsResponse.arrivals || [])
             ];
 
             // Find the closest train by checking stop times
@@ -156,7 +157,7 @@ const CurrentLocationWidget: React.FC = () => {
 
             // Find nearby stations
             const coordStr = `${longitude};${latitude}`;
-            let response;
+            let response:StopAreasResponse ;
             try {
                 response = await getPlacesNearby(coordStr, 'sncf', {
                     type: ['stop_area', 'stop_point'],
@@ -189,11 +190,7 @@ const CurrentLocationWidget: React.FC = () => {
                 }
             }
 
-            const places = response.data.places || [];
-            const stations = places.filter(place =>
-                place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
-            );
-
+            const stations = response.stop_areas || [];
             if (stations.length === 0) {
                 setLocationInfo({
                     loading: false,
@@ -207,11 +204,7 @@ const CurrentLocationWidget: React.FC = () => {
             let minDistance = Infinity;
 
             for (const station of stations) {
-                const coord = station.coord ||
-                    station.stop_area?.coord ||
-                    station.stop_point?.coord ||
-                    station.stop_point?.stop_area?.coord;
-
+                const coord = station.coord;
                 if (coord?.lat && coord?.lon) {
                     const distance = calculateDistance(latitude, longitude, coord.lat, coord.lon);
                     if (distance < minDistance) {

@@ -3,13 +3,10 @@
  *
  * This service wraps the generated NavitiaClient to provide typed API responses.
  *
- * All functions return the full Axios response object with typed .data property.
- * Access the typed data via response.data (e.g., response.data.journeys)
+ * All functions return the typed data directly (e.g., response.journeys)
  */
 
 import { NavitiaClient } from '@/client/client';
-import type { AxiosPromise } from 'axios';
-import axios from 'axios';
 import type {
     Journey,
     JourneyItem,
@@ -38,8 +35,7 @@ import type {
     CoverageCoverageCoordCoordFreefloatingsGet200Response
 } from '@/client/models';
 import type {
-    CoverageCoveragePlacesGetTypeEnum,
-    CoverageCoveragePlacesNearbyGetTypeEnum
+    CoverageCoveragePlacesGetTypeEnum
 } from '@/client/api/places-api';
 import {DEFAULT_RADIUS_NEARBY} from "@/pages/LocationDetection";
 
@@ -156,20 +152,22 @@ interface IsochronesParams {
 /**
  * Get commercial modes available in SNCF API
  */
-export const getCommercialModes = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<CommercialModesResponse> =>
-    getClient().transportModes.coverageCoverageCommercialModesGet(coverage);
+export const getCommercialModes = async (coverage: string = DEFAULT_COVERAGE): Promise<CommercialModesResponse> => {
+    const response = await getClient().transportModes.coverageCoverageCommercialModesGet(coverage);
+    return response.data;
+};
 
 /**
  * Get journeys between two locations
  */
-export const getJourneys = (
+export const getJourneys = async (
     from: string,
     to: string,
     datetime: string | null = null,
     coverage: string = DEFAULT_COVERAGE,
     params: JourneyParams = {}
-): AxiosPromise<Journey> =>
-    getClient().journeys.coverageCoverageJourneysGet(
+): Promise<Journey> => {
+    const response = await getClient().journeys.coverageCoverageJourneysGet(
         coverage,
         from,
         to,
@@ -181,46 +179,54 @@ export const getJourneys = (
         params.min_nb_journeys || undefined,
         params.timeframe_duration || undefined
     );
+    return response.data;
+};
 
 /**
  * Get departures from a stop area
  */
-export const getDepartures = (
+export const getDepartures = async (
     stopAreaId: string,
     datetime: string | null = null,
     coverage: string = DEFAULT_COVERAGE,
     params: DepartureArrivalParams = {}
-): AxiosPromise<DeparturesResponse> =>
-    getClient().departures.coverageCoverageStopAreasIdDeparturesGet(
+): Promise<DeparturesResponse> => {
+    const response = await getClient().departures.coverageCoverageStopAreasIdDeparturesGet(
         coverage,
         stopAreaId,
         datetime || undefined,
         params.count || undefined,
         params.depth || undefined
     );
+    return response.data;
+};
 
 /**
  * Get arrivals to a stop area
  */
-export const getArrivals = (
+export const getArrivals = async (
     stopAreaId: string,
     datetime: string | null = null,
     coverage: string = DEFAULT_COVERAGE,
     params: DepartureArrivalParams = {}
-): AxiosPromise<ArrivalsResponse> =>
-    getClient().arrivals.coverageCoverageStopAreasIdArrivalsGet(
+): Promise<ArrivalsResponse> => {
+    const response = await getClient().arrivals.coverageCoverageStopAreasIdArrivalsGet(
         coverage,
         stopAreaId,
         datetime || undefined,
         params.count || undefined,
         params.depth || undefined
     );
+    return response.data;
+};
 
 /**
  * Get all available coverages
  */
-export const getCoverages = (): AxiosPromise<CoverageResponse> =>
-    getClient().coverage.coverageGet();
+export const getCoverages = async (): Promise<CoverageResponse> => {
+    const response = await getClient().coverage.coverageGet();
+    return response.data;
+};
 
 /**
  * Get coverage areas (alias for getCoverages for backward compatibility)
@@ -230,55 +236,65 @@ export const getCoverage = getCoverages;
 /**
  * Get specific coverage area details
  */
-export const getCoverageDetails = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<CoverageResponse> =>
-    getClient().coverage.coverageCoverageGet(coverage);
+export const getCoverageDetails = async (coverage: string = DEFAULT_COVERAGE): Promise<Coverage> => {
+    const response = await getClient().coverage.coverageCoverageGet(coverage);
+    return response.data;
+};
 
 /**
  * Get physical modes
  */
-export const getPhysicalModes = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<PhysicalModesResponse> =>
-    getClient().transportModes.coverageCoveragePhysicalModesGet(coverage);
+export const getPhysicalModes = async (coverage: string = DEFAULT_COVERAGE): Promise<PhysicalModesResponse> => {
+    const response = await getClient().transportModes.coverageCoveragePhysicalModesGet(coverage);
+    return response.data;
+};
 
 /**
  * Get all lines
  */
-export const getLines = (coverage: string = DEFAULT_COVERAGE, params: LinesParams = {}): AxiosPromise<LinesResponse> =>
-    getClient().publicTransportObjects.coverageCoverageLinesGet(coverage);
+export const getLines = async (coverage: string = DEFAULT_COVERAGE, params: LinesParams = {}): Promise<LinesResponse> => {
+    const response = await getClient().publicTransportObjects.coverageCoverageLinesGet(coverage);
+    return response.data;
+};
 
 /**
  * Get all stop areas
  */
-export const getStopAreas = (coverage: string = DEFAULT_COVERAGE, params: StopAreasParams = {}): AxiosPromise<StopAreasResponse> =>
-    getClient().publicTransportObjects.coverageCoverageStopAreasGet(coverage);
+export const getStopAreas = async (coverage: string = DEFAULT_COVERAGE, params: StopAreasParams = {}): Promise<StopAreasResponse> => {
+    const response = await getClient().publicTransportObjects.coverageCoverageStopAreasGet(coverage);
+    return response.data;
+};
 
 /**
  * Search for places (geographical autocomplete)
  */
-export const searchPlaces = (
+export const searchPlaces = async (
     query: string,
     coverage: string = DEFAULT_COVERAGE,
     params: PlacesParams = {}
-): AxiosPromise<PlacesResponse> =>
-    getClient().places.coverageCoveragePlacesGet(
+): Promise<PlacesResponse> => {
+    const response = await getClient().places.coverageCoveragePlacesGet(
         coverage,
         query,
         params.count || undefined,
         params.type ? (Array.isArray(params.type) ? params.type as CoverageCoveragePlacesGetTypeEnum[] : [params.type] as CoverageCoveragePlacesGetTypeEnum[]) : undefined,
         params.depth || undefined
     );
+    return response.data;
+};
 
 /**
  * Autocomplete on geographical objects (alias for searchPlaces)
  */
-export const autocompleteGeo = (
+export const autocompleteGeo = async (
     q: string,
     coverage: string = DEFAULT_COVERAGE,
     count: number = 10,
     type: string | null = null
-): AxiosPromise<PlacesResponse> => {
+): Promise<PlacesResponse> => {
     const params: PlacesParams = { count };
     if (type) params.type = type;
-    return searchPlaces(q, coverage, params);
+    return await searchPlaces(q, coverage, params);
 };
 
 /**
@@ -286,13 +302,13 @@ export const autocompleteGeo = (
  * Uses the path-based endpoint format: /coverage/{coverage}/coord/{coord}/stop_areas
  * This endpoint returns stop areas within a certain distance from coordinates
  */
-export const getPlacesNearby = (
+export const getPlacesNearby = async (
     coord: string | null,
     latOrCoverage: string | number = DEFAULT_COVERAGE,
     lonOrParams: number | PlacesNearbyParams = {},
     coverageOrDistance: string | number = DEFAULT_RADIUS_NEARBY,
     paramsOrType: string | null = null
-): AxiosPromise<StopAreasResponse> => {
+): Promise<StopAreasResponse> => {
     let coverage: string;
     let coordStr: string;
     let params: PlacesNearbyParams;
@@ -316,25 +332,27 @@ export const getPlacesNearby = (
 
     // Use the generated client method with the stop_areas endpoint
     // Note: The stop_areas endpoint doesn't support type filtering, so we ignore the type parameter if provided
-    return getClient().places.coverageCoverageCoordCoordStopAreasGet(
+    const axiosResponse = await getClient().places.coverageCoverageCoordCoordStopAreasGet(
         coverage,
         coordStr,
         params.distance || undefined,
         params.count || undefined,
         params.depth || undefined
     );
+    
+    return axiosResponse.data;
 };
 
 /**
  * Stop areas nearby using lat/lon separately (convenience function)
  */
-export const placesNearby = (
+export const placesNearby = async (
     lat: number,
     lon: number,
     coverage: string = DEFAULT_COVERAGE,
     distance: number = 200,
     type: string | null = null
-): AxiosPromise<StopAreasResponse> => {
+): Promise<StopAreasResponse> => {
     const coordStr = `${lon};${lat}`;
     const params: PlacesNearbyParams = { distance };
     // Note: type parameter is ignored as the stop_areas endpoint doesn't support type filtering
@@ -344,69 +362,74 @@ export const placesNearby = (
 /**
  * Get stop schedules
  */
-export const getStopSchedules = (
+export const getStopSchedules = async (
     filterOrStopPointId: string,
     fromDatetimeOrCoverage: string = DEFAULT_COVERAGE,
     coverageOrParams: string | null = null,
     params: StopSchedulesParams = {}
-): AxiosPromise<StopSchedulesResponse> => {
+): Promise<StopSchedulesResponse> => {
+    let response;
     if (filterOrStopPointId.includes('=') || filterOrStopPointId.startsWith('stop_area') || filterOrStopPointId.startsWith('stop_point')) {
-        return getClient().schedules.coverageCoverageStopSchedulesGet(
+        response = await getClient().schedules.coverageCoverageStopSchedulesGet(
             fromDatetimeOrCoverage,
             filterOrStopPointId,
             coverageOrParams || undefined
         );
     } else {
-        return getClient().schedules.coverageCoverageStopPointsIdStopSchedulesGet(
+        response = await getClient().schedules.coverageCoverageStopPointsIdStopSchedulesGet(
             coverageOrParams || DEFAULT_COVERAGE,
             filterOrStopPointId,
             fromDatetimeOrCoverage || undefined
         );
     }
+    return response.data;
 };
 
 /**
  * Get route schedules
  */
-export const getRouteSchedules = (
+export const getRouteSchedules = async (
     filterOrRouteId: string,
     fromDatetimeOrCoverage: string = DEFAULT_COVERAGE,
     coverageOrParams: string | null = null,
     params: RouteSchedulesParams = {}
-): AxiosPromise<RouteSchedulesResponse> => {
+): Promise<RouteSchedulesResponse> => {
+    let response;
     if (filterOrRouteId.includes('=') || filterOrRouteId.startsWith('line') || filterOrRouteId.startsWith('route')) {
-        return getClient().schedules.coverageCoverageRouteSchedulesGet(
+        response = await getClient().schedules.coverageCoverageRouteSchedulesGet(
             fromDatetimeOrCoverage,
             filterOrRouteId,
             coverageOrParams || undefined
         );
     } else {
-        return getClient().schedules.coverageCoverageRoutesIdRouteSchedulesGet(
+        response = await getClient().schedules.coverageCoverageRoutesIdRouteSchedulesGet(
             coverageOrParams || DEFAULT_COVERAGE,
             filterOrRouteId,
             fromDatetimeOrCoverage || undefined
         );
     }
+    return response.data;
 };
 
 /**
  * Get terminus schedules
  */
-export const getTerminusSchedules = (
+export const getTerminusSchedules = async (
     filterOrLineId: string,
     stopAreaIdOrFromDatetime: string | null = null,
     fromDatetimeOrCoverage: string = DEFAULT_COVERAGE,
     coverageOrParams: string | null = null,
     params: TerminusSchedulesParams = {}
-): AxiosPromise<TerminusSchedulesResponse> => {
+): Promise<TerminusSchedulesResponse> => {
+    let response;
     if (filterOrLineId.includes('=')) {
-        return getClient().schedules.coverageCoverageTerminusSchedulesGet(
+        response = await getClient().schedules.coverageCoverageTerminusSchedulesGet(
             fromDatetimeOrCoverage,
             filterOrLineId,
             stopAreaIdOrFromDatetime || undefined
         );
     } else {
-        return getClient().schedules.coverageCoveragePhysicalModesPhysicalModeLinesLineStopAreasStopAreaTerminusSchedulesGet(
+        response = await getClient().schedules.coverageCoveragePhysicalModesPhysicalModeLinesLineStopAreasStopAreaTerminusSchedulesGet(
             coverageOrParams || DEFAULT_COVERAGE,
             'physical_mode:Bus',
             filterOrLineId,
@@ -414,68 +437,81 @@ export const getTerminusSchedules = (
             fromDatetimeOrCoverage || undefined
         );
     }
+    return response.data;
 };
 
 /**
  * Calculate isochrones (Beta)
  */
-export const getIsochrones = (
+export const getIsochrones = async (
     from: string,
     datetime: string | null = null,
     coverage: string = DEFAULT_COVERAGE,
     params: IsochronesParams = {}
-): AxiosPromise<CoverageCoverageIsochronesGet200Response> =>
-    getClient().isochrones.coverageCoverageIsochronesGet(
+): Promise<CoverageCoverageIsochronesGet200Response> => {
+    const response = await getClient().isochrones.coverageCoverageIsochronesGet(
         coverage,
         from,
         params.max_duration || undefined
     );
+    return response.data;
+};
 
 /**
  * Get line reports
  */
-export const getLineReports = (
+export const getLineReports = async (
     filterOrLineId: string,
     coverageOrParams: string = DEFAULT_COVERAGE,
     params: LineReportsParams = {}
-): AxiosPromise<CoverageCoverageLineReportsGet200Response> => {
+): Promise<CoverageCoverageLineReportsGet200Response> => {
+    let response;
     if (filterOrLineId.includes('=')) {
-        return getClient().reports.coverageCoverageLineReportsGet(coverageOrParams, filterOrLineId);
+        response = await getClient().reports.coverageCoverageLineReportsGet(coverageOrParams, filterOrLineId);
     } else {
-        return getClient().reports.coverageCoverageLinesIdLineReportsGet(coverageOrParams, filterOrLineId);
+        response = await getClient().reports.coverageCoverageLinesIdLineReportsGet(coverageOrParams, filterOrLineId);
     }
+    return response.data;
 };
 
 /**
  * Get traffic reports
  */
-export const getTrafficReports = (coverage: string = DEFAULT_COVERAGE, params: TrafficReportsParams = {}): AxiosPromise<CoverageCoverageTrafficReportsGet200Response> =>
-    getClient().reports.coverageCoverageTrafficReportsGet(coverage);
+export const getTrafficReports = async (coverage: string = DEFAULT_COVERAGE, params: TrafficReportsParams = {}): Promise<CoverageCoverageTrafficReportsGet200Response> => {
+    const response = await getClient().reports.coverageCoverageTrafficReportsGet(coverage);
+    return response.data;
+};
 
 /**
  * Get equipment reports
  */
-export const getEquipmentReports = (
+export const getEquipmentReports = async (
     coverage: string = DEFAULT_COVERAGE,
     filter: string | null = null,
     params: EquipmentReportsParams = {}
-): AxiosPromise<CoverageCoverageEquipmentReportsGet200Response> =>
-    getClient().reports.coverageCoverageEquipmentReportsGet(
+): Promise<CoverageCoverageEquipmentReportsGet200Response> => {
+    const response = await getClient().reports.coverageCoverageEquipmentReportsGet(
         coverage,
         filter || undefined
     );
+    return response.data;
+};
 
 /**
  * Get datasets information
  */
-export const getDatasets = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<DatasetsResponse> =>
-    getClient().datasets.coverageCoverageDatasetsGet(coverage);
+export const getDatasets = async (coverage: string = DEFAULT_COVERAGE): Promise<DatasetsResponse> => {
+    const response = await getClient().datasets.coverageCoverageDatasetsGet(coverage);
+    return response.data;
+};
 
 /**
  * Get contributors information
  */
-export const getContributors = (coverage: string = DEFAULT_COVERAGE): AxiosPromise<ContributorsResponse> =>
-    getClient().contributors.coverageCoverageContributorsGet(coverage);
+export const getContributors = async (coverage: string = DEFAULT_COVERAGE): Promise<ContributorsResponse> => {
+    const response = await getClient().contributors.coverageCoverageContributorsGet(coverage);
+    return response.data;
+};
 
 /**
  * Format datetime to SNCF API format (YYYYMMDDTHHmmss)
@@ -493,53 +529,63 @@ export const formatDateTime = (date: Date): string => {
 /**
  * Autocomplete on Public Transport objects
  */
-export const autocompletePT = (
+export const autocompletePT = async (
     q: string,
     coverage: string = DEFAULT_COVERAGE,
     count: number = 10
-): AxiosPromise<PlacesResponse> =>
-    getClient().publicTransportObjects.coverageCoveragePtObjectsGet(coverage, q, count);
+): Promise<PlacesResponse> => {
+    const response = await getClient().publicTransportObjects.coverageCoveragePtObjectsGet(coverage, q, count);
+    return response.data;
+};
 
 /**
  * Inverted geocoding - get address from coordinates
  */
-export const invertedGeocoding = (
+export const invertedGeocoding = async (
     lat: number,
     lon: number,
     coverage: string = DEFAULT_COVERAGE
-): AxiosPromise<PlacesResponse> => {
+): Promise<PlacesResponse> => {
     const coord = `${lon};${lat}`;
-    return getClient().places.coverageCoverageCoordCoordAddressesGet(coverage, coord);
+    const response = await getClient().places.coverageCoverageCoordCoordAddressesGet(coverage, coord);
+    return response.data;
 };
 
 /**
  * Get routes
  */
-export const getRoutes = (coverage: string = DEFAULT_COVERAGE, params: RoutesParams = {}): AxiosPromise<CoverageCoverageRoutesGet200Response> =>
-    getClient().publicTransportObjects.coverageCoverageRoutesGet(coverage);
+export const getRoutes = async (coverage: string = DEFAULT_COVERAGE, params: RoutesParams = {}): Promise<CoverageCoverageRoutesGet200Response> => {
+    const response = await getClient().publicTransportObjects.coverageCoverageRoutesGet(coverage);
+    return response.data;
+};
 
 /**
  * Get stop points
  */
-export const getStopPoints = (coverage: string = DEFAULT_COVERAGE, params: StopPointsParams = {}): AxiosPromise<CoverageCoverageStopPointsGet200Response> =>
-    getClient().publicTransportObjects.coverageCoverageStopPointsGet(coverage);
+export const getStopPoints = async (coverage: string = DEFAULT_COVERAGE, params: StopPointsParams = {}): Promise<CoverageCoverageStopPointsGet200Response> => {
+    const response = await getClient().publicTransportObjects.coverageCoverageStopPointsGet(coverage);
+    return response.data;
+};
 
 /**
  * Get networks
  */
-export const getNetworks = (coverage: string = DEFAULT_COVERAGE, params: NetworksParams = {}): AxiosPromise<CoverageCoverageNetworksGet200Response> =>
-    getClient().publicTransportObjects.coverageCoverageNetworksGet(coverage);
+export const getNetworks = async (coverage: string = DEFAULT_COVERAGE, params: NetworksParams = {}): Promise<CoverageCoverageNetworksGet200Response> => {
+    const response = await getClient().publicTransportObjects.coverageCoverageNetworksGet(coverage);
+    return response.data;
+};
 
 /**
  * Get freefloatings nearby
  */
-export const getFreefloatingsNearby = (
+export const getFreefloatingsNearby = async (
     lat: number,
     lon: number,
     coverage: string = DEFAULT_COVERAGE,
     distance: number = 200
-): AxiosPromise<CoverageCoverageCoordCoordFreefloatingsGet200Response> => {
+): Promise<CoverageCoverageCoordCoordFreefloatingsGet200Response> => {
     const coord = `${lon};${lat}`;
-    return getClient().places.coverageCoverageCoordCoordFreefloatingsGet(coverage, coord, distance);
+    const response = await getClient().places.coverageCoverageCoordCoordFreefloatingsGet(coverage, coord, distance);
+    return response.data;
 };
 
