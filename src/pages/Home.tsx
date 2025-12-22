@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import LoginButton from '@/components/LoginButton';
+import Avatar from '@/components/Avatar';
+import { useAuth } from '@/contexts/AuthContext';
 import Footer from '@/components/Footer';
 import CurrentLocationWidget from '@/components/CurrentLocationWidget';
 import Ad from '@/components/Ad';
@@ -15,6 +17,7 @@ interface DashboardCard {
 }
 
 const Home: React.FC = () => {
+    const { user } = useAuth();
     const mainPages: DashboardCard[] = [
         {
             title: 'Train',
@@ -162,7 +165,7 @@ const Home: React.FC = () => {
                         <div className='columns is-centered'>
                             <div className='column is-half has-text-centered'>
                                 <p className='mb-4'>Connectez-vous pour accéder à des fonctionnalités supplémentaires.</p>
-                                <LoginButton />
+                                {user ? <Avatar /> : <LoginButton />}
                             </div>
                         </div>
                     </div>
