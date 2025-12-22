@@ -10,16 +10,27 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // Initialize Google Analytics
 initGA();
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+const hasValidClientId = googleClientId && googleClientId.trim() !== '';
+
+const AppContent = () => (
+    <BrowserRouter basename={import.meta.env.BASE_URL}>
+        <AuthProvider>
+            <App />
+        </AuthProvider>
+    </BrowserRouter>
+);
+
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
     <React.StrictMode>
-        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID || ''}>
-            <BrowserRouter basename={import.meta.env.BASE_URL}>
-                <AuthProvider>
-                    <App />
-                </AuthProvider>
-            </BrowserRouter>
-        </GoogleOAuthProvider>
+        {hasValidClientId ? (
+            <GoogleOAuthProvider clientId={googleClientId}>
+                <AppContent />
+            </GoogleOAuthProvider>
+        ) : (
+            <AppContent />
+        )}
     </React.StrictMode>
 );
 

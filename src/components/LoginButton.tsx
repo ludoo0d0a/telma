@@ -5,6 +5,13 @@ import { useAuth } from '../contexts/AuthContext';
 
 const LoginButton: React.FC = () => {
   const { login } = useAuth();
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const hasValidClientId = googleClientId && googleClientId.trim() !== '';
+
+  // Don't render GoogleLogin if client ID is not configured
+  if (!hasValidClientId) {
+    return null;
+  }
 
   return (
     <GoogleLogin
