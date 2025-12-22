@@ -3,37 +3,9 @@ import { Loader2, Search, Train as TrainIcon } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import Ad from '@/components/Ad';
 import { autocompletePT } from '@/services/navitiaApi';
-import { encodeVehicleJourneyId } from '@/utils/uriUtils';
+import { encodeVehicleJourneyId, parseVehicleJourneyId } from '@/utils/uriUtils';
 import { getTransportIcon } from '@/services/transportService';
 import type { ExtendedVehicleJourney } from './types';
-
-interface ParsedVehicleJourneyId {
-    date: string;
-    number: string;
-    unknownId: string;
-    type: string;
-}
-
-/**
- * Parse vehicle journey ID format: vehicle_journey:SNCF:$date:$number:$unknownId:$type
- */
-const parseVehicleJourneyId = (id: string): ParsedVehicleJourneyId | null => {
-    if (!id || !id.startsWith('vehicle_journey:SNCF:')) {
-        return null;
-    }
-    
-    const parts = id.split(':');
-    if (parts.length !== 6) {
-        return null;
-    }
-    
-    return {
-        date: parts[2],
-        number: parts[3],
-        unknownId: parts[4],
-        type: parts[5],
-    };
-};
 
 const TrainSearch: React.FC = () => {
     const navigate = useNavigate();
@@ -222,14 +194,14 @@ const TrainSearch: React.FC = () => {
                                                 </span>
                                                 <div>
                                                     <p className='title is-5 mb-1'>
-                                                        Train {parsed.number}
+                                                        Train {parsed.trainNumber}
                                                     </p>
                                                     <p className='subtitle is-6 mb-1'>
-                                                        <span className='tag is-dark mr-2'>{parsed.type}</span>
+                                                        <span className='tag is-dark mr-2'>{parsed.vehicleType}</span>
                                                         <span className='has-text-grey'>{parsed.date}</span>
                                                     </p>
                                                     <p className='help'>
-                                                        ID: {parsed.unknownId}
+                                                        ID: {parsed.id2}
                                                     </p>
                                                 </div>
                                             </div>

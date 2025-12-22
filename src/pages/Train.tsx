@@ -4,7 +4,7 @@ import Footer from '@/components/Footer';
 import TrainWaypointsMap from '@/components/TrainWaypointsMap';
 import Ad from '@/components/Ad';
 import { getVehicleJourney } from '@/services/vehicleJourneyService';
-import { decodeVehicleJourneyId } from '@/utils/uriUtils';
+import { decodeVehicleJourneyId, extractTrainNumber } from '@/utils/uriUtils';
 import { cleanLocationName } from '@/services/locationService';
 import TrainSearch from '@/components/train/TrainSearch';
 import TrainLoadingState from '@/components/train/TrainLoadingState';
@@ -94,7 +94,10 @@ const Train: React.FC = () => {
     const stopTimes = trainData.stop_times || [];
     const commercialMode = displayInfo.commercial_mode || '';
     const network = displayInfo.network || '';
-    const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || 'N/A';
+    
+    // Extract train number using the utility function
+    const trainNumber = extractTrainNumber(trainData, id);
+    
     const direction = displayInfo.direction || '';
 
     const waypoints: Waypoint[] = (stopTimes || [])

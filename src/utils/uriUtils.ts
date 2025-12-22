@@ -84,3 +84,104 @@ export const decodeVehicleJourneyId = (encodedId: string): string => {
     return decodeId(encodedId);
 };
 
+/**
+ * Parsed vehicle journey ID structure
+ */
+export interface ParsedVehicleJourneyId {
+    type: string;
+    coverage: string;
+    date: string;
+    trainNumber: string;
+    id2: string;
+    vehicleType: string;
+}
+
+/**
+ * Parse vehicle journey ID format: vehicle_journey:SNCF:$date:$number:$id2:$type
+ * 
+ * Example: vehicle_journey:SNCF:2025-12-22:88786:1187:Train
+ * - type: "vehicle_journey"
+ * - coverage: "SNCF"
+ * - date: "2025-12-22"
+ * - trainNumber: "88786"
+ * - id2: "1187"
+ * - vehicleType: "Train"
+ * 
+ * @param id - The vehicle journey ID to parse
+ * @returns Parsed vehicle journey ID or null if invalid format
+ */
+export const parseVehicleJourneyId = (id: string): ParsedVehicleJourneyId | null => {
+    if (!id || !id.startsWith('vehicle_journey:')) {
+        return null;
+    }
+    
+    const parts = id.split(':');
+    if (parts.length !== 6) {
+        return null;
+    }
+    
+    return {
+        type: parts[0],
+        coverage: parts[1],
+        date: parts[2],
+        trainNumber: parts[3],
+        id2: parts[4],
+        vehicleType: parts[5],
+    };
+};
+
+/**
+ * Extract train number from vehicle journey data
+ * Checks multiple sources in priority order:
+ * 1. trip.name (from vehicle journey data)
+ * 2. Parsed ID (extracted from vehicle journey ID format)
+ * 3. display_informations.headsign or trip_short_name
+ * 
+ * @param vehicleJourney - The vehicle journey object (can have trip, id, display_informations)
+ * @param encodedUrlId - Optional encoded ID from URL to parse as fallback
+ * @returns Train number or 'N/A' if not found
+ */
+export const extractTrainNumber = (
+    vehicleJourney: { 
+        trip?: { name?: string } | null;
+        id?: string | null;
+        display_informations?: { 
+            headsign?: string | null; 
+            trip_short_name?: string | null;
+        } | null;
+    } | null,
+    encodedUrlId?: string | null
+): string => {
+    if (!vehicleJourney) {
+        return 'N/A';
+    }
+
+    // 1. Try trip.name first (highest priority)
+    const trip = vehicleJourney.trip;
+    if (trip?.name) {
+        return trip.name;
+    }
+
+    // 2. Try parsing from vehicle journey ID
+    const idToParse = vehicleJourney.id || (encodedUrlId ? decodeVehicleJourneyId(encodedUrlId) : null);
+    if (idToParse) {
+        const parsed = parseVehicleJourneyId(idToParse);
+        if (parsed && parsed.trainNumber) {
+            return parsed.trainNumber;
+        }
+    }
+
+    // 3. Fallback to display_informations
+    const displayInfo = vehicleJourney.display_informations;
+    if (displayInfo) {
+        if (displayInfo.headsign) {
+            return displayInfo.headsign;
+        }
+        if (displayInfo.trip_short_name) {
+            return displayInfo.trip_short_name;
+        }
+    }
+
+    return 'N/A';
+};
+
