@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Footer from '../components/Footer';
-import GeoJSONMap from '../components/GeoJSONMap';
+import Footer from '@/components/Footer';
+import GeoJSONMap from '@/components/GeoJSONMap';
 import { Loader2, Calculator } from 'lucide-react';
-import { getIsochrones } from '../services/navitiaApi';
-import type { CoverageCoverageIsochronesGet200Response } from '../client/models';
+import { getIsochrones } from '@/services/navitiaApi';
+import type { CoverageCoverageIsochronesGet200Response } from '@/client/models';
 
 interface IsochroneFeature {
     max_duration?: number;

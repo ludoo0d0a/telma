@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import Footer from '../components/Footer';
-import Ad from '../components/Ad';
-import LocationAutocomplete from '../components/LocationAutocomplete';
-import { getJourneys, formatDateTime } from '../services/navitiaApi';
-import { parseUTCDate, formatTime, formatDate } from '../utils/dateUtils';
-import { cleanLocationName } from '../services/locationService';
-import { getDelay, getMaxDelay } from '../services/delayService';
-import { getJourneyInfo, type JourneyInfo } from '../services/journeyService';
-import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '../services/disruptionService';
-import { encodeTripId, encodeVehicleJourneyId } from '../utils/uriUtils';
+import Footer from '@/components/Footer';
+import Ad from '@/components/Ad';
+import LocationAutocomplete from '@/components/LocationAutocomplete';
+import { getJourneys, formatDateTime } from '@/services/navitiaApi';
+import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
+import { cleanLocationName } from '@/services/locationService';
+import { getDelay, getMaxDelay } from '@/services/delayService';
+import { getJourneyInfo, type JourneyInfo } from '@/services/journeyService';
+import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '@/services/disruptionService';
+import { encodeTripId, encodeVehicleJourneyId } from '@/utils/uriUtils';
 import { Loader2, RefreshCw, ArrowLeftRight, Search, AlertTriangle, ChevronUp, ChevronDown, Ban, Info, Clock, Train as TrainIcon } from 'lucide-react';
-import type { JourneyItem } from '../client/models/journey-item';
-import type { Disruption } from '../client/models/disruption';
-import type { Section } from '../client/models/section';
-import type { Place } from '../client/models/place';
-import type { ImpactApplicationPeriodsInner } from '../client/models/impact-application-periods-inner';
+import type { JourneyItem } from '@/client/models/journey-item';
+import type { Disruption } from '@/client/models/disruption';
+import type { Section } from '@/client/models/section';
+import type { Place } from '@/client/models/place';
+import type { ImpactApplicationPeriodsInner } from '@/client/models/impact-application-periods-inner';
 
 // Decode URL parameters and format location names
 const decodeLocationName = (slug: string | undefined): string => {

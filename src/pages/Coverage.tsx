@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
-import Footer from '../components/Footer';
-import { getCoverage, getCoverageDetails } from '../services/navitiaApi';
-import type { CoverageResponse, Coverage } from '../client/models';
-import type { Link } from '../client/models/link';
-import type { Context } from '../client/models/context';
+import Footer from '@/components/Footer';
+import { getCoverage, getCoverageDetails } from '@/services/navitiaApi';
+import type { CoverageResponse, Coverage } from '@/client/models';
+import type { Link } from '@/client/models/link';
+import type { Context } from '@/client/models/context';
 
 interface SelectedCoverage extends Coverage {
     id: string;

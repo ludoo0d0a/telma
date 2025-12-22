@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, CheckCircle2, Navigation, Star } from 'lucide-react';
-import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
-import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '../services/favoritesService';
-import { cleanLocationName } from '../services/locationService';
-import type { Place } from '../client/models/place';
+import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
+import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '@/services/favoritesService';
+import { cleanLocationName } from '@/services/locationService';
+import type { Place } from '@/client/models/place';
 
 interface LocationAutocompleteProps {
     label: string;

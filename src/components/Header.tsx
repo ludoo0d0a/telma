@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useSidebar } from '../contexts/SidebarContext';
+import { useSidebar } from '@/contexts/SidebarContext';
 import LoginButton from './LoginButton';
 import { X, Menu } from 'lucide-react';
 

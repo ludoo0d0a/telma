@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import LoginButton from '../components/LoginButton';
-import Footer from '../components/Footer';
-import CurrentLocationWidget from '../components/CurrentLocationWidget';
-import Ad from '../components/Ad';
+import LoginButton from '@/components/LoginButton';
+import Footer from '@/components/Footer';
+import CurrentLocationWidget from '@/components/CurrentLocationWidget';
+import Ad from '@/components/Ad';
 import { LogIn, Crosshair, LayoutGrid, Route, List, Code, Train, MapPin, Clock, BarChart3, Map, Circle, Star, Bus, ArrowRight, Bookmark, Book } from 'lucide-react';
 
 interface DashboardCard {

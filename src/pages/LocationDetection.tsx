@@ -3,18 +3,18 @@ import { Link } from 'react-router-dom';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import type { MapRef, ViewState } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import Footer from '../components/Footer';
-import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '../services/navitiaApi';
-import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService';
-import { encodeVehicleJourneyId } from '../utils/uriUtils';
+import Footer from '@/components/Footer';
+import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
+import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
+import { encodeVehicleJourneyId } from '@/utils/uriUtils';
 import { MapPin, RefreshCw, Square, Loader2, CheckCircle2, Train, Info, AlertTriangle } from 'lucide-react';
-import { cleanLocationName } from '../services/locationService';
-import { parseUTCDate } from '../utils/dateUtils';
-import type { Place } from '../client/models/place';
-import type { Departure } from '../client/models/departure';
-import type { Arrival } from '../client/models/arrival';
-import type { VehicleJourney } from '../client/models/vehicle-journey';
-import type { StopTime } from '../client/models/stop-time';
+import { cleanLocationName } from '@/services/locationService';
+import { parseUTCDate } from '@/utils/dateUtils';
+import type { Place } from '@/client/models/place';
+import type { Departure } from '@/client/models/departure';
+import type { Arrival } from '@/client/models/arrival';
+import type { VehicleJourney } from '@/client/models/vehicle-journey';
+import type { StopTime } from '@/client/models/stop-time';
 
 export const DEFAULT_RADIUS_NEARBY = 5000;
 export const DEFAULT_RADIUS_NEARBY_LARGE = 10000;
@@ -234,9 +234,15 @@ const LocationDetection: React.FC = () => {
                                 const confidence = (distanceScore * 0.6 + timeScore * 0.4) * 100;
 
                                 if (confidence > bestConfidence) {
-                                    const displayInfo = vehicleJourney.display_informations ||
-                                        (train.departure?.display_informations) ||
-                                        (train.arrival?.display_informations);
+                                    // VehicleJourney doesn't have display_informations, construct it from available properties
+                                    const displayInfo = (train.departure?.display_informations) ||
+                                        (train.arrival?.display_informations) ||
+                                        {
+                                            headsign: vehicleJourney.headsign || '',
+                                            trip_short_name: vehicleJourney.name || '',
+                                            network: (vehicleJourney.journey_pattern as any)?.route?.line?.network?.name || 'SNCF',
+                                            direction: vehicleJourney.headsign || ''
+                                        };
 
                                     const nextStop = i < stopTimes.length - 1 ?
                                         cleanLocationName(stopTimes[i + 1].stop_point?.name || stopTimes[i + 1].stop_point?.stop_area?.name) || 'Inconnu' :

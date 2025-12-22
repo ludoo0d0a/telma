@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getDepartures } from '../services/navitiaApi'
-import { extractVehicleJourneyId } from '../services/vehicleJourneyService'
-import { parseUTCDate, getFullMinutes } from '../utils/dateUtils'
-import { encodeVehicleJourneyId } from '../utils/uriUtils'
-import { calculateDelay } from '../services/delayService'
-import { matchDisruptionsForDepartureArrival } from '../services/disruptionService'
+import { getDepartures } from '@/services/navitiaApi'
+import { extractVehicleJourneyId } from '@/services/vehicleJourneyService'
+import { parseUTCDate, getFullMinutes } from '@/utils/dateUtils'
+import { encodeVehicleJourneyId } from '@/utils/uriUtils'
+import { calculateDelay } from '@/services/delayService'
+import { matchDisruptionsForDepartureArrival } from '@/services/disruptionService'
 import { AlertTriangle, Ban, Info, Clock } from 'lucide-react'
 import Stops from './Stops'
-import type { Disruption } from '../client/models/disruption'
-import type { Departure } from '../client/models/departure'
+import type { Disruption } from '@/client/models/disruption'
+import type { Departure } from '@/client/models/departure'
 
 interface ProcessedDeparture {
     id: string | undefined;

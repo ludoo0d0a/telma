@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Header, SearchCard, FlightList } from '../components/skytrip';
+import { Header, SearchCard, FlightList } from '@/components/skytrip';
 import './Sample1.scss';
 
 const Sample1: React.FC = () => {

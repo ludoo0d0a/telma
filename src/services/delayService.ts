@@ -1,4 +1,4 @@
-import { parseUTCDate } from '../utils/dateUtils';
+import { parseUTCDate } from '@/utils/dateUtils';
 
 /**
  * Calculate delay between base and real departure/arrival times

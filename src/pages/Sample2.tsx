@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageHeader, Tabs, FlightCard } from '../components/skytrip';
+import { PageHeader, Tabs, FlightCard } from '@/components/skytrip';
 import { PlaneTakeoff, Bookmark } from 'lucide-react';
 import './Sample2.scss';
 

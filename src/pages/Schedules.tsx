@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { MapPin, Route, Flag, Loader2, Search } from 'lucide-react';
-import Footer from '../components/Footer';
-import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '../services/navitiaApi';
-import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '../client/models';
+import Footer from '@/components/Footer';
+import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '@/services/navitiaApi';
+import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '@/client/models';
 
 const Schedules: React.FC = () => {
     const [scheduleType, setScheduleType] = useState<'stop' | 'route' | 'terminus'>('stop'); // 'stop', 'route', 'terminus'

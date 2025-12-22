@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Star, Trash2 } from 'lucide-react';
-import Footer from '../components/Footer';
-import { getFavorites, removeFavorite, type FavoriteLocation } from '../services/favoritesService';
+import Footer from '@/components/Footer';
+import { getFavorites, removeFavorite, type FavoriteLocation } from '@/services/favoritesService';
 
 const Favorites: React.FC = () => {
     const [favorites, setFavorites] = useState<FavoriteLocation[]>([]);

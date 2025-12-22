@@ -1,10 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './styles/index.scss';
-import App from './App';
+import '@/styles/index.scss';
+import App from '@/App';
 import { BrowserRouter } from 'react-router-dom';
-import { initGA } from './utils/analytics';
-import { AuthProvider } from './contexts/AuthContext';
+import { initGA } from '@/utils/analytics';
+import { AuthProvider } from '@/contexts/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
 // Initialize Google Analytics

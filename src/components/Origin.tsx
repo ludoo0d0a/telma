@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
-import { cleanLocationName } from '../services/locationService'
-import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService'
+import { cleanLocationName } from '@/services/locationService'
+import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService'
 
 interface OriginProps {
     idArrival: string | undefined;

@@ -7,7 +7,7 @@
  * Access the typed data via response.data (e.g., response.data.journeys)
  */
 
-import { NavitiaClient } from '../client/client';
+import { NavitiaClient } from '@/client/client';
 import type { AxiosPromise } from 'axios';
 import axios from 'axios';
 import type {
@@ -36,12 +36,12 @@ import type {
     CoverageCoverageNetworksGet200Response,
     CoverageCoverageIsochronesGet200Response,
     CoverageCoverageCoordCoordFreefloatingsGet200Response
-} from '../client/models';
+} from '@/client/models';
 import type {
     CoverageCoveragePlacesGetTypeEnum,
     CoverageCoveragePlacesNearbyGetTypeEnum
-} from '../client/api/places-api';
-import {DEFAULT_RADIUS_NEARBY} from "../pages/LocationDetection";
+} from '@/client/api/places-api';
+import {DEFAULT_RADIUS_NEARBY} from "@/pages/LocationDetection";
 
 export const DEFAULT_COVERAGE = 'sncf';
 

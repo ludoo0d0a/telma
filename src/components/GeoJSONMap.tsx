@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Map, { Marker, Popup, Source, Layer, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import type { MapRef, ViewState } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
-import type { GeoJSONMapProps, LayerPaintProperties } from '../types/geojsonMap';
-import { processGeoJSONData, calculateBoundsWithMarkers, hasLineStrings, hasPolygons } from '../services/geojsonService';
+import type { GeoJSONMapProps, LayerPaintProperties } from '@/types/geojsonMap';
+import { processGeoJSONData, calculateBoundsWithMarkers, hasLineStrings, hasPolygons } from '@/services/geojsonService';
 import type { FeatureCollection } from 'geojson';
 
 /**

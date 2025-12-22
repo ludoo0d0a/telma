@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Footer from '../components/Footer';
-import Ad from '../components/Ad';
-import { searchPlaces, getPlacesNearby } from '../services/navitiaApi';
-import type { Place } from '../client/models/place';
+import Footer from '@/components/Footer';
+import Ad from '@/components/Ad';
+import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
+import type { Place } from '@/client/models/place';
 import { Search, MapPin, Loader2 } from 'lucide-react';
 
 const Places: React.FC = () => {

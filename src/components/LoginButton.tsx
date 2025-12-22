@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { GoogleLogin } from '@react-oauth/google';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const LoginButton: React.FC = () => {
   const { login } = useAuth();

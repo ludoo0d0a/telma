@@ -1,5 +1,5 @@
 import React from 'react';
-import Footer from '../components/Footer';
+import Footer from '@/components/Footer';
 import packageJson from '../../package.json';
 import { Info, Tag, ExternalLink, Star, Settings, CheckSquare, History, Train, Route, MapPin, Bus, Map, Search, Circle, BarChart3, Book, Code, Network, Palette, BookOpen, Wrench, Smartphone, TrendingUp, FlaskConical } from 'lucide-react';
 

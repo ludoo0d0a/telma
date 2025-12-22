@@ -1,5 +1,5 @@
 import React from 'react';
-import type { JourneyItem } from '../client/models/journey-item';
+import type { JourneyItem } from '@/client/models/journey-item';
 import { getTransportIcon, getWagonCount } from './transportService';
 import { cleanLocationName } from './locationService';
 

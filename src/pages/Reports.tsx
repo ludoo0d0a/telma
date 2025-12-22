@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Route, TrafficCone, Settings, Loader2, Download } from 'lucide-react';
-import Footer from '../components/Footer';
-import { getLineReports, getTrafficReports, getEquipmentReports } from '../services/navitiaApi';
+import Footer from '@/components/Footer';
+import { getLineReports, getTrafficReports, getEquipmentReports } from '@/services/navitiaApi';
 import type { 
     CoverageCoverageLineReportsGet200Response,
     CoverageCoverageTrafficReportsGet200Response,
     CoverageCoverageEquipmentReportsGet200Response
-} from '../client/models';
+} from '@/client/models';
 
 const Reports: React.FC = () => {
     const [reportType, setReportType] = useState<'line' | 'traffic' | 'equipment'>('traffic'); // 'line', 'traffic', 'equipment'

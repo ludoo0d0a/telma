@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { useSidebar } from '../contexts/SidebarContext';
+import { useSidebar } from '@/contexts/SidebarContext';
 import { X, Home, Route, Clock, MapPin, Crosshair, Star, Train, BarChart3, Map, Circle, Bus, Book, Info } from 'lucide-react';
 
 interface SidebarProps {

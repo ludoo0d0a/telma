@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
-import GeoJSONMap from '../components/GeoJSONMap';
-import { parseUTCDate, formatTime, formatDate } from '../utils/dateUtils';
-import { cleanLocationName } from '../services/locationService';
-import { getTransportIcon } from '../services/transportService';
-import { getDelay } from '../services/delayService';
-import { getVehicleJourney } from '../services/vehicleJourneyService';
-import { getJourneyInfo } from '../services/journeyService';
-import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId, encodeTripId } from '../utils/uriUtils';
+import Footer from '@/components/Footer';
+import GeoJSONMap from '@/components/GeoJSONMap';
+import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
+import { cleanLocationName } from '@/services/locationService';
+import { getTransportIcon } from '@/services/transportService';
+import { getDelay } from '@/services/delayService';
+import { getVehicleJourney } from '@/services/vehicleJourneyService';
+import { getJourneyInfo } from '@/services/journeyService';
+import { decodeTripId, decodeVehicleJourneyId, encodeVehicleJourneyId, encodeTripId } from '@/utils/uriUtils';
 import { Loader2, Route, AlertTriangle, Train as TrainIcon, Map, Ban, Info, Clock, RefreshCw } from 'lucide-react';
-import type { JourneyItem } from '../client/models/journey-item';
-import type { JourneyInfo } from '../services/journeyService';
-import type { Disruption } from '../client/models/disruption';
-import type { Section } from '../client/models/section';
-import type { Coord } from '../client/models/coord';
-import type { VehicleJourney } from '../client/models/vehicle-journey';
+import type { JourneyItem } from '@/client/models/journey-item';
+import type { JourneyInfo } from '@/services/journeyService';
+import type { Disruption } from '@/client/models/disruption';
+import type { Section } from '@/client/models/section';
+import type { Coord } from '@/client/models/coord';
+import type { VehicleJourney } from '@/client/models/vehicle-journey';
 
 interface TripData {
     journey: JourneyItem;
@@ -314,8 +314,9 @@ const Trip: React.FC = () => {
                                         stop_area: lastStop.stop_point?.stop_area,
                                         coord: lastStop.stop_point?.coord
                                     },
-                                    display_informations: vehicleJourney.display_informations || {
-                                        commercial_mode: (vehicleJourney.journey_pattern as any)?.commercial_mode || 'Train',
+                                    display_informations: {
+                                        commercial_mode: (vehicleJourney.journey_pattern as any)?.route?.line?.commercial_mode?.name || 
+                                                         (vehicleJourney.journey_pattern as any)?.commercial_mode || 'Train',
                                         network: (vehicleJourney.journey_pattern as any)?.route?.line?.network?.name || 'SNCF',
                                         headsign: vehicleJourney.headsign || '',
                                         trip_short_name: vehicleJourney.name || ''

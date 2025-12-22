@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, Geometry } from 'geojson';
-import type { GeoJSONInput, SectionWithGeoJSON } from '../types/geojson';
-import { isGeoJSONFeatureCollection, isGeoJSONFeature, isGeoJSONGeometry, isSectionWithGeoJSON } from '../types/geojson';
+import type { GeoJSONInput, SectionWithGeoJSON } from '@/types/geojson';
+import { isGeoJSONFeatureCollection, isGeoJSONFeature, isGeoJSONGeometry, isSectionWithGeoJSON } from '@/types/geojson';
 
 /**
  * Convert multi-geometries to single geometries

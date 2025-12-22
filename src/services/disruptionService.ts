@@ -1,5 +1,5 @@
-import type { Disruption } from '../client/models/disruption';
-import type { Impact } from '../client/models/impact';
+import type { Disruption } from '@/client/models/disruption';
+import type { Impact } from '@/client/models/impact';
 
 /**
  * Match disruptions by trip ID using impacted_objects.pt_object.trip

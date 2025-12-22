@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '../services/navitiaApi';
-import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService';
-import { cleanLocationName } from '../services/locationService';
-import { parseUTCDate } from '../utils/dateUtils';
+import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
+import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
+import { cleanLocationName } from '@/services/locationService';
+import { parseUTCDate } from '@/utils/dateUtils';
 import { Loader2, AlertTriangle, MapPin, Train, Ruler } from 'lucide-react';
-import {DEFAULT_RADIUS_NEARBY} from "../pages/LocationDetection";
+import {DEFAULT_RADIUS_NEARBY, DEFAULT_RADIUS_NEARBY_LARGE} from "@/pages/LocationDetection";
 
 interface CurrentLocationInfo {
     station?: {
@@ -95,7 +95,13 @@ const CurrentLocationWidget: React.FC = () => {
 
                             // Train should be at this stop if distance < 100m and time < 5 minutes
                             if (distance < 100 && timeDiff < 5 * 60 * 1000) {
-                                const displayInfo = vehicleJourney.display_informations || train.display_informations;
+                                // VehicleJourney doesn't have display_informations, construct it from available properties
+                                const displayInfo = train.display_informations || {
+                                    headsign: vehicleJourney.headsign || '',
+                                    trip_short_name: vehicleJourney.name || '',
+                                    network: (vehicleJourney.journey_pattern as any)?.route?.line?.network?.name || 'SNCF',
+                                    direction: vehicleJourney.headsign || ''
+                                };
                                 return {
                                     number: displayInfo?.headsign || displayInfo?.trip_short_name || 'N/A',
                                     destination: displayInfo?.direction || 'Inconnu'
@@ -155,6 +161,7 @@ const CurrentLocationWidget: React.FC = () => {
                 if (apiError?.response?.status === 404) {
                     try {
                         response = await getPlacesNearby(coordStr, 'sncf', {
+                            type: ['stop_area', 'stop_point'],
                             count: 5,
                             distance: DEFAULT_RADIUS_NEARBY_LARGE,
                             depth: 2

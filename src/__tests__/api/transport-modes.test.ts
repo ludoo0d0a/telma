@@ -4,7 +4,7 @@
  */
 
 import { NavitiaClient } from '../../client/client';
-import { validateResponse, formatValidationErrors } from '../utils/openapi-validator';
+import { validateResponse, formatValidationErrors } from '@/utils/openapi-validator';
 
 const API_KEY = process.env.VITE_API_KEY || process.env.API_KEY;
 const COVERAGE = 'sncf';

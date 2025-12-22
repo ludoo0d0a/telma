@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Footer from '../components/Footer';
-import { getCommercialModes } from '../services/navitiaApi';
-import type { CommercialMode } from '../client/models/commercial-mode';
+import Footer from '@/components/Footer';
+import { getCommercialModes } from '@/services/navitiaApi';
+import type { CommercialMode } from '@/client/models/commercial-mode';
 
 const CommercialModes: React.FC = () => {
     const [modes, setModes] = useState<CommercialMode[]>([]);

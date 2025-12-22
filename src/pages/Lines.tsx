@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import Footer from '../components/Footer';
+import Footer from '@/components/Footer';
 import { ArrowDown } from 'lucide-react';
-import { getLines } from '../services/navitiaApi';
-import type { Line } from '../client/models/line';
+import { getLines } from '@/services/navitiaApi';
+import type { Line } from '@/client/models/line';
 
 const Lines: React.FC = () => {
     const [lines, setLines] = useState<Line[]>([]);

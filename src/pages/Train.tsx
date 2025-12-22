@@ -1,20 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, Search, Train as TrainIcon, RefreshCw, AlertTriangle } from 'lucide-react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import Footer from '../components/Footer';
-import TrainWaypointsMap from '../components/TrainWaypointsMap';
-import Ad from '../components/Ad';
-import { autocompletePT } from '../services/navitiaApi';
-import { getVehicleJourney } from '../services/vehicleJourneyService';
-import { encodeVehicleJourneyId, decodeVehicleJourneyId } from '../utils/uriUtils';
-import { parseUTCDate, formatTime } from '../utils/dateUtils';
-import { calculateDelay } from '../services/delayService';
-import { cleanLocationName } from '../services/locationService';
-import { getTransportIcon } from '../services/transportService';
-import type { VehicleJourney } from '../client/models/vehicle-journey';
-import type { DisplayInformation } from '../client/models/display-information';
-import type { StopTime } from '../client/models/stop-time';
-import type { Place } from '../client/models/place';
+import Footer from '@/components/Footer';
+import TrainWaypointsMap from '@/components/TrainWaypointsMap';
+import Ad from '@/components/Ad';
+import { autocompletePT } from '@/services/navitiaApi';
+import { getVehicleJourney } from '@/services/vehicleJourneyService';
+import { encodeVehicleJourneyId, decodeVehicleJourneyId } from '@/utils/uriUtils';
+import { parseUTCDate, formatTime } from '@/utils/dateUtils';
+import { calculateDelay } from '@/services/delayService';
+import { cleanLocationName } from '@/services/locationService';
+import { getTransportIcon } from '@/services/transportService';
+import type { VehicleJourney } from '@/client/models/vehicle-journey';
+import type { DisplayInformation } from '@/client/models/display-information';
+import type { StopTime } from '@/client/models/stop-time';
+import type { Place } from '@/client/models/place';
 
 interface ExtendedVehicleJourney extends VehicleJourney {
     display_informations?: DisplayInformation;

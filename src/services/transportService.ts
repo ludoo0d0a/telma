@@ -1,6 +1,6 @@
 import React from 'react';
 import { Train, TramFront, Bus } from 'lucide-react';
-import type { Section } from '../client/models/section';
+import type { Section } from '@/client/models/section';
 
 export interface TransportIconInfo {
     icon: React.ComponentType<{ size?: number | string; className?: string }>;

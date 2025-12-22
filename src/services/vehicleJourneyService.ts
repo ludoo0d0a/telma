@@ -5,7 +5,7 @@
  */
 
 import type { AxiosPromise } from 'axios';
-import type { VehicleJourneysResponse } from '../client/models';
+import type { VehicleJourneysResponse } from '@/client/models';
 import { getClient, DEFAULT_COVERAGE } from './navitiaApi';
 
 /**

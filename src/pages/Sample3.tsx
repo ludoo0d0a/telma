@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { PageHeader, DateSelector, FlightList } from '../components/skytrip';
+import { PageHeader, DateSelector, FlightList } from '@/components/skytrip';
 import './Sample3.scss';
 
 const Sample3: React.FC = () => {
