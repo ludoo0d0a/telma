@@ -1,0 +1,97 @@
+================================================================================
+Navitia C++ Types vs OpenAPI Schemas Comparison
+================================================================================
+
+Loading OpenAPI schemas...
+Found 65 total schemas
+Found 13 core model schemas
+
+Extracting C++ types from headers...
+  Processing stop_area.h...
+  Processing stop_point.h...
+  Processing line.h...
+  Processing route.h...
+  Processing vehicle_journey.h...
+  Processing stop_time.h...
+  Processing network.h...
+  Processing commercial_mode.h...
+  Processing physical_mode.h...
+  Processing company.h...
+  Processing contributor.h...
+  Processing dataset.h...
+  Processing calendar.h...
+  Processing connection.h...
+  Processing access_point.h...
+  Processing entry_point.h...
+  Processing message.h...
+  Processing comment.h...
+Found 17 C++ types
+
+================================================================================
+COMPARISON RESULTS
+================================================================================
+
+Types in C++ but NOT in OpenAPI (6):
+  - AccessPoint (from access_point.h)
+  - Calendar (from calendar.h)
+  - DiscreteVehicleJourney (from vehicle_journey.h)
+  - FrequencyVehicleJourney (from vehicle_journey.h)
+  - LineGroup (from line.h)
+  - StopPointConnection (from connection.h)
+
+Types in OpenAPI but NOT in C++ (2):
+  - Journey
+  - StopTime
+
+Common types (11):
+  ✓ CommercialMode
+  ✓ Company
+  ✓ Contributor
+  ✓ Dataset
+  ✓ Line
+  ✓ Network
+  ✓ PhysicalMode
+  ✓ Route
+  ✓ StopArea
+  ✓ StopPoint
+  ✓ VehicleJourney
+
+================================================================================
+DETAILED FIELD COMPARISON (Sample)
+================================================================================
+
+
+--- StopArea ---
+C++ fields (9): ['additional_data', 'admin_list', 'admin_name', 'coord', 'label', 'route_list', 'stop_point_list', 'timezone', 'wheelchair_boarding']
+OpenAPI fields (6): ['coord', 'id', 'links', 'name', 'stop_points', 'timezone']
+  Fields only in C++: ['additional_data', 'admin_list', 'admin_name', 'label', 'route_list', 'stop_point_list', 'wheelchair_boarding']
+  Fields only in OpenAPI: ['id', 'links', 'name', 'stop_points']
+  Common fields: 2
+
+--- Line ---
+C++ fields (17): ['additional_data', 'backward_name', 'calendar_list', 'code', 'color', 'commercial_mode', 'company_list', 'forward_name', 'line_group_list', 'line_list', 'main_line', 'network', 'physical_mode_list', 'properties', 'route_list', 'shape', 'text_color']
+OpenAPI fields (9): ['code', 'color', 'commercial_mode', 'id', 'links', 'name', 'network', 'physical_modes', 'text_color']
+  Fields only in C++: ['additional_data', 'backward_name', 'calendar_list', 'company_list', 'forward_name', 'line_group_list', 'line_list', 'main_line', 'physical_mode_list', 'properties', 'route_list', 'shape']
+  Fields only in OpenAPI: ['id', 'links', 'name', 'physical_modes']
+  Common fields: 5
+
+--- VehicleJourney ---
+C++ fields (16): ['DiscreteVehicleJourney', 'FrequencyVehicleJourney', 'company', 'dataset', 'headsign', 'meta_vj', 'next_vj', 'odt_message', 'physical_mode', 'prev_vj', 'realtime_level', 'route', 'shift', 'stop_time_list', 'validity_patterns', 'vehicle_journey_type']
+OpenAPI fields (7): ['disruptions', 'headsign', 'id', 'journey_pattern', 'links', 'name', 'stop_times']
+  Fields only in C++: ['DiscreteVehicleJourney', 'FrequencyVehicleJourney', 'company', 'dataset', 'meta_vj', 'next_vj', 'odt_message', 'physical_mode', 'prev_vj', 'realtime_level', 'route', 'shift', 'stop_time_list', 'validity_patterns', 'vehicle_journey_type']
+  Fields only in OpenAPI: ['disruptions', 'id', 'journey_pattern', 'links', 'name', 'stop_times']
+  Common fields: 1
+
+--- StopPoint ---
+C++ fields (14): ['access_points', 'address', 'address_id', 'admin_list', 'coord', 'dataset_list', 'fare_zone', 'is_zonal', 'label', 'network', 'platform_code', 'route_list', 'stop_area', 'stop_point_connection_list']
+OpenAPI fields (5): ['coord', 'id', 'links', 'name', 'stop_area']
+  Fields only in C++: ['access_points', 'address', 'address_id', 'admin_list', 'dataset_list', 'fare_zone', 'is_zonal', 'label', 'network', 'platform_code', 'route_list', 'stop_point_connection_list']
+  Fields only in OpenAPI: ['id', 'links', 'name']
+  Common fields: 2
+
+--- Route ---
+C++ fields (9): ['dataset_list', 'destination', 'direction_type', 'discrete_vehicle_journey_list', 'frequency_vehicle_journey_list', 'line', 'shape', 'stop_area_list', 'stop_point_list']
+OpenAPI fields (5): ['direction', 'id', 'line', 'links', 'name']
+  Fields only in C++: ['dataset_list', 'destination', 'direction_type', 'discrete_vehicle_journey_list', 'frequency_vehicle_journey_list', 'shape', 'stop_area_list', 'stop_point_list']
+  Fields only in OpenAPI: ['direction', 'id', 'links', 'name']
+  Common fields: 1
