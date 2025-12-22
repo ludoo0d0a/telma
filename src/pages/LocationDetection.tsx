@@ -545,9 +545,14 @@ const LocationDetection: React.FC = () => {
             allPoints.push(...detectionResult.nearbyStations.map(s => s.coord));
         }
 
-        // Also include detected station if available
+        // Also include detected station if available (and not already in nearbyStations)
         if (detectionResult.station) {
-            allPoints.push(detectionResult.station.coord);
+            const alreadyIncluded = detectionResult.nearbyStations?.some(
+                s => s.id === detectionResult.station?.id
+            );
+            if (!alreadyIncluded) {
+                allPoints.push(detectionResult.station.coord);
+            }
         }
 
         // Also include platform if available
@@ -565,9 +570,14 @@ const LocationDetection: React.FC = () => {
         const minLon = Math.min(...lons);
         const maxLon = Math.max(...lons);
 
-        // Add padding to ensure all markers are visible (about 10% on each side)
-        const latPadding = (maxLat - minLat) * 0.1 || 0.001; // Minimum 0.001 degrees (~111m)
-        const lonPadding = (maxLon - minLon) * 0.1 || 0.001;
+        // Calculate padding based on the spread of points
+        // For a single point or very close points, use a minimum padding
+        const latRange = maxLat - minLat;
+        const lonRange = maxLon - minLon;
+        
+        // Use 15% padding, but at least 0.002 degrees (~222m) for visibility
+        const latPadding = Math.max(latRange * 0.15, 0.002);
+        const lonPadding = Math.max(lonRange * 0.15, 0.002);
 
         return [
             [minLon - lonPadding, minLat - latPadding],
@@ -595,15 +605,25 @@ const LocationDetection: React.FC = () => {
     useEffect(() => {
         if (!mapRef.current || !isMapLoaded) return;
 
+        // If we have bounds and nearby stations, fit bounds to show all stations
         if (mapBounds && detectionResult?.nearbyStations && detectionResult.nearbyStations.length > 0) {
             // Use fitBounds to show all stations with proper padding
             mapRef.current.fitBounds(mapBounds, {
-                padding: { top: 80, bottom: 80, left: 80, right: 80 },
+                padding: { top: 100, bottom: 100, left: 100, right: 100 },
                 duration: 800,
-                maxZoom: 16 // Prevent zooming in too much
+                maxZoom: 16, // Prevent zooming in too much
+                minZoom: 12  // Prevent zooming out too much
+            });
+        } else if (mapBounds && detectionResult?.userLocation) {
+            // If we have bounds but no nearby stations (e.g., only user location and detected station)
+            // Still fit bounds but with less padding
+            mapRef.current.fitBounds(mapBounds, {
+                padding: { top: 100, bottom: 100, left: 100, right: 100 },
+                duration: 800,
+                maxZoom: 16
             });
         } else if (detectionResult?.userLocation) {
-            // If no stations, just center on user location
+            // If no bounds calculated, just center on user location with a reasonable zoom
             setViewState(prev => ({
                 ...prev,
                 longitude: detectionResult.userLocation!.lon,
