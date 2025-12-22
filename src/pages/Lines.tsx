@@ -15,8 +15,7 @@ const Lines: React.FC = () => {
         const fetchLines = async (): Promise<void> => {
             try {
                 setLoading(true);
-                const response = await getLines('sncf', { start_page: page, count: 25 });
-                const data = response.data;
+                const data = await getLines('sncf', { start_page: page, count: 25 });
                 const newLines = data.lines || [];
                 setLines((prev) => (page === 0 ? newLines : [...prev, ...newLines]));
                 setHasMore(newLines.length === 25);

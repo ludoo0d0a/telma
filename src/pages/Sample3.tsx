@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader, DateSelector, FlightList } from '@/components/skytrip';
-import './Sample3.scss';
-
 const Sample3: React.FC = () => {
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState('Sat 22');
@@ -36,7 +34,7 @@ const Sample3: React.FC = () => {
     ];
 
     return (
-        <div className="sample3-page">
+        <div className="app-flight">
             <PageHeader
                 title="Select Flight"
                 onBack={() => navigate(-1)}
@@ -50,7 +48,7 @@ const Sample3: React.FC = () => {
                 selectedDate="04 Jan 2023"
             />
 
-            <main className="sample3-main">
+            <main>
                 <DateSelector
                     dates={dates}
                     selectedDate={selectedDate}

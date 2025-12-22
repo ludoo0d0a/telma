@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Header, SearchCard, FlightList } from '@/components/skytrip';
-import './Sample1.scss';
 
 const Sample1: React.FC = () => {
     const [activeTab, setActiveTab] = useState('one-way');
@@ -24,10 +23,10 @@ const Sample1: React.FC = () => {
     ];
 
     return (
-        <div className="sample1-page">
+        <div className="app-flight">
             <Header />
 
-            <main className="main-content">
+            <main>
                 <SearchCard
                     tabs={tabs}
                     activeTab={activeTab}
@@ -35,7 +34,7 @@ const Sample1: React.FC = () => {
                     onSearch={() => console.log('Search clicked')}
                 />
 
-                <div className="results-section">
+                <div className="flight-results-section">
                     <FlightList
                         flights={flights}
                         title="Results"

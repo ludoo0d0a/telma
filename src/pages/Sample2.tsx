@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { PageHeader, Tabs, FlightCard } from '@/components/skytrip';
 import { PlaneTakeoff, Bookmark } from 'lucide-react';
-import './Sample2.scss';
 
 const Sample2: React.FC = () => {
   const [activeTab, setActiveTab] = useState('active');
@@ -87,7 +86,7 @@ const Sample2: React.FC = () => {
   ];
 
   return (
-    <div className="sample2-page">
+    <div className="app-flight">
       <PageHeader
         title="Saved Flights"
         backUrl="/"
@@ -100,7 +99,7 @@ const Sample2: React.FC = () => {
           onTabChange={setActiveTab}
           variant="rounded"
         />
-        <div className="flight-list">
+        <div className="saved-flights">
           {flights.map((flight, index) => (
             <FlightCard
               key={index}

@@ -13,6 +13,9 @@
 @use './pages/metzBettembourg' as *;
 @use './pages/about' as *;
 @use './pages/locationDetection' as *;
+@use './pages/appFlight' as *;
+
+
 @use './components/cityCards' as *;
 @use './components/trainCard' as *;
 @use './components/bottomNavbar' as *;
@@ -23,6 +26,7 @@
 @use './components/trainStation' as *;
 @use './components/stops' as *;
 @use './components/ad' as *;
+@use './components/flights' as *;
 
 // Animation for spinning icons
 @keyframes spin {
