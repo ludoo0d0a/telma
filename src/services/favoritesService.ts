@@ -1,6 +1,6 @@
 const FAVORITES_KEY = 'sncf_favorite_locations';
 
-interface FavoriteLocation {
+export interface FavoriteLocation {
     id: string;
     name: string;
     type: string;
