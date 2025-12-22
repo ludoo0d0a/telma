@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
@@ -26,6 +26,7 @@ const CurrentLocationWidget: React.FC = () => {
         error: null
     });
     const navigate = useNavigate();
+    const hasDetectedRef = useRef<boolean>(false);
 
     // Calculate distance between two coordinates (Haversine formula)
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
@@ -122,6 +123,12 @@ const CurrentLocationWidget: React.FC = () => {
     };
 
     const detectCurrentLocation = useCallback(async () => {
+        // Prevent multiple calls
+        if (hasDetectedRef.current) {
+            return;
+        }
+        hasDetectedRef.current = true;
+
         if (!navigator.geolocation) {
             setLocationInfo({
                 loading: false,
@@ -274,24 +281,11 @@ const CurrentLocationWidget: React.FC = () => {
         }
     }, []);
 
-    // Initial detection on mount
+    // Initial detection on mount - only once
     useEffect(() => {
         detectCurrentLocation();
-    }, [detectCurrentLocation]);
-
-    // Retry detection every 30 seconds if station is not found
-    useEffect(() => {
-        // Only set up interval if station is not found and there's no error
-        if (!locationInfo.station && !locationInfo.error && !locationInfo.loading) {
-            const interval = setInterval(() => {
-                detectCurrentLocation();
-            }, 30000); // 30 seconds
-
-            return () => {
-                clearInterval(interval);
-            };
-        }
-    }, [locationInfo.station, locationInfo.error, locationInfo.loading, detectCurrentLocation]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency array ensures this runs only once on mount
 
     const handleClick = () => {
         navigate('/location-detection');
