@@ -10,6 +10,12 @@ import { GoogleOAuthProvider } from '@react-oauth/google';
 // Initialize Google Analytics
 initGA();
 
+// Log environment variables for verification
+console.log('Environment Variables Check:');
+console.log('VITE_GOOGLE_ADSENSE_ID:', import.meta.env.VITE_GOOGLE_ADSENSE_ID);
+console.log('VITE_GOOGLE_CLIENT_ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
+console.log('VITE_SHOW_ADS:', import.meta.env.VITE_SHOW_ADS);
+
 const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const hasValidClientId = googleClientId && googleClientId.trim() !== '';
 
