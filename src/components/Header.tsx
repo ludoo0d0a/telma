@@ -3,9 +3,12 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSidebar } from '@/contexts/SidebarContext';
 import LoginButton from './LoginButton';
+import Avatar from './Avatar';
+import { useAuth } from '@/contexts/AuthContext';
 import { X, Menu } from 'lucide-react';
 
 const Header: React.FC = () => {
+    const { user } = useAuth();
     const { toggleSidebar, isOpen } = useSidebar();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
@@ -83,7 +86,7 @@ const Header: React.FC = () => {
                 <div className="navbar-end">
                     <div className="navbar-item">
                         <div className="buttons">
-                            <LoginButton />
+                            {user ? <Avatar /> : <LoginButton />}
                         </div>
                     </div>
                 </div>
