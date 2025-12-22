@@ -540,17 +540,38 @@ const LocationDetection: React.FC = () => {
             { lat: detectionResult.userLocation.lat, lon: detectionResult.userLocation.lon }
         ];
 
-        if (detectionResult.nearbyStations) {
+        // Always include all nearby stations
+        if (detectionResult.nearbyStations && detectionResult.nearbyStations.length > 0) {
             allPoints.push(...detectionResult.nearbyStations.map(s => s.coord));
         }
 
-        if (allPoints.length < 2) return null;
+        // Also include detected station if available
+        if (detectionResult.station) {
+            allPoints.push(detectionResult.station.coord);
+        }
+
+        // Also include platform if available
+        if (detectionResult.platform) {
+            allPoints.push(detectionResult.platform.coord);
+        }
+
+        if (allPoints.length === 0) return null;
 
         const lats = allPoints.map(p => p.lat);
         const lons = allPoints.map(p => p.lon);
+        
+        const minLat = Math.min(...lats);
+        const maxLat = Math.max(...lats);
+        const minLon = Math.min(...lons);
+        const maxLon = Math.max(...lons);
+
+        // Add padding to ensure all markers are visible (about 10% on each side)
+        const latPadding = (maxLat - minLat) * 0.1 || 0.001; // Minimum 0.001 degrees (~111m)
+        const lonPadding = (maxLon - minLon) * 0.1 || 0.001;
+
         return [
-            [Math.min(...lons), Math.min(...lats)],
-            [Math.max(...lons), Math.max(...lats)]
+            [minLon - lonPadding, minLat - latPadding],
+            [maxLon + lonPadding, maxLat + latPadding]
         ];
     }, [detectionResult]);
 
@@ -570,14 +591,19 @@ const LocationDetection: React.FC = () => {
         padding: { top: 0, bottom: 0, left: 0, right: 0 }
     });
 
-    // Fit bounds when detection result changes
+    // Fit bounds when detection result changes or when map is loaded
     useEffect(() => {
-        if (mapBounds && mapRef.current) {
+        if (!mapRef.current || !isMapLoaded) return;
+
+        if (mapBounds && detectionResult?.nearbyStations && detectionResult.nearbyStations.length > 0) {
+            // Use fitBounds to show all stations with proper padding
             mapRef.current.fitBounds(mapBounds, {
-                padding: { top: 50, bottom: 50, left: 50, right: 50 },
-                duration: 500
+                padding: { top: 80, bottom: 80, left: 80, right: 80 },
+                duration: 800,
+                maxZoom: 16 // Prevent zooming in too much
             });
         } else if (detectionResult?.userLocation) {
+            // If no stations, just center on user location
             setViewState(prev => ({
                 ...prev,
                 longitude: detectionResult.userLocation!.lon,
@@ -585,7 +611,7 @@ const LocationDetection: React.FC = () => {
                 zoom: 15
             }));
         }
-    }, [mapBounds, detectionResult]);
+    }, [mapBounds, detectionResult, isMapLoaded]);
 
     return (
         <>

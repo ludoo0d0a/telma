@@ -420,6 +420,18 @@
             "type": "string",
             "description": "Network name"
           },
+          "address_name": {
+            "type": "string",
+            "description": "Address name"
+          },
+          "address_number": {
+            "type": "string",
+            "description": "Address number"
+          },
+          "address_type_name": {
+            "type": "string",
+            "description": "Address type name"
+          },
           "links": {
             "type": "array",
             "items": {
@@ -450,6 +462,17 @@
           "text_color": {
             "type": "string",
             "description": "Text color (hex)"
+          },
+          "additional_data": {
+            "type": "string",
+            "description": "Additional data"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Additional properties"
           },
           "commercial_mode": {
             "$ref": "#/components/schemas/CommercialMode"
@@ -537,8 +560,41 @@
             "type": "string",
             "description": "Stop point name"
           },
+          "label": {
+            "type": "string",
+            "description": "Stop point label"
+          },
           "coord": {
             "$ref": "#/components/schemas/Coord"
+          },
+          "platform_code": {
+            "type": "string",
+            "description": "Platform code"
+          },
+          "fare_zone": {
+            "type": "string",
+            "description": "Fare zone"
+          },
+          "address_id": {
+            "type": "string",
+            "description": "Address ID"
+          },
+          "address": {
+            "type": "object",
+            "description": "Address information",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Address ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Address name"
+              },
+              "coord": {
+                "$ref": "#/components/schemas/Coord"
+              }
+            }
           },
           "stop_area": {
             "$ref": "#/components/schemas/StopArea"
@@ -602,12 +658,24 @@
             "type": "string",
             "description": "Stop area name"
           },
+          "label": {
+            "type": "string",
+            "description": "Stop area label"
+          },
           "coord": {
             "$ref": "#/components/schemas/Coord"
           },
           "timezone": {
             "type": "string",
             "description": "Timezone"
+          },
+          "wheelchair_boarding": {
+            "type": "boolean",
+            "description": "Whether wheelchair boarding is available"
+          },
+          "additional_data": {
+            "type": "string",
+            "description": "Additional data"
           },
           "stop_points": {
             "type": "array",
@@ -1765,6 +1833,18 @@
           "name": {
             "type": "string",
             "description": "Company name"
+          },
+          "address_name": {
+            "type": "string",
+            "description": "Address name"
+          },
+          "address_number": {
+            "type": "string",
+            "description": "Address number"
+          },
+          "address_type_name": {
+            "type": "string",
+            "description": "Address type name"
           },
           "links": {
             "type": "array",
