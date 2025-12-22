@@ -329,6 +329,16 @@ Size guidelines:
 6. **TypeScript**: All components should be typed with proper interfaces
 7. **State Management**: Use React hooks for local state management
 
+## API Client Architecture
+
+**IMPORTANT**: The API client is generated from an OpenAPI specification.
+
+1. **API Contract Definition**: `openapi.json` defines the API contract first
+2. **Client Generation**: `src/client` is automatically generated from the OpenAPI specification
+3. **Update Workflow**: If you need to update the API:
+   - **First**: Modify `openapi.json` to reflect the API changes
+   - **Then**: Regenerate the client (the client code in `src/client` should not be manually edited as it will be overwritten during regeneration)
+
 ## Example Component Structure
 
 ```tsx

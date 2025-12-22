@@ -5,6 +5,7 @@ import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJ
 import { cleanLocationName } from '../services/locationService';
 import { parseUTCDate } from '../utils/dateUtils';
 import { Loader2, AlertTriangle, MapPin, Train, Ruler } from 'lucide-react';
+import {DEFAULT_RADIUS_NEARBY} from "../pages/LocationDetection";
 
 interface CurrentLocationInfo {
     station?: {
@@ -47,7 +48,7 @@ const CurrentLocationWidget: React.FC = () => {
         try {
             const now = new Date();
             const nowStr = formatDateTime(now);
-            
+
             const [departuresResponse, arrivalsResponse] = await Promise.all([
                 getDepartures(stopAreaId, nowStr, 'sncf', { count: 5, depth: 2 }),
                 getArrivals(stopAreaId, nowStr, 'sncf', { count: 5, depth: 2 })
@@ -60,38 +61,38 @@ const CurrentLocationWidget: React.FC = () => {
 
             // Find the closest train by checking stop times
             for (const train of allTrains.slice(0, 3)) { // Check first 3 trains
-                const vehicleJourneyLink = train.links?.find(link => 
+                const vehicleJourneyLink = train.links?.find(link =>
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
                 );
                 const rawVehicleJourneyId = vehicleJourneyLink?.id || vehicleJourneyLink?.href;
                 const vehicleJourneyId = extractVehicleJourneyId(rawVehicleJourneyId);
-                
+
                 if (!vehicleJourneyId) continue;
 
                 try {
                     const vjResponse = await getVehicleJourney(vehicleJourneyId, 'sncf', 2);
                     const vehicleJourney = vjResponse.data.vehicle_journeys?.[0];
-                    
+
                     if (!vehicleJourney?.stop_times) continue;
 
                     const stopTimes = vehicleJourney.stop_times as Array<any>;
-                    
+
                     // Check if train is at a stop near user location
                     for (const stopTime of stopTimes) {
                         const stopPoint = stopTime.stop_point;
                         const coord = stopPoint?.coord || stopPoint?.stop_area?.coord;
-                        
+
                         if (!coord?.lat || !coord?.lon) continue;
 
                         const distance = calculateDistance(userLat, userLon, coord.lat, coord.lon);
                         const arrivalTime = stopTime.arrival_date_time || stopTime.base_arrival_date_time || stopTime.utc_arrival_time;
                         const departureTime = stopTime.departure_date_time || stopTime.base_departure_date_time || stopTime.utc_departure_time;
-                        
+
                         if (arrivalTime || departureTime) {
                             const timeStr = departureTime || arrivalTime;
                             const stopDateTime = parseUTCDate(timeStr);
                             const timeDiff = Math.abs(now.getTime() - stopDateTime.getTime());
-                            
+
                             // Train should be at this stop if distance < 100m and time < 5 minutes
                             if (distance < 100 && timeDiff < 5 * 60 * 1000) {
                                 const displayInfo = vehicleJourney.display_informations || train.display_informations;
@@ -139,7 +140,7 @@ const CurrentLocationWidget: React.FC = () => {
             });
 
             const { latitude, longitude } = position.coords;
-            
+
             // Find nearby stations
             const coordStr = `${longitude};${latitude}`;
             let response;
@@ -147,7 +148,7 @@ const CurrentLocationWidget: React.FC = () => {
                 response = await getPlacesNearby(coordStr, 'sncf', {
                     type: ['stop_area', 'stop_point'],
                     count: 5,
-                    distance: 500,
+                    distance: DEFAULT_RADIUS_NEARBY,
                     depth: 2
                 });
             } catch (apiError: any) {
@@ -155,7 +156,7 @@ const CurrentLocationWidget: React.FC = () => {
                     try {
                         response = await getPlacesNearby(coordStr, 'sncf', {
                             count: 5,
-                            distance: 500,
+                            distance: DEFAULT_RADIUS_NEARBY_LARGE,
                             depth: 2
                         });
                     } catch (fallbackError) {
@@ -175,7 +176,7 @@ const CurrentLocationWidget: React.FC = () => {
             }
 
             const places = response.data.places || [];
-            const stations = places.filter(place => 
+            const stations = places.filter(place =>
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
             );
 
@@ -192,11 +193,11 @@ const CurrentLocationWidget: React.FC = () => {
             let minDistance = Infinity;
 
             for (const station of stations) {
-                const coord = station.coord || 
-                    station.stop_area?.coord || 
+                const coord = station.coord ||
+                    station.stop_area?.coord ||
                     station.stop_point?.coord ||
                     station.stop_point?.stop_area?.coord;
-                
+
                 if (coord?.lat && coord?.lon) {
                     const distance = calculateDistance(latitude, longitude, coord.lat, coord.lon);
                     if (distance < minDistance) {
@@ -236,8 +237,8 @@ const CurrentLocationWidget: React.FC = () => {
 
             const stationId = closestStation.stop_area?.id || closestStation.id;
             const stationName = cleanLocationName(
-                closestStation.stop_area?.name || 
-                closestStation.stop_point?.name || 
+                closestStation.stop_area?.name ||
+                closestStation.stop_point?.name ||
                 closestStation.name
             ) || 'Gare inconnue';
 

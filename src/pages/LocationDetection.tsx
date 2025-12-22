@@ -16,6 +16,9 @@ import type { Arrival } from '../client/models/arrival';
 import type { VehicleJourney } from '../client/models/vehicle-journey';
 import type { StopTime } from '../client/models/stop-time';
 
+export const DEFAULT_RADIUS_NEARBY = 5000;
+export const DEFAULT_RADIUS_NEARBY_LARGE = 10000;
+
 interface DetectedTrain {
     vehicleJourneyId: string;
     trainNumber: string;
@@ -151,7 +154,7 @@ const LocationDetection: React.FC = () => {
         try {
             const now = new Date();
             const nowStr = formatDateTime(now);
-            
+
             // Get both departures and arrivals to catch trains that are currently at the station
             const [departuresResponse, arrivalsResponse] = await Promise.all([
                 getDepartures(stopAreaId, nowStr, 'sncf', { count: 20, depth: 2 }),
@@ -167,18 +170,18 @@ const LocationDetection: React.FC = () => {
             let bestConfidence = 0;
 
             for (const train of allTrains) {
-                const vehicleJourneyLink = (train.departure || train.arrival)?.links?.find(link => 
+                const vehicleJourneyLink = (train.departure || train.arrival)?.links?.find(link =>
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
                 );
                 const rawVehicleJourneyId = vehicleJourneyLink?.id || vehicleJourneyLink?.href;
                 const vehicleJourneyId = extractVehicleJourneyId(rawVehicleJourneyId);
-                
+
                 if (!vehicleJourneyId) continue;
 
                 try {
                     const vjResponse = await getVehicleJourney(vehicleJourneyId, 'sncf', 2);
                     const vehicleJourney = vjResponse.data.vehicle_journeys?.[0];
-                    
+
                     if (!vehicleJourney?.stop_times) continue;
 
                     const stopTimes = vehicleJourney.stop_times as Array<StopTime & {
@@ -202,7 +205,7 @@ const LocationDetection: React.FC = () => {
                         const stopTime = stopTimes[i];
                         const stopPoint = stopTime.stop_point;
                         const coord = stopPoint?.coord || stopPoint?.stop_area?.coord;
-                        
+
                         if (!coord?.lat || !coord?.lon) continue;
 
                         const stopLat = coord.lat;
@@ -212,18 +215,18 @@ const LocationDetection: React.FC = () => {
                         // Check if this stop is close enough and the train should be here now
                         const arrivalTime = stopTime.arrival_date_time || stopTime.base_arrival_date_time || stopTime.utc_arrival_time;
                         const departureTime = stopTime.departure_date_time || stopTime.base_departure_date_time || stopTime.utc_departure_time;
-                        
+
                         if (arrivalTime || departureTime) {
                             const timeStr = departureTime || arrivalTime;
                             const stopDateTime = parseUTCDate(timeStr);
                             const timeDiff = Math.abs(now.getTime() - stopDateTime.getTime());
-                            
+
                             // Train should be at this stop if:
                             // 1. Distance is within user's accuracy + 50m (for platform width)
                             // 2. Time is within 5 minutes of scheduled time
                             const maxDistance = userAccuracy + 50; // Allow some margin for platform width
                             const maxTimeDiff = 5 * 60 * 1000; // 5 minutes
-                            
+
                             if (distance <= maxDistance && timeDiff <= maxTimeDiff) {
                                 // Calculate confidence based on distance and time accuracy
                                 const distanceScore = Math.max(0, 1 - (distance / maxDistance));
@@ -231,12 +234,12 @@ const LocationDetection: React.FC = () => {
                                 const confidence = (distanceScore * 0.6 + timeScore * 0.4) * 100;
 
                                 if (confidence > bestConfidence) {
-                                    const displayInfo = vehicleJourney.display_informations || 
-                                        (train.departure?.display_informations) || 
+                                    const displayInfo = vehicleJourney.display_informations ||
+                                        (train.departure?.display_informations) ||
                                         (train.arrival?.display_informations);
-                                    
-                                    const nextStop = i < stopTimes.length - 1 ? 
-                                        cleanLocationName(stopTimes[i + 1].stop_point?.name || stopTimes[i + 1].stop_point?.stop_area?.name) || 'Inconnu' : 
+
+                                    const nextStop = i < stopTimes.length - 1 ?
+                                        cleanLocationName(stopTimes[i + 1].stop_point?.name || stopTimes[i + 1].stop_point?.stop_area?.name) || 'Inconnu' :
                                         'Terminus';
 
                                     bestMatch = {
@@ -277,7 +280,7 @@ const LocationDetection: React.FC = () => {
 
         try {
             const { latitude, longitude, accuracy } = position.coords;
-            
+
             // Find nearby train stations
             const coordStr = `${longitude};${latitude}`;
             let response;
@@ -316,17 +319,17 @@ const LocationDetection: React.FC = () => {
             }
 
             const places = response.data.places || [];
-            const stations = places.filter(place => 
+            const stations = places.filter(place =>
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
             );
 
             // Store nearby stations for map display
             const nearbyStations = stations.map(station => {
-                const coord = station.coord || 
-                    station.stop_area?.coord || 
+                const coord = station.coord ||
+                    station.stop_area?.coord ||
                     station.stop_point?.coord ||
                     station.stop_point?.stop_area?.coord;
-                
+
                 if (coord?.lat && coord?.lon) {
                     const distance = calculateDistance(latitude, longitude, coord.lat, coord.lon);
                     return {
@@ -360,11 +363,11 @@ const LocationDetection: React.FC = () => {
             let closestStopPoint: Place | null = null;
 
             for (const station of stations) {
-                const coord = station.coord || 
-                    station.stop_area?.coord || 
+                const coord = station.coord ||
+                    station.stop_area?.coord ||
                     station.stop_point?.coord ||
                     station.stop_point?.stop_area?.coord;
-                
+
                 if (coord?.lat && coord?.lon) {
                     const distance = calculateDistance(latitude, longitude, coord.lat, coord.lon);
                     if (distance < minDistance) {
@@ -393,8 +396,8 @@ const LocationDetection: React.FC = () => {
                 return;
             }
 
-            const stationCoord = closestStation.coord || 
-                closestStation.stop_area?.coord || 
+            const stationCoord = closestStation.coord ||
+                closestStation.stop_area?.coord ||
                 closestStation.stop_point?.coord ||
                 closestStation.stop_point?.stop_area?.coord;
 
@@ -417,7 +420,7 @@ const LocationDetection: React.FC = () => {
                 const platformName = closestStopPoint.stop_point?.name || closestStopPoint.name || '';
                 const platformNumber = extractPlatform(platformName);
                 const platformCoord = closestStopPoint.stop_point?.coord || closestStopPoint.coord;
-                
+
                 if (platformCoord?.lat && platformCoord?.lon) {
                     platform = {
                         id: closestStopPoint.stop_point?.id || closestStopPoint.id || '',
@@ -524,17 +527,17 @@ const LocationDetection: React.FC = () => {
     // Calculate map bounds and center
     const mapBounds = useMemo<[[number, number], [number, number]] | null>(() => {
         if (!detectionResult?.userLocation) return null;
-        
+
         const allPoints: Array<{ lat: number; lon: number }> = [
             { lat: detectionResult.userLocation.lat, lon: detectionResult.userLocation.lon }
         ];
-        
+
         if (detectionResult.nearbyStations) {
             allPoints.push(...detectionResult.nearbyStations.map(s => s.coord));
         }
-        
+
         if (allPoints.length < 2) return null;
-        
+
         const lats = allPoints.map(p => p.lat);
         const lons = allPoints.map(p => p.lon);
         return [
@@ -650,12 +653,12 @@ const LocationDetection: React.FC = () => {
                     {detectionResult && (
                         <div className='box'>
                             <h3 className='title is-4 mb-4'>Résultats de la détection</h3>
-                            
+
                             {detectionResult.userLocation && (
                                 <div className='mb-4'>
                                     <p><strong>Votre position :</strong></p>
                                     <p>
-                                        Latitude: {detectionResult.userLocation.lat.toFixed(6)}, 
+                                        Latitude: {detectionResult.userLocation.lat.toFixed(6)},
                                         Longitude: {detectionResult.userLocation.lon.toFixed(6)}
                                     </p>
                                     <p>Précision: ±{Math.round(detectionResult.userLocation.accuracy)}m</p>
@@ -713,8 +716,8 @@ const LocationDetection: React.FC = () => {
                                                 Aucun train détecté à votre position actuelle.
                                             </p>
                                             <p className='is-size-7 mt-2'>
-                                                Cela peut signifier que vous êtes sur un quai sans train, 
-                                                ou que le train n'a pas encore été détecté. Essayez de vous déplacer 
+                                                Cela peut signifier que vous êtes sur un quai sans train,
+                                                ou que le train n'a pas encore été détecté. Essayez de vous déplacer
                                                 ou attendez quelques instants.
                                             </p>
                                         </div>
@@ -728,7 +731,7 @@ const LocationDetection: React.FC = () => {
                                             Vous ne semblez pas être dans une gare.
                                         </p>
                                         <p className='is-size-7 mt-2'>
-                                            Aucune gare trouvée à moins de 200m de votre position. 
+                                            Aucune gare trouvée à moins de 200m de votre position.
                                             Vous pouvez sélectionner une gare dans la liste ci-dessous pour continuer.
                                         </p>
                                     </div>
@@ -744,9 +747,9 @@ const LocationDetection: React.FC = () => {
                                                     .sort((a, b) => a.distance - b.distance)
                                                     .map((station, idx) => (
                                                         <div key={`station-${station.id}-${idx}`} className='column is-half-tablet is-one-third-desktop'>
-                                                            <div 
+                                                            <div
                                                                 className={`box station-card ${selectedStation?.id === station.id ? 'has-background-info-light' : ''}`}
-                                                                style={{ 
+                                                                style={{
                                                                     cursor: 'pointer',
                                                                     transition: 'all 0.2s',
                                                                     border: selectedStation?.id === station.id ? '2px solid #3273dc' : '1px solid #dbdbdb'
@@ -838,7 +841,7 @@ const LocationDetection: React.FC = () => {
                                                         Aucun train détecté à la gare sélectionnée.
                                                     </p>
                                                     <p className='is-size-7 mt-2'>
-                                                        Cela peut signifier qu'il n'y a pas de train actuellement à cette gare, 
+                                                        Cela peut signifier qu'il n'y a pas de train actuellement à cette gare,
                                                         ou que le train n'a pas encore été détecté.
                                                     </p>
                                                 </div>
@@ -883,7 +886,7 @@ const LocationDetection: React.FC = () => {
                                 >
                                     <NavigationControl position="top-right" />
                                     <GeolocateControl position="top-right" />
-                                    
+
                                     {/* User location marker */}
                                     <Marker
                                         longitude={detectionResult.userLocation.lon}
@@ -940,11 +943,11 @@ const LocationDetection: React.FC = () => {
                                                         justifyContent: 'center'
                                                     }}
                                                 >
-                                                    <svg 
-                                                        width={isClosest ? 20 : 18} 
-                                                        height={isClosest ? 20 : 18} 
-                                                        viewBox="0 0 24 24" 
-                                                        fill="white" 
+                                                    <svg
+                                                        width={isClosest ? 20 : 18}
+                                                        height={isClosest ? 20 : 18}
+                                                        viewBox="0 0 24 24"
+                                                        fill="white"
                                                         xmlns="http://www.w3.org/2000/svg"
                                                     >
                                                         <path d="M12 2c-4 0-8 .5-8 4v9.5c0 .95.38 1.81 1 2.44L3 22h3l.5-2h11l.5 2h3l-2-4.06c.62-.63 1-1.49 1-2.44V6c0-3.5-3.58-4-8-4zM5.5 16c-.83 0-1.5-.67-1.5-1.5S4.67 13 5.5 13s1.5.67 1.5 1.5S6.33 16 5.5 16zm13 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5H4V6h16v5z"/>

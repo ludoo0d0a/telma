@@ -1,8 +1,8 @@
 /**
  * Navitia API Service
- * 
+ *
  * This service wraps the generated NavitiaClient to provide typed API responses.
- * 
+ *
  * All functions return the full Axios response object with typed .data property.
  * Access the typed data via response.data (e.g., response.data.journeys)
  */
@@ -41,6 +41,7 @@ import type {
     CoverageCoveragePlacesGetTypeEnum,
     CoverageCoveragePlacesNearbyGetTypeEnum
 } from '../client/api/places-api';
+import {DEFAULT_RADIUS_NEARBY} from "../pages/LocationDetection";
 
 export const DEFAULT_COVERAGE = 'sncf';
 
@@ -289,7 +290,7 @@ export const getPlacesNearby = (
     coord: string | null,
     latOrCoverage: string | number = DEFAULT_COVERAGE,
     lonOrParams: number | PlacesNearbyParams = {},
-    coverageOrDistance: string | number = 200,
+    coverageOrDistance: string | number = DEFAULT_RADIUS_NEARBY,
     paramsOrType: string | null = null
 ): AxiosPromise<PlacesResponse> => {
     let coverage: string;
@@ -305,7 +306,7 @@ export const getPlacesNearby = (
         const lon = lonOrParams;
         coverage = typeof coverageOrDistance === 'string' ? coverageOrDistance : DEFAULT_COVERAGE;
         coordStr = `${lon};${lat}`;
-        const distance = typeof coverageOrDistance === 'number' ? coverageOrDistance : 200;
+        const distance = typeof coverageOrDistance === 'number' ? coverageOrDistance : DEFAULT_RADIUS_NEARBY;
         const type = typeof paramsOrType === 'string' ? paramsOrType : null;
         params = { distance };
         if (type) params.type = type;

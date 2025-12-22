@@ -160,7 +160,7 @@ export const PlacesApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
             if (type) {
-                localVarQueryParameter['type[]'] = type;
+                localVarQueryParameter['type'] = type;
             }
 
             if (count !== undefined) {
@@ -279,7 +279,7 @@ export const PlacesApiAxiosParamCreator = function (configuration?: Configuratio
             }
 
             if (type) {
-                localVarQueryParameter['type[]'] = type;
+                localVarQueryParameter['type'] = type;
             }
 
             if (depth !== undefined) {
