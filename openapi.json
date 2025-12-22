@@ -150,6 +150,32 @@
           }
         }
       },
+      "FrequencyVehicleJourney": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VehicleJourney"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "start_time": {
+                "type": "string",
+                "description": "First departure time (HHmmss)"
+              },
+              "end_time": {
+                "type": "string",
+                "description": "Last departure time (HHmmss)"
+              },
+              "headway_secs": {
+                "type": "integer",
+                "description": "Seconds between each departure"
+              }
+            }
+          }
+        ],
+        "description": "Frequency-based vehicle journey with regular intervals"
+      },
       "WeekPattern": {
         "type": "object",
         "properties": {
@@ -167,6 +193,76 @@
         "properties": {
           "begin": { "type": "string" },
           "end": { "type": "string" }
+        }
+      },
+      "AccessPoint": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Access point ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Access point name"
+          },
+          "stop_code": {
+            "type": "string",
+            "description": "Stop code"
+          },
+          "is_entrance": {
+            "type": "boolean",
+            "description": "Whether this is an entrance"
+          },
+          "is_exit": {
+            "type": "boolean",
+            "description": "Whether this is an exit"
+          },
+          "pathway_mode": {
+            "type": "integer",
+            "description": "Pathway mode (-1 if not set)"
+          },
+          "length": {
+            "type": "integer",
+            "description": "Length in meters (-1 if not set)"
+          },
+          "traversal_time": {
+            "type": "integer",
+            "description": "Traversal time in seconds (-1 if not set)"
+          },
+          "stair_count": {
+            "type": "integer",
+            "description": "Number of stairs (-1 if not set)"
+          },
+          "max_slope": {
+            "type": "integer",
+            "description": "Maximum slope (-1 if not set)"
+          },
+          "min_width": {
+            "type": "integer",
+            "description": "Minimum width in meters (-1 if not set)"
+          },
+          "signposted_as": {
+            "type": "string",
+            "description": "Signposted name"
+          },
+          "reversed_signposted_as": {
+            "type": "string",
+            "description": "Reversed signposted name"
+          },
+          "coord": {
+            "$ref": "#/components/schemas/Coord"
+          },
+          "stop_area": {
+            "$ref": "#/components/schemas/StopArea",
+            "description": "Parent stop area"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
         }
       },
       "JourneyCalendar": {
@@ -236,6 +332,54 @@
           }
         }
       },
+      "Calendar": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Calendar ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Calendar name"
+          },
+          "week_pattern": {
+            "$ref": "#/components/schemas/WeekPattern"
+          },
+          "active_periods": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ActivePeriod"
+            },
+            "description": "Active periods for this calendar"
+          },
+          "exceptions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["Add", "Sub"],
+                  "description": "Exception type: Add (exclusion) or Sub (inclusion)"
+                },
+                "date": {
+                  "type": "string",
+                  "format": "date",
+                  "description": "Exception date (YYYYMMDD)"
+                }
+              }
+            },
+            "description": "Exception dates"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
       "CommercialMode": {
         "type": "object",
         "properties": {
@@ -276,6 +420,18 @@
             "type": "string",
             "description": "Network name"
           },
+          "address_name": {
+            "type": "string",
+            "description": "Address name"
+          },
+          "address_number": {
+            "type": "string",
+            "description": "Address number"
+          },
+          "address_type_name": {
+            "type": "string",
+            "description": "Address type name"
+          },
           "links": {
             "type": "array",
             "items": {
@@ -307,6 +463,17 @@
             "type": "string",
             "description": "Text color (hex)"
           },
+          "additional_data": {
+            "type": "string",
+            "description": "Additional data"
+          },
+          "properties": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Additional properties"
+          },
           "commercial_mode": {
             "$ref": "#/components/schemas/CommercialMode"
           },
@@ -318,6 +485,36 @@
           },
           "network": {
             "$ref": "#/components/schemas/Network"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "LineGroup": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Line group ID"
+          },
+          "name": {
+            "type": "string",
+            "description": "Line group name"
+          },
+          "main_line": {
+            "$ref": "#/components/schemas/Line",
+            "description": "Main line of the group"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Line"
+            },
+            "description": "Lines in this group"
           },
           "links": {
             "type": "array",
@@ -363,11 +560,84 @@
             "type": "string",
             "description": "Stop point name"
           },
+          "label": {
+            "type": "string",
+            "description": "Stop point label"
+          },
           "coord": {
             "$ref": "#/components/schemas/Coord"
           },
+          "platform_code": {
+            "type": "string",
+            "description": "Platform code"
+          },
+          "fare_zone": {
+            "type": "string",
+            "description": "Fare zone"
+          },
+          "address_id": {
+            "type": "string",
+            "description": "Address ID"
+          },
+          "address": {
+            "type": "object",
+            "description": "Address information",
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Address ID"
+              },
+              "name": {
+                "type": "string",
+                "description": "Address name"
+              },
+              "coord": {
+                "$ref": "#/components/schemas/Coord"
+              }
+            }
+          },
           "stop_area": {
             "$ref": "#/components/schemas/StopArea"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Link"
+            }
+          }
+        }
+      },
+      "StopPointConnection": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Connection ID"
+          },
+          "departure": {
+            "$ref": "#/components/schemas/StopPoint",
+            "description": "Departure stop point"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/StopPoint",
+            "description": "Destination stop point"
+          },
+          "display_duration": {
+            "type": "integer",
+            "description": "Display duration in seconds"
+          },
+          "duration": {
+            "type": "integer",
+            "description": "Connection duration in seconds"
+          },
+          "max_duration": {
+            "type": "integer",
+            "description": "Maximum connection duration in seconds"
+          },
+          "connection_type": {
+            "type": "string",
+            "enum": ["StopPoint", "StopArea", "Walking", "VJ", "Default", "stay_in", "undefined"],
+            "description": "Type of connection"
           },
           "links": {
             "type": "array",
@@ -388,12 +658,24 @@
             "type": "string",
             "description": "Stop area name"
           },
+          "label": {
+            "type": "string",
+            "description": "Stop area label"
+          },
           "coord": {
             "$ref": "#/components/schemas/Coord"
           },
           "timezone": {
             "type": "string",
             "description": "Timezone"
+          },
+          "wheelchair_boarding": {
+            "type": "boolean",
+            "description": "Whether wheelchair boarding is available"
+          },
+          "additional_data": {
+            "type": "string",
+            "description": "Additional data"
           },
           "stop_points": {
             "type": "array",
@@ -576,6 +858,15 @@
             "description": "Display name"
           }
         }
+      },
+      "DiscreteVehicleJourney": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/VehicleJourney"
+          }
+        ],
+        "description": "Discrete vehicle journey with specific stop times"
       },
       "DateTime": {
         "type": "object",
@@ -1542,6 +1833,18 @@
           "name": {
             "type": "string",
             "description": "Company name"
+          },
+          "address_name": {
+            "type": "string",
+            "description": "Address name"
+          },
+          "address_number": {
+            "type": "string",
+            "description": "Address number"
+          },
+          "address_type_name": {
+            "type": "string",
+            "description": "Address type name"
           },
           "links": {
             "type": "array",
