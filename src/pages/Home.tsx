@@ -222,6 +222,9 @@ const Home: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Advertisement */}
+                    <Ad format="horizontal" size="responsive" className="mb-6" />
+
                     {/* Sample Routes Section */}
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
@@ -259,6 +262,9 @@ const Home: React.FC = () => {
                         </div>
                     </div>
 
+                    {/* Advertisement */}
+                    <Ad format="horizontal" size="responsive" className="mb-6" />
+
                     {/* Sample Trips Section */}
                     <div className='mb-6'>
                         <h2 className='title is-3 mb-4'>
@@ -295,6 +301,9 @@ const Home: React.FC = () => {
                             ))}
                         </div>
                     </div>
+
+                    {/* Advertisement */}
+                    <Ad format="horizontal" size="responsive" className="mb-6" />
 
                     {/* API Documentation Section */}
                     <div className='mb-6'>
