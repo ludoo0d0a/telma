@@ -13,22 +13,24 @@
  */
 
 
-import type { Configuration } from '../configuration';
+import type { Configuration } from '@/client/configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '@/client/common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '@/client/base';
 // @ts-ignore
-import type { CoverageCoverageCoordCoordFreefloatingsGet200Response } from '../models';
+import type { CoverageCoverageCoordCoordFreefloatingsGet200Response } from '@/client/models';
 // @ts-ignore
-import type { POITypesResponse } from '../models';
+import type { POITypesResponse } from '@/client/models';
 // @ts-ignore
-import type { POIsResponse } from '../models';
+import type { POIsResponse } from '@/client/models';
 // @ts-ignore
-import type { PlacesResponse } from '../models';
+import type { PlacesResponse } from '@/client/models';
+// @ts-ignore
+import type { StopAreasResponse } from '@/client/models';
 /**
  * PlacesApi - axios parameter creator
  */
@@ -239,6 +241,62 @@ export const PlacesApiAxiosParamCreator = function (configuration?: Configuratio
             };
         },
         /**
+         * Find stop areas within a certain distance from coordinates
+         * @summary Find stop areas nearby coordinates
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {string} coord Coordinates in format \&#39;lon;lat\&#39;
+         * @param {number} [distance] Distance in meters (default: 200)
+         * @param {number} [count] Number of results to return
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        coverageCoverageCoordCoordStopAreasGet: async (coverage: string, coord: string, distance?: number, count?: number, depth?: number, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'coverage' is not null or undefined
+            assertParamExists('coverageCoverageCoordCoordStopAreasGet', 'coverage', coverage)
+            // verify required parameter 'coord' is not null or undefined
+            assertParamExists('coverageCoverageCoordCoordStopAreasGet', 'coord', coord)
+            const localVarPath = `/coverage/{coverage}/coord/{coord}/stop_areas`
+                .replace(`{${"coverage"}}`, encodeURIComponent(String(coverage)))
+                .replace(`{${"coord"}}`, encodeURIComponent(String(coord)));
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            // authentication ApiKeyAuth required
+            await setApiKeyToObject(localVarHeaderParameter, "Authorization", configuration)
+
+            if (distance !== undefined) {
+                localVarQueryParameter['distance'] = distance;
+            }
+
+            if (count !== undefined) {
+                localVarQueryParameter['count'] = count;
+            }
+
+            if (depth !== undefined) {
+                localVarQueryParameter['depth'] = depth;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
          * Search for places including stop areas, stop points, addresses, POIs, and administrative regions
          * @summary Search for places (geographical autocomplete)
          * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -413,6 +471,23 @@ export const PlacesApiFp = function(configuration?: Configuration) {
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
         /**
+         * Find stop areas within a certain distance from coordinates
+         * @summary Find stop areas nearby coordinates
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {string} coord Coordinates in format \&#39;lon;lat\&#39;
+         * @param {number} [distance] Distance in meters (default: 200)
+         * @param {number} [count] Number of results to return
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async coverageCoverageCoordCoordStopAreasGet(coverage: string, coord: string, distance?: number, count?: number, depth?: number, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<StopAreasResponse>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.coverageCoverageCoordCoordStopAreasGet(coverage, coord, distance, count, depth, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['PlacesApi.coverageCoverageCoordCoordStopAreasGet']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
          * Search for places including stop areas, stop points, addresses, POIs, and administrative regions
          * @summary Search for places (geographical autocomplete)
          * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -505,6 +580,20 @@ export const PlacesApiFactory = function (configuration?: Configuration, basePat
             return localVarFp.coverageCoverageCoordCoordPoisGet(coverage, coord, distance, poiTypes, depth, options).then((request) => request(axios, basePath));
         },
         /**
+         * Find stop areas within a certain distance from coordinates
+         * @summary Find stop areas nearby coordinates
+         * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+         * @param {string} coord Coordinates in format \&#39;lon;lat\&#39;
+         * @param {number} [distance] Distance in meters (default: 200)
+         * @param {number} [count] Number of results to return
+         * @param {number} [depth] Depth of detail in response
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        coverageCoverageCoordCoordStopAreasGet(coverage: string, coord: string, distance?: number, count?: number, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<StopAreasResponse> {
+            return localVarFp.coverageCoverageCoordCoordStopAreasGet(coverage, coord, distance, count, depth, options).then((request) => request(axios, basePath));
+        },
+        /**
          * Search for places including stop areas, stop points, addresses, POIs, and administrative regions
          * @summary Search for places (geographical autocomplete)
          * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
@@ -583,6 +672,19 @@ export interface PlacesApiInterface {
      * @throws {RequiredError}
      */
     coverageCoverageCoordCoordPoisGet(coverage: string, coord: string, distance?: number, poiTypes?: Array<string>, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<POIsResponse>;
+
+    /**
+     * Find stop areas within a certain distance from coordinates
+     * @summary Find stop areas nearby coordinates
+     * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+     * @param {string} coord Coordinates in format \&#39;lon;lat\&#39;
+     * @param {number} [distance] Distance in meters (default: 200)
+     * @param {number} [count] Number of results to return
+     * @param {number} [depth] Depth of detail in response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    coverageCoverageCoordCoordStopAreasGet(coverage: string, coord: string, distance?: number, count?: number, depth?: number, options?: RawAxiosRequestConfig): AxiosPromise<StopAreasResponse>;
 
     /**
      * Search for places including stop areas, stop points, addresses, POIs, and administrative regions
@@ -667,6 +769,21 @@ export class PlacesApi extends BaseAPI implements PlacesApiInterface {
      */
     public coverageCoverageCoordCoordPoisGet(coverage: string, coord: string, distance?: number, poiTypes?: Array<string>, depth?: number, options?: RawAxiosRequestConfig) {
         return PlacesApiFp(this.configuration).coverageCoverageCoordCoordPoisGet(coverage, coord, distance, poiTypes, depth, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * Find stop areas within a certain distance from coordinates
+     * @summary Find stop areas nearby coordinates
+     * @param {string} coverage Coverage area (e.g., \&#39;sncf\&#39;)
+     * @param {string} coord Coordinates in format \&#39;lon;lat\&#39;
+     * @param {number} [distance] Distance in meters (default: 200)
+     * @param {number} [count] Number of results to return
+     * @param {number} [depth] Depth of detail in response
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     */
+    public coverageCoverageCoordCoordStopAreasGet(coverage: string, coord: string, distance?: number, count?: number, depth?: number, options?: RawAxiosRequestConfig) {
+        return PlacesApiFp(this.configuration).coverageCoverageCoordCoordStopAreasGet(coverage, coord, distance, count, depth, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

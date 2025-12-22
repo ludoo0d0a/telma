@@ -282,9 +282,9 @@ export const autocompleteGeo = (
 };
 
 /**
- * Find places nearby coordinates
- * Uses the path-based endpoint format: /coverage/{coverage}/coord/{coord}/places_nearby
- * This is the correct format according to Navitia documentation
+ * Find stop areas nearby coordinates
+ * Uses the path-based endpoint format: /coverage/{coverage}/coord/{coord}/stop_areas
+ * This endpoint returns stop areas within a certain distance from coordinates
  */
 export const getPlacesNearby = (
     coord: string | null,
@@ -292,7 +292,7 @@ export const getPlacesNearby = (
     lonOrParams: number | PlacesNearbyParams = {},
     coverageOrDistance: string | number = DEFAULT_RADIUS_NEARBY,
     paramsOrType: string | null = null
-): AxiosPromise<PlacesResponse> => {
+): AxiosPromise<StopAreasResponse> => {
     let coverage: string;
     let coordStr: string;
     let params: PlacesNearbyParams;
@@ -307,28 +307,26 @@ export const getPlacesNearby = (
         coverage = typeof coverageOrDistance === 'string' ? coverageOrDistance : DEFAULT_COVERAGE;
         coordStr = `${lon};${lat}`;
         const distance = typeof coverageOrDistance === 'number' ? coverageOrDistance : DEFAULT_RADIUS_NEARBY;
-        const type = typeof paramsOrType === 'string' ? paramsOrType : null;
         params = { distance };
-        if (type) params.type = type;
     } else {
         coverage = latOrCoverage as string;
         coordStr = coord as string;
         params = lonOrParams as PlacesNearbyParams;
     }
 
-    // Use the generated client method with the correct path-based endpoint format
-    return getClient().places.coverageCoverageCoordCoordPlacesNearbyGet(
+    // Use the generated client method with the stop_areas endpoint
+    // Note: The stop_areas endpoint doesn't support type filtering, so we ignore the type parameter if provided
+    return getClient().places.coverageCoverageCoordCoordStopAreasGet(
         coverage,
         coordStr,
         params.distance || undefined,
-        params.type ? (Array.isArray(params.type) ? params.type as any[] : [params.type] as any[]) : undefined,
         params.count || undefined,
         params.depth || undefined
     );
 };
 
 /**
- * Places nearby using lat/lon separately (convenience function)
+ * Stop areas nearby using lat/lon separately (convenience function)
  */
 export const placesNearby = (
     lat: number,
@@ -336,10 +334,10 @@ export const placesNearby = (
     coverage: string = DEFAULT_COVERAGE,
     distance: number = 200,
     type: string | null = null
-): AxiosPromise<PlacesResponse> => {
+): AxiosPromise<StopAreasResponse> => {
     const coordStr = `${lon};${lat}`;
     const params: PlacesNearbyParams = { distance };
-    if (type) params.type = type;
+    // Note: type parameter is ignored as the stop_areas endpoint doesn't support type filtering
     return getPlacesNearby(coordStr, coverage, params);
 };
 

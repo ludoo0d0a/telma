@@ -1,6 +1,6 @@
 import React from 'react';
 import TrainCard from './TrainCard';
-import stations from '../gares.json';
+import stations from '@/gares.json';
 
 interface CityCardsProps {
     searchTerm: string;

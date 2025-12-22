@@ -13,30 +13,30 @@
  */
 
 
-import type { Configuration } from '../configuration';
+import type { Configuration } from '@/client/configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '@/client/common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '@/client/base';
 // @ts-ignore
-import type { CompaniesResponse } from '../models';
+import type { CompaniesResponse } from '@/client/models';
 // @ts-ignore
-import type { CoverageCoverageNetworksGet200Response } from '../models';
+import type { CoverageCoverageNetworksGet200Response } from '@/client/models';
 // @ts-ignore
-import type { CoverageCoverageRoutesGet200Response } from '../models';
+import type { CoverageCoverageRoutesGet200Response } from '@/client/models';
 // @ts-ignore
-import type { CoverageCoverageStopPointsGet200Response } from '../models';
+import type { CoverageCoverageStopPointsGet200Response } from '@/client/models';
 // @ts-ignore
-import type { LinesResponse } from '../models';
+import type { LinesResponse } from '@/client/models';
 // @ts-ignore
-import type { PlacesResponse } from '../models';
+import type { PlacesResponse } from '@/client/models';
 // @ts-ignore
-import type { StopAreasResponse } from '../models';
+import type { StopAreasResponse } from '@/client/models';
 // @ts-ignore
-import type { VehicleJourneysResponse } from '../models';
+import type { VehicleJourneysResponse } from '@/client/models';
 /**
  * PublicTransportObjectsApi - axios parameter creator
  */

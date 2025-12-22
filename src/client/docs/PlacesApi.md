@@ -8,6 +8,7 @@ All URIs are relative to *https://api.sncf.com/v1*
 |[**coverageCoverageCoordCoordFreefloatingsGet**](#coveragecoveragecoordcoordfreefloatingsget) | **GET** /coverage/{coverage}/coord/{coord}/freefloatings | Get freefloatings nearby coordinates|
 |[**coverageCoverageCoordCoordPlacesNearbyGet**](#coveragecoveragecoordcoordplacesnearbyget) | **GET** /coverage/{coverage}/coord/{coord}/places_nearby | Find places nearby coordinates|
 |[**coverageCoverageCoordCoordPoisGet**](#coveragecoveragecoordcoordpoisget) | **GET** /coverage/{coverage}/coord/{coord}/pois | Get POIs nearby coordinates|
+|[**coverageCoverageCoordCoordStopAreasGet**](#coveragecoveragecoordcoordstopareasget) | **GET** /coverage/{coverage}/coord/{coord}/stop_areas | Find stop areas nearby coordinates|
 |[**coverageCoveragePlacesGet**](#coveragecoverageplacesget) | **GET** /coverage/{coverage}/places | Search for places (geographical autocomplete)|
 |[**coverageCoveragePoiTypesGet**](#coveragecoveragepoitypesget) | **GET** /coverage/{coverage}/poi_types | List POI types|
 
@@ -250,6 +251,70 @@ const { status, data } = await apiInstance.coverageCoverageCoordCoordPoisGet(
 |**400** | Bad request (invalid coordinates format) |  -  |
 |**401** | Unauthorized |  -  |
 |**404** | Coverage not found |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+# **coverageCoverageCoordCoordStopAreasGet**
+> StopAreasResponse coverageCoverageCoordCoordStopAreasGet()
+
+Find stop areas within a certain distance from coordinates
+
+### Example
+
+```typescript
+import {
+    PlacesApi,
+    Configuration
+} from './api';
+
+const configuration = new Configuration();
+const apiInstance = new PlacesApi(configuration);
+
+let coverage: string; //Coverage area (e.g., \'sncf\') (default to undefined)
+let coord: string; //Coordinates in format \'lon;lat\' (default to undefined)
+let distance: number; //Distance in meters (default: 200) (optional) (default to 200)
+let count: number; //Number of results to return (optional) (default to 10)
+let depth: number; //Depth of detail in response (optional) (default to 1)
+
+const { status, data } = await apiInstance.coverageCoverageCoordCoordStopAreasGet(
+    coverage,
+    coord,
+    distance,
+    count,
+    depth
+);
+```
+
+### Parameters
+
+|Name | Type | Description  | Notes|
+|------------- | ------------- | ------------- | -------------|
+| **coverage** | [**string**] | Coverage area (e.g., \&#39;sncf\&#39;) | defaults to undefined|
+| **coord** | [**string**] | Coordinates in format \&#39;lon;lat\&#39; | defaults to undefined|
+| **distance** | [**number**] | Distance in meters (default: 200) | (optional) defaults to 200|
+| **count** | [**number**] | Number of results to return | (optional) defaults to 10|
+| **depth** | [**number**] | Depth of detail in response | (optional) defaults to 1|
+
+
+### Return type
+
+**StopAreasResponse**
+
+### Authorization
+
+[ApiKeyAuth](../README.md#ApiKeyAuth)
+
+### HTTP request headers
+
+ - **Content-Type**: Not defined
+ - **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+|**200** | List of nearby stop areas |  -  |
+|**400** | Bad request (e.g., invalid coordinates format) |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

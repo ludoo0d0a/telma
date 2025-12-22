@@ -2,7 +2,7 @@ import React from 'react'
 import { Outlet, useParams } from 'react-router-dom'
 import Footer from '@/components/Footer'
 import TrainStations from '@/components/TrainStations'
-import stations from '../gares.json'
+import stations from '@/gares.json'
 
 const City: React.FC = () => {
     const { city } = useParams<{ city?: string }>()

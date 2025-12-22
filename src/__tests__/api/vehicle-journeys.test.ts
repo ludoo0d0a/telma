@@ -3,7 +3,7 @@
  * Validates that responses match the OpenAPI schema
  */
 
-import { NavitiaClient } from '../../client/client';
+import { NavitiaClient } from '@/client/client';
 import { validateResponse, formatValidationErrors } from '@/utils/openapi-validator';
 
 const API_KEY = process.env.REACT_APP_API_KEY || process.env.API_KEY;

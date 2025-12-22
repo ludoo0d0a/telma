@@ -13,20 +13,20 @@
  */
 
 
-import type { Configuration } from '../configuration';
+import type { Configuration } from '@/client/configuration';
 import type { AxiosPromise, AxiosInstance, RawAxiosRequestConfig } from 'axios';
 import globalAxios from 'axios';
 // Some imports not used depending on template conditions
 // @ts-ignore
-import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '../common';
+import { DUMMY_BASE_URL, assertParamExists, setApiKeyToObject, setBasicAuthToObject, setBearerAuthToObject, setOAuthToObject, setSearchParams, serializeDataIfNeeded, toPathString, createRequestFunction } from '@/client/common';
 // @ts-ignore
-import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '../base';
+import { BASE_PATH, COLLECTION_FORMATS, type RequestArgs, BaseAPI, RequiredError, operationServerMap } from '@/client/base';
 // @ts-ignore
-import type { CoverageCoverageEquipmentReportsGet200Response } from '../models';
+import type { CoverageCoverageEquipmentReportsGet200Response } from '@/client/models';
 // @ts-ignore
-import type { CoverageCoverageLineReportsGet200Response } from '../models';
+import type { CoverageCoverageLineReportsGet200Response } from '@/client/models';
 // @ts-ignore
-import type { CoverageCoverageTrafficReportsGet200Response } from '../models';
+import type { CoverageCoverageTrafficReportsGet200Response } from '@/client/models';
 /**
  * ReportsApi - axios parameter creator
  */

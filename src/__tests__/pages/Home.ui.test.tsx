@@ -5,8 +5,8 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import { AuthProvider } from '../../contexts/AuthContext';
-import Home from '../../pages/Home';
+import { AuthProvider } from '@/contexts/AuthContext';
+import Home from '@/pages/Home';
 
 const renderWithRouter = (component: React.ReactElement) => {
   return render(

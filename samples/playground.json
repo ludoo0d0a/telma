@@ -1,0 +1,18 @@
+{
+  "samples": [
+    {
+      "name": "Stop Areas Nearby Coordinates",
+      "description": "Get stop areas near coordinates using the Navitia API",
+      "playground_url": "https://playground.navitia.io/play.html?request=https%3A%2F%2Fapi.sncf.com%2Fv1%2Fcoverage%2Fsncf%2Fcoord%2F6.14744%253B49.20879%2Fstop_areas%3Fdistance%3D5000%26",
+      "api_endpoint": "/coverage/{coverage}/coord/{coord}/stop_areas",
+      "method": "GET",
+      "parameters": {
+        "coverage": "sncf",
+        "coord": "6.14744;49.20879",
+        "distance": 5000
+      },
+      "example_request": "https://api.sncf.com/v1/coverage/sncf/coord/6.14744;49.20879/stop_areas?distance=5000"
+    }
+  ]
+}
+
