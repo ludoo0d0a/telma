@@ -2767,6 +2767,66 @@
         }
       }
     },
+    "/coverage/{coverage}/coord/{coord}/stop_areas": {
+      "get": {
+        "tags": ["Places"],
+        "summary": "Find stop areas nearby coordinates",
+        "description": "Find stop areas within a certain distance from coordinates",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/coverage"
+          },
+          {
+            "name": "coord",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "pattern": "^[+-]?\\d+\\.?\\d*;[+-]?\\d+\\.?\\d*$"
+            },
+            "description": "Coordinates in format 'lon;lat'"
+          },
+          {
+            "name": "distance",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "default": 200,
+              "minimum": 0
+            },
+            "description": "Distance in meters (default: 200)"
+          },
+          {
+            "$ref": "#/components/parameters/count"
+          },
+          {
+            "$ref": "#/components/parameters/depth"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of nearby stop areas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopAreasResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (e.g., invalid coordinates format)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/coverage/{coverage}/stop_schedules": {
       "get": {
         "tags": ["Schedules"],
