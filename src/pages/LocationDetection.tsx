@@ -10,7 +10,6 @@ import { encodeVehicleJourneyId } from '@/utils/uriUtils';
 import { MapPin, RefreshCw, Square, Loader2, CheckCircle2, Train, Info, AlertTriangle } from 'lucide-react';
 import { cleanLocationName } from '@/services/locationService';
 import { parseUTCDate } from '@/utils/dateUtils';
-import type { Place } from '@/client/models/place';
 import type { Departure } from '@/client/models/departure';
 import type { Arrival } from '@/client/models/arrival';
 import type { VehicleJourney } from '@/client/models/vehicle-journey';
@@ -324,32 +323,39 @@ const LocationDetection: React.FC = () => {
                 }
             }
 
-            const places = response.data.places || [];
-            const stations = places.filter(place =>
-                place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
-            );
+            // getPlacesNearby returns StopAreasResponse with stop_areas property
+            const stopAreas = response.stop_areas || [];
+            
+            // Also collect stop_points from the stop_areas
+            const allStations: Array<{ type: 'stop_area' | 'stop_point'; data: any }> = [];
+            for (const stopArea of stopAreas) {
+                allStations.push({ type: 'stop_area', data: stopArea });
+                // Add stop_points as separate entries
+                if (stopArea.stop_points) {
+                    for (const stopPoint of stopArea.stop_points) {
+                        allStations.push({ type: 'stop_point', data: stopPoint });
+                    }
+                }
+            }
 
             // Store nearby stations for map display
-            const nearbyStations = stations.map(station => {
-                const coord = station.coord ||
-                    station.stop_area?.coord ||
-                    station.stop_point?.coord ||
-                    station.stop_point?.stop_area?.coord;
+            const nearbyStations = allStations.map(({ type, data }) => {
+                const coord = data.coord || data.stop_area?.coord;
 
                 if (coord?.lat && coord?.lon) {
                     const distance = calculateDistance(latitude, longitude, coord.lat, coord.lon);
                     return {
-                        id: station.stop_area?.id || station.stop_point?.id || station.id || '',
-                        name: cleanLocationName(station.stop_area?.name || station.stop_point?.name || station.name) || 'Gare inconnue',
+                        id: data.id || data.stop_area?.id || '',
+                        name: cleanLocationName(data.name || data.stop_area?.name) || 'Gare inconnue',
                         distance: Math.round(distance),
                         coord: { lat: coord.lat, lon: coord.lon },
-                        type: (station.embedded_type || 'stop_area') as 'stop_area' | 'stop_point'
+                        type: type
                     };
                 }
                 return null;
             }).filter((s): s is NonNullable<typeof s> => s !== null);
 
-            if (stations.length === 0) {
+            if (allStations.length === 0) {
                 setDetectionResult({
                     isInStation: false,
                     userLocation: { lat: latitude, lon: longitude, accuracy },
@@ -364,29 +370,28 @@ const LocationDetection: React.FC = () => {
             // We then iterate through this list and calculate the precise distance to each station
             // to identify the one that is truly the closest to the user's coordinates.
             // This approach is correct and ensures accuracy.
-            let closestStation: Place | null = null;
+            let closestStation: { type: 'stop_area' | 'stop_point'; data: any } | null = null;
             let minDistance = Infinity;
-            let closestStopPoint: Place | null = null;
+            let closestStopPoint: { type: 'stop_area' | 'stop_point'; data: any } | null = null;
 
-            for (const station of stations) {
-                const coord = station.coord ||
-                    station.stop_area?.coord ||
-                    station.stop_point?.coord ||
-                    station.stop_point?.stop_area?.coord;
+            for (const { type, data } of allStations) {
+                const coord = data.coord || data.stop_area?.coord;
 
                 if (coord?.lat && coord?.lon) {
                     const distance = calculateDistance(latitude, longitude, coord.lat, coord.lon);
                     if (distance < minDistance) {
                         minDistance = distance;
-                        if (station.embedded_type === 'stop_point') {
-                            closestStopPoint = station;
-                            closestStation = station.stop_point?.stop_area ? {
-                                ...station,
-                                embedded_type: 'stop_area',
-                                stop_area: station.stop_point.stop_area
-                            } : station;
+                        if (type === 'stop_point') {
+                            closestStopPoint = { type, data };
+                            // Find the parent stop_area for the stop_point
+                            const parentStopArea = stopAreas.find(sa => 
+                                sa.stop_points?.some(sp => sp.id === data.id)
+                            );
+                            closestStation = parentStopArea 
+                                ? { type: 'stop_area', data: parentStopArea }
+                                : { type, data };
                         } else {
-                            closestStation = station;
+                            closestStation = { type, data };
                         }
                     }
                 }
@@ -402,10 +407,7 @@ const LocationDetection: React.FC = () => {
                 return;
             }
 
-            const stationCoord = closestStation.coord ||
-                closestStation.stop_area?.coord ||
-                closestStation.stop_point?.coord ||
-                closestStation.stop_point?.stop_area?.coord;
+            const stationCoord = closestStation.data.coord || closestStation.data.stop_area?.coord;
 
             if (!stationCoord?.lat || !stationCoord?.lon) {
                 setError('Impossible de déterminer les coordonnées de la gare');
@@ -413,7 +415,7 @@ const LocationDetection: React.FC = () => {
                 return;
             }
 
-            const stationId = closestStation.stop_area?.id || closestStation.id;
+            const stationId = closestStation.data.id;
             if (!stationId) {
                 setError('Impossible de déterminer l\'ID de la gare');
                 setLoading(false);
@@ -423,13 +425,13 @@ const LocationDetection: React.FC = () => {
             // Determine platform
             let platform: DetectionResult['platform'] | undefined;
             if (closestStopPoint) {
-                const platformName = closestStopPoint.stop_point?.name || closestStopPoint.name || '';
+                const platformName = closestStopPoint.data.name || '';
                 const platformNumber = extractPlatform(platformName);
-                const platformCoord = closestStopPoint.stop_point?.coord || closestStopPoint.coord;
+                const platformCoord = closestStopPoint.data.coord;
 
                 if (platformCoord?.lat && platformCoord?.lon) {
                     platform = {
-                        id: closestStopPoint.stop_point?.id || closestStopPoint.id || '',
+                        id: closestStopPoint.data.id || '',
                         name: platformName,
                         coord: { lat: platformCoord.lat, lon: platformCoord.lon }
                     };
@@ -448,7 +450,7 @@ const LocationDetection: React.FC = () => {
                 isInStation: true,
                 station: {
                     id: stationId,
-                    name: cleanLocationName(closestStation.stop_area?.name || closestStation.name) || 'Gare inconnue',
+                    name: cleanLocationName(closestStation.data.name) || 'Gare inconnue',
                     distance: Math.round(minDistance),
                     coord: { lat: stationCoord.lat, lon: stationCoord.lon }
                 },
