@@ -190,9 +190,10 @@ const Trip: React.FC = () => {
                             // If decoding fails, use as-is
                         }
                         
-                        let response;
+                        let vehicleJourneyData;
                         try {
-                            response = await getVehicleJourney(cleanVehicleJourneyId, 'sncf');
+                            const data = await getVehicleJourney(cleanVehicleJourneyId, 'sncf');
+                            vehicleJourneyData = data.data;
                         } catch (apiError: any) {
                             console.error('[Trip] API error:', {
                                 message: apiError?.message,
@@ -234,7 +235,6 @@ const Trip: React.FC = () => {
                             // Continue to show error message below
                             throw apiError;
                         }
-                        const vehicleJourneyData = response.data;
                         
                         if (vehicleJourneyData.vehicle_journeys && vehicleJourneyData.vehicle_journeys.length > 0) {
                             const vehicleJourney = vehicleJourneyData.vehicle_journeys[0] as VehicleJourney & {

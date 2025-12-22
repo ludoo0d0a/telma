@@ -40,7 +40,7 @@ const Reports: React.FC = () => {
                     throw new Error('Type de rapport invalide');
             }
 
-            setReports(response.data);
+            setReports(response);
         } catch (err) {
             setError('Erreur lors de la récupération des rapports');
             console.error(err);

@@ -20,13 +20,11 @@ export function createClient(apiKey: string): NavitiaClient {
 // Example 2: Search for places
 export async function searchPlacesExample(client: NavitiaClient, query: string) {
   try {
-    const response = await client.places.coverageCoveragePlacesGet(
+    const places: Place[] = (await client.places.coverageCoveragePlacesGet(
       'sncf',
       query,
       20 // count
-    );
-    
-    const places: Place[] = response.data.places || [];
+    )).data.places || [];
     return places.filter(place => 
       place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
     );
@@ -44,7 +42,7 @@ export async function getJourneysExample(
   datetime?: string
 ) {
   try {
-    const response = await client.journeys.coverageCoverageJourneysGet(
+    const journey: Journey = (await client.journeys.coverageCoverageJourneysGet(
       'sncf',
       from,
       to,
@@ -52,9 +50,7 @@ export async function getJourneysExample(
       'departure', // datetimeRepresents
       'realtime', // dataFreshness
       100 // count
-    );
-    
-    const journey: Journey = response.data;
+    )).data;
     return journey.journeys || [];
   } catch (error) {
     console.error('Error getting journeys:', error);
@@ -69,15 +65,13 @@ export async function getDeparturesExample(
   count: number = 10
 ) {
   try {
-    const response = await client.departures.coverageCoverageStopAreasIdDeparturesGet(
+    const departures: Departure[] = (await client.departures.coverageCoverageStopAreasIdDeparturesGet(
       'sncf',
       stopAreaId,
       undefined, // datetime
       count,
       2 // depth
-    );
-    
-    const departures: Departure[] = response.data.departures || [];
+    )).data.departures || [];
     return departures;
   } catch (error) {
     console.error('Error getting departures:', error);
@@ -92,15 +86,13 @@ export async function getArrivalsExample(
   count: number = 10
 ) {
   try {
-    const response = await client.arrivals.coverageCoverageStopAreasIdArrivalsGet(
+    return (await client.arrivals.coverageCoverageStopAreasIdArrivalsGet(
       'sncf',
       stopAreaId,
       undefined, // datetime
       count,
       2 // depth
-    );
-    
-    return response.data.arrivals || [];
+    )).data.arrivals || [];
   } catch (error) {
     console.error('Error getting arrivals:', error);
     throw error;
@@ -114,13 +106,11 @@ export async function getStopSchedulesExample(
   datetime?: string
 ) {
   try {
-    const response = await client.schedules.coverageCoverageStopSchedulesGet(
+    return (await client.schedules.coverageCoverageStopSchedulesGet(
       'sncf',
       filter,
       datetime
-    );
-    
-    return response.data.stop_schedules || [];
+    )).data.stop_schedules || [];
   } catch (error) {
     console.error('Error getting stop schedules:', error);
     throw error;

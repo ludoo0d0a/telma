@@ -71,9 +71,8 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             if (defaultSearchTerm && defaultSearchTerm.length >= 2 && !selectedStation && !hasUserInteractedRef.current) {
                 setLoading(true);
                 try {
-                    const response = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
-                    const results = response.data;
-                    const stations = results.places?.filter(place =>
+                    const data = await searchPlaces(defaultSearchTerm, 'sncf', { count: 20 });
+                    const stations = data.places?.filter(place =>
                         place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
                     ) || [];
 
@@ -116,9 +115,8 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
         setLoading(true);
         try {
-            const response = await searchPlaces(searchTerm, 'sncf', { count: 20 });
-            const results = response.data;
-            const stations = results.places?.filter(place => 
+            const data = await searchPlaces(searchTerm, 'sncf', { count: 20 });
+            const stations = data.places?.filter(place => 
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
             ) || [];
             
@@ -218,16 +216,19 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             
             // Find nearby stations using coordinates
             const coordStr = `${longitude};${latitude}`;
-            const response = await getPlacesNearby(coordStr, 'sncf', {
+            const data = await getPlacesNearby(coordStr, 'sncf', {
                 type: ['stop_area', 'stop_point'],
                 count: 20,
                 distance: 2000 // Search within 2km
             });
 
-            const results = response.data;
-            const stations = results.places?.filter(place =>
+            // getPlacesNearby returns StopAreasResponse with stop_areas, convert to Place-like format
+            const stations = (data.stop_areas || []).map(stopArea => ({
+                ...stopArea,
+                embedded_type: 'stop_area' as const
+            })).filter(place =>
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
-            ) || [];
+            );
 
             if (stations.length > 0) {
                 // Sort favorites first

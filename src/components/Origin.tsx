@@ -30,11 +30,10 @@ const Origin: React.FC<OriginProps> = ({ idArrival}) => {
         }
         
         getVehicleJourney(vehicleJourneyId)
-            .then((response) => {
-                const stopsApi = response.data.vehicle_journeys?.[0]?.stop_times?.map(
+            .then((data) => {
+                setStops(data.data.vehicle_journeys?.[0]?.stop_times?.map(
                     (stop) => cleanLocationName(stop.stop_point?.name) || ''
-                ) || []
-                setStops(stopsApi)
+                ) || [])
             })
             .catch((error) => {
                 console.error('Error fetching origin stops:', error);

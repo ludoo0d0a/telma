@@ -39,7 +39,7 @@ const Schedules: React.FC = () => {
                     throw new Error('Type de planning invalide');
             }
 
-            setSchedules(response.data);
+            setSchedules(response);
         } catch (err) {
             setError('Erreur lors de la récupération des horaires');
             console.error(err);

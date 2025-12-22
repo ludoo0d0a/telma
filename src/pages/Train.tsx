@@ -102,8 +102,7 @@ const Train: React.FC = () => {
             setError(null);
             // Decode the ID
             const decodedId = decodeVehicleJourneyId(id);
-            const response = await getVehicleJourney(decodedId, 'sncf');
-            const data = response.data;
+            const data = await getVehicleJourney(decodedId, 'sncf');
             
             if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
                 setTrainData(data.vehicle_journeys[0] as ExtendedVehicleJourney);
@@ -154,8 +153,7 @@ const Train: React.FC = () => {
 
         setSearchLoading(true);
         try {
-            const response = await autocompletePT(query, 'sncf', 20);
-            const data = response.data;
+            const data = await autocompletePT(query, 'sncf', 20);
             // Filter to only show vehicle_journeys and extract the vehicle_journey object
             const vehicleJourneys = (data.pt_objects || [])
                 .filter((obj: { embedded_type?: string; vehicle_journey?: unknown }) => 

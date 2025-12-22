@@ -1,16 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import Footer from '@/components/Footer';
 import Ad from '@/components/Ad';
-import LocationAutocomplete from '@/components/LocationAutocomplete';
+import ItinerarySearchForm from '@/components/itinerary/ItinerarySearchForm';
+import DisruptionsList from '@/components/itinerary/DisruptionsList';
+import JourneyTable from '@/components/itinerary/JourneyTable';
+import EmptyState from '@/components/itinerary/EmptyState';
 import { getJourneys, formatDateTime } from '@/services/navitiaApi';
-import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
+import { parseUTCDate } from '@/utils/dateUtils';
 import { cleanLocationName } from '@/services/locationService';
-import { getDelay, getMaxDelay } from '@/services/delayService';
 import { getJourneyInfo, type JourneyInfo } from '@/services/journeyService';
 import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '@/services/disruptionService';
-import { encodeTripId, encodeVehicleJourneyId } from '@/utils/uriUtils';
-import { Loader2, RefreshCw, ArrowLeftRight, Search, AlertTriangle, ChevronUp, ChevronDown, Ban, Info, Clock, Train as TrainIcon } from 'lucide-react';
+import { encodeTripId } from '@/utils/uriUtils';
+import { Loader2, RefreshCw } from 'lucide-react';
 import type { JourneyItem } from '@/client/models/journey-item';
 import type { Disruption } from '@/client/models/disruption';
 import type { Section } from '@/client/models/section';
@@ -34,7 +36,6 @@ const Trajet: React.FC = () => {
     const [fromId, setFromId] = useState<string | undefined>(undefined);
     const [toId, setToId] = useState<string | undefined>(undefined);
     const [disruptions, setDisruptions] = useState<Disruption[]>([]);
-    const [showDisruptionsSection, setShowDisruptionsSection] = useState<boolean>(false);
 
     // Track if we should auto-search on initial load
     const hasAutoSearchedRef = useRef<boolean>(false);
@@ -602,107 +603,37 @@ const Trajet: React.FC = () => {
                     {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-5" />
 
-                    <div className='box mb-5'>
-                        <h3 className='title is-5 mb-4'>Recherche d'itinéraire</h3>
-                        <div className='columns'>
-                            <div className='column'>
-                                <LocationAutocomplete
-                                    label='Gare de départ'
-                                    value={fromName}
-                                    onValueChange={(value) => {
+                    <ItinerarySearchForm
+                        fromName={fromName}
+                        toName={toName}
+                        fromId={fromId}
+                        toId={toId}
+                        filterDate={filterDate}
+                        filterTime={filterTime}
+                        loading={loading}
+                        onFromChange={(id: string | undefined) => setFromId(id)}
+                        onToChange={(id: string | undefined) => setToId(id)}
+                        onFromValueChange={(value) => {
                                         setFromName(value);
                                         // Mark as user change if they typed something different
                                         if (hasAutoSearchedRef.current || value !== initialFromNameRef.current) {
                                             userHasChangedValuesRef.current = true;
                                         }
                                     }}
-                                    onChange={(id: string | undefined) => setFromId(id)}
-                                    defaultSearchTerm={fromName || 'Metz'}
-                                    onStationFound={handleFromStationFound}
-                                    disabled={loading}
-                                />
-                            </div>
-                            <div className='column is-narrow'>
-                                <div className='field'>
-                                    <label className='label'>&nbsp;</label>
-                                    <div className='control'>
-                                        <button
-                                            className='button is-light'
-                                            onClick={handleInvertItinerary}
-                                            disabled={loading || !fromId || !toId}
-                                            title="Inverser l'itinéraire"
-                                        >
-                                            <span className='icon'>
-                                                <ArrowLeftRight size={20} />
-                                            </span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='column'>
-                                <LocationAutocomplete
-                                    label="Gare d'arrivée"
-                                    value={toName}
-                                    onValueChange={(value) => {
+                        onToValueChange={(value) => {
                                         setToName(value);
                                         // Mark as user change if they typed something different
                                         if (hasAutoSearchedRef.current || value !== initialToNameRef.current) {
                                             userHasChangedValuesRef.current = true;
                                         }
                                     }}
-                                    onChange={(id: string | undefined) => setToId(id)}
-                                    defaultSearchTerm={toName || 'Thionville'}
-                                    onStationFound={handleToStationFound}
-                                    disabled={loading}
-                                />
-                            </div>
-                        </div>
-                        <div className='columns mt-4'>
-                            <div className='column is-narrow'>
-                                <div className='field'>
-                                    <label className='label'>Date</label>
-                                    <div className='control'>
-                                        <input
-                                            className='input'
-                                            type='date'
-                                            value={filterDate}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilterDate(e.target.value)}
-                                            disabled={loading}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='column is-narrow'>
-                                <div className='field'>
-                                    <label className='label'>Heure</label>
-                                    <div className='control'>
-                                        <input
-                                            className='input'
-                                            type='time'
-                                            value={filterTime}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilterTime(e.target.value)}
-                                            disabled={loading}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='column is-narrow'>
-                                <div className='field'>
-                                    <label className='label'>&nbsp;</label>
-                                    <div className='control'>
-                                        <button
-                                            className='button is-primary'
-                                            onClick={handleSearch}
-                                            disabled={loading || !fromId || !toId}
-                                        >
-                                            <span className='icon'><Search size={16} /></span>
-                                            <span>Rechercher</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                        onFromStationFound={handleFromStationFound}
+                        onToStationFound={handleToStationFound}
+                        onFilterDateChange={setFilterDate}
+                        onFilterTimeChange={setFilterTime}
+                        onSearch={handleSearch}
+                        onInvertItinerary={handleInvertItinerary}
+                    />
 
                     {loading && (
                         <div className='box has-text-centered'>
@@ -729,355 +660,27 @@ const Trajet: React.FC = () => {
                         </div>
                     )}
 
-                    {!loading && disruptions.length > 0 && (
-                        <div className='box mb-5'>
-                            <h3
-                                className='title is-5 mb-4 is-clickable'
-                                onClick={() => setShowDisruptionsSection(!showDisruptionsSection)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <span className='icon has-text-warning mr-2'>
-                                    <AlertTriangle size={20} />
-                                </span>
-                                Perturbations ({disruptions.length})
-                                <span className='icon ml-2'>
-                                    {showDisruptionsSection ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                                </span>
-                            </h3>
-                            {showDisruptionsSection && disruptions.map((disruption, index) => {
-                                // Handle severity - can be string, object with name, or object with other properties
-                                let severityText = 'unknown';
-                                if (typeof disruption.severity === 'string') {
-                                    severityText = disruption.severity;
-                                } else if (disruption.severity && typeof disruption.severity === 'object') {
-                                    severityText = (disruption.severity as { name?: string; label?: string }).name ||
-                                                  (disruption.severity as { name?: string; label?: string }).label ||
-                                                  JSON.stringify(disruption.severity);
-                                }
-
-                                const severityLevel = severityText.toLowerCase();
-
-                                // Determine notification type based on severity
-                                let notificationClass = 'is-warning';
-                                let IconComponent = AlertTriangle;
-                                if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
-                                    notificationClass = 'is-danger';
-                                    IconComponent = Ban;
-                                } else if (severityLevel.includes('information') || severityLevel.includes('info') || severityLevel.includes('information')) {
-                                    notificationClass = 'is-info';
-                                    IconComponent = Info;
-                                } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
-                                    notificationClass = 'is-warning';
-                                    IconComponent = Clock;
-                                }
-
-                                return (
-                                    <div key={index} className={`notification ${notificationClass} mb-3`}>
-                                        <div className='is-flex is-align-items-center mb-2'>
-                                            <span className='icon mr-2'>
-                                                <IconComponent size={20} />
-                                            </span>
-                                            <strong>
-                                                {severityText !== 'unknown' ? severityText : 'Perturbation'}
-                                            </strong>
-                                        </div>
-                                        {/* Display messages from messages array */}
-                                        {disruption.messages && Array.isArray(disruption.messages) && disruption.messages.length > 0 && (
-                                            <div className='content mb-2'>
-                                                {disruption.messages.map((msg, msgIndex) => (
-                                                    <p key={msgIndex} className='mb-2'>
-                                                        {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
-                                                    </p>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {/* Fallback to single message field if messages array doesn't exist */}
-                                        {(!disruption.messages || disruption.messages.length === 0) && disruption.message && (
-                                            <p className='mb-2'>{disruption.message}</p>
-                                        )}
-                                        {disruption.impacted_objects && disruption.impacted_objects.length > 0 && (
-                                            <div className='content is-small mt-2'>
-                                                <p className='has-text-weight-semibold'>Objets impactés:</p>
-                                                {disruption.impacted_objects.map((obj, objIndex) => (
-                                                    <div key={objIndex} className='mb-3'>
-                                                        <p className='has-text-weight-medium mb-1'>
-                                                            {obj.pt_object?.name || obj.pt_object?.id || `Objet ${objIndex + 1}`}
-                                                        </p>
-                                                        {/* Display impacted stops */}
-                                                        {obj.impacted_stops && Array.isArray(obj.impacted_stops) && obj.impacted_stops.length > 0 && (
-                                                            <div className='ml-3'>
-                                                                <p className='has-text-weight-semibold is-size-7 mb-1'>Arrêts impactés:</p>
-                                                                <ul className='is-size-7'>
-                                                                    {obj.impacted_stops.map((stop, stopIndex) => (
-                                                                        <li key={stopIndex}>
-                                                                            {cleanLocationName(stop.name || stop.stop_point?.name || stop.stop_area?.name || stop.id || 'Arrêt inconnu')}
-                                                                        </li>
-                                                                    ))}
-                                                                </ul>
-                                                            </div>
-                                                        )}
-                                                        {/* Display other pt_object properties */}
-                                                        {obj.pt_object && (
-                                                            <div className='ml-3 is-size-7'>
-                                                                {obj.pt_object.name && (
-                                                                    <p><strong>Nom:</strong> {obj.pt_object.name}</p>
-                                                                )}
-                                                                {obj.pt_object.id && (
-                                                                    <p><strong>ID:</strong> {obj.pt_object.id}</p>
-                                                                )}
-                                                                {obj.pt_object.embedded_type && (
-                                                                    <p><strong>Type:</strong> {obj.pt_object.embedded_type}</p>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {disruption.application_periods && disruption.application_periods.length > 0 && (
-                                            <div className='content is-small mt-2'>
-                                                <p className='has-text-weight-semibold'>Période d'application:</p>
-                                                <ul>
-                                                    {disruption.application_periods.map((period, periodIndex) => (
-                                                        <li key={periodIndex}>
-                                                            Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : 'N/A'}
-                                                            {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : 'N/A'}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                            {!showDisruptionsSection && (
-                                <p className='has-text-grey is-italic'>
-                                    Cliquez sur le titre pour afficher les détails des perturbations.
-                                    Les perturbations sont également affichées dans le tableau ci-dessous.
-                                </p>
-                            )}
-                        </div>
-                    )}
+                    {!loading && <DisruptionsList disruptions={disruptions} />}
 
                     {!loading && !error && terTrains.length > 0 && (
                         <>
                             {/* Advertisement */}
                             <Ad format="auto" size="responsive" className="mb-5" />
 
-                            <div className='box'>
-                                <h2 className='title is-4 mb-5'>
-                                    Trains disponibles <span className='tag is-primary is-medium'>{terTrains.length}</span>
-                                </h2>
-                            <div className='table-container'>
-                                <table className='table is-fullwidth is-striped is-hoverable'>
-                                    <thead>
-                                        <tr>
-                                            <th>Date</th>
-                                            <th>Train</th>
-                                            <th>Départ</th>
-                                            <th>Arrivée</th>
-                                            <th>Retard</th>
-                                            <th>Perturbations</th>
-                                            <th>Durée</th>
-                                            <th>Wagons</th>
-                                            <th>Détails</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {terTrains.map((journey, index) => {
-                                            const info = getJourneyInfo(journey, fromName, toName);
-                                            const depDate = parseUTCDate(info.departureTime);
-                                            const arrDate = parseUTCDate(info.arrivalTime);
-                                            const depDelay = getDelay(info.baseDepartureTime, info.realDepartureTime);
-                                            const arrDelay = getDelay(info.baseArrivalTime, info.realArrivalTime);
-                                            const maxDelay = getMaxDelay(
-                                                depDelay,
-                                                arrDelay,
-                                                info.baseDepartureTime,
-                                                info.realDepartureTime,
-                                                info.baseArrivalTime,
-                                                info.realArrivalTime
-                                            );
-                                            const journeyDisruptions = getJourneyDisruptions(journey, info);
-                                            const tripId = generateTripId(journey, info);
-
+                            <JourneyTable
+                                journeys={terTrains}
+                                getJourneyInfo={(journey) => getJourneyInfo(journey, fromName, toName)}
+                                getJourneyDisruptions={getJourneyDisruptions}
+                                generateTripId={generateTripId}
+                                onDetailClick={(journey, journeyInfo, journeyDisruptions, tripId) => {
                                             // Store journey data in sessionStorage for the Trip page
-                                            const handleDetailClick = (): void => {
                                                 sessionStorage.setItem(`trip_${tripId}`, JSON.stringify({
                                                     journey,
-                                                    info,
+                                        info: journeyInfo,
                                                     disruptions: journeyDisruptions
                                                 }));
-                                            };
-
-                                            return (
-                                                <tr key={index}>
-                                                    <td>
-                                                        <span className='tag is-dark has-text-weight-semibold'>{formatDate(depDate, 'short')}</span>
-                                                    </td>
-                                                    <td>
-                                                        <div>
-                                                            <div className='is-flex is-align-items-center mb-2'>
-                                                                <span className={`icon ${info.transportColor} mr-2`}>
-                                                                    <info.transportIcon size={20} />
-                                                                </span>
-                                                                {info.vehicleJourneyId ? (() => {
-                                                                    // Ensure we have a string ID, not an object
-                                                                    let trainId = info.vehicleJourneyId;
-                                                                    if (typeof trainId === 'object' && trainId !== null) {
-                                                                        trainId = (trainId as { id?: string; href?: string }).id || (trainId as { id?: string; href?: string }).href || null;
-                                                                    }
-                                                                    return trainId ? (
-                                                                        <Link
-                                                                            to={`/train/${encodeVehicleJourneyId(trainId)}`}
-                                                                            className='has-text-primary has-text-weight-bold'
-                                                                        >
-                                                                            {info.trainNumber}
-                                                                        </Link>
-                                                                    ) : (
-                                                                        <strong className='has-text-primary'>{info.trainNumber}</strong>
-                                                                    );
-                                                                })() : (
-                                                                    <strong className='has-text-primary'>{info.trainNumber}</strong>
-                                                                )}
-                                                            </div>
-                                                            <span className={`tag ${info.transportTagColor} is-dark`}>
-                                                                {info.transportLabel}
-                                                            </span>
-                                                            {info.network && info.network !== info.commercialMode && (
-                                                                <>
-                                                                    <br />
-                                                                    <small className='has-text-grey'>{info.network}</small>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div>
-                                                            <strong className='has-text-info'>{info.departureStation}</strong>
-                                                            <br />
-                                                            <span className='is-size-5'>{formatTime(parseUTCDate(info.baseDepartureTime))}</span>
-                                                            {depDelay && depDelay !== 'À l\'heure' && (
-                                                                <>
-                                                                    <br />
-                                                                    <span className='has-text-danger'>{formatTime(parseUTCDate(info.realDepartureTime))}</span>
-                                                                </>
-                                                            )}
-                                                            {depDelay && (
-                                                                <>
-                                                                    <br />
-                                                                    <span className={`tag is-small ${depDelay !== 'À l\'heure' ? 'is-danger' : 'is-success'}`}>
-                                                                        {depDelay}
-                                                                    </span>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div>
-                                                            <strong className='has-text-info'>{info.arrivalStation}</strong>
-                                                            <br />
-                                                            <span className='is-size-5'>{formatTime(parseUTCDate(info.baseArrivalTime))}</span>
-                                                            {arrDelay && arrDelay !== 'À l\'heure' && (
-                                                                <>
-                                                                    <br />
-                                                                    <span className='has-text-danger'>{formatTime(parseUTCDate(info.realArrivalTime))}</span>
-                                                                </>
-                                                            )}
-                                                            {arrDelay && (
-                                                                <>
-                                                                    <br />
-                                                                    <span className={`tag is-small ${arrDelay !== 'À l\'heure' ? 'is-danger' : 'is-success'}`}>
-                                                                        {arrDelay}
-                                                                    </span>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        {maxDelay && maxDelay !== 'À l\'heure' ? (
-                                                            <span className='tag is-danger'>{maxDelay}</span>
-                                                        ) : (
-                                                            <span className='tag is-success'>À l'heure</span>
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        {journeyDisruptions.length > 0 ? (
-                                                            <div className='tags'>
-                                                                {journeyDisruptions.map((disruption, disIndex) => {
-                                                                    let severityText = 'unknown';
-                                                                    if (typeof disruption.severity === 'string') {
-                                                                        severityText = disruption.severity;
-                                                                    } else if (disruption.severity && typeof disruption.severity === 'object') {
-                                                                        severityText = (disruption.severity as { name?: string; label?: string }).name ||
-                                                                                      (disruption.severity as { name?: string; label?: string }).label ||
-                                                                                      'Perturbation';
-                                                                    }
-
-                                                                    const severityLevel = severityText.toLowerCase();
-                                                                    let tagClass = 'is-warning';
-                                                                    if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
-                                                                        tagClass = 'is-danger';
-                                                                    } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
-                                                                        tagClass = 'is-info';
-                                                                    } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
-                                                                        tagClass = 'is-warning';
-                                                                    }
-
-                                                                    const message = disruption.messages && disruption.messages.length > 0
-                                                                        ? disruption.messages[0].text || (disruption.messages[0] as { message?: string }).message
-                                                                        : disruption.message || severityText;
-
-                                                                    return (
-                                                                        <span
-                                                                            key={disIndex}
-                                                                            className={`tag ${tagClass} is-small`}
-                                                                            title={message}
-                                                                        >
-                                                                            <span className='icon mr-1'>
-                                                                                <AlertTriangle size={20} />
-                                                                            </span>
-                                                                            {message.length > 30 ? message.substring(0, 30) + '...' : message}
-                                                                        </span>
-                                                                    );
-                                                                })}
-                                                            </div>
-                                                        ) : (
-                                                            <span className='has-text-grey' style={{fontStyle: 'italic'}}>-</span>
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        <span className='tag is-dark has-text-weight-semibold'>{Math.floor(info.duration / 60)}min</span>
-                                                    </td>
-                                                    <td>
-                                                        {info.wagonCount ? (
-                                                            <span className='tag is-info is-dark'>
-                                                                <span className='icon mr-1'><TrainIcon size={16} /></span>
-                                                                {info.wagonCount}
-                                                            </span>
-                                                        ) : (
-                                                            <span className='has-text-grey' style={{fontStyle: 'italic'}}>N/A</span>
-                                                        )}
-                                                    </td>
-                                                    <td>
-                                                        <Link
-                                                            to={`/trip/${tripId}`}
-                                                            className='button is-small is-info is-light'
-                                                            onClick={handleDetailClick}
-                                                            title='Voir les détails du trajet'
-                                                        >
-                                                            <span className='icon'>
-                                                                <Info size={16} />
-                                                            </span>
-                                                        </Link>
-                                                    </td>
-                                                </tr>
-                                            );
-                                        })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                                }}
+                            />
 
                         {/* Advertisement */}
                         <Ad format="rectangle" size="responsive" className="mb-5" />
@@ -1085,34 +688,12 @@ const Trajet: React.FC = () => {
                     )}
 
                     {!loading && !error && terTrains.length === 0 && (
-                        <div className='box has-text-centered'>
-                            <div className='content'>
-                                <span className='icon is-large has-text-warning mb-4' style={{fontSize: '4rem'}}>🚂</span>
-                                <h2 className='title is-4'>Aucun train trouvé</h2>
-                                <p className='subtitle is-6 has-text-grey'>
-                                    Il n'y a actuellement aucun train disponible entre {fromName || 'la gare de départ'} et {toName || 'la gare d\'arrivée'} pour les prochains jours.
-                                </p>
-                                <div className='content has-text-left mt-5'>
-                                    <div className='message is-info'>
-                                        <div className='message-header'>
-                                            <p>Informations</p>
-                                        </div>
-                                        <div className='message-body'>
-                                            <ul>
-                                                <li>Gare de départ: <strong>{fromId ? `${fromName} (trouvée)` : `${fromName || 'Non sélectionnée'} (non trouvée)`}</strong></li>
-                                                <li>Gare d'arrivée: <strong>{toId ? `${toName} (trouvée)` : `${toName || 'Non sélectionnée'} (non trouvée)`}</strong></li>
-                                                <li>Période recherchée: Aujourd'hui et les 2 prochains jours</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div className='notification is-warning is-light mt-4'>
-                                        <p>
-                                            <strong>Suggestion:</strong> Essayez de vérifier les horaires directement sur le site SNCF ou contactez le service client.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <EmptyState
+                            fromName={fromName}
+                            toName={toName}
+                            fromId={fromId}
+                            toId={toId}
+                        />
                     )}
                 </div>
             </section>

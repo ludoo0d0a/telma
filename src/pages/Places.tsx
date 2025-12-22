@@ -23,8 +23,7 @@ const Places: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await searchPlaces(searchQuery);
-            const data = response.data;
+            const data = await searchPlaces(searchQuery);
             setPlaces(data.places || []);
         } catch (err) {
             setError('Erreur lors de la recherche');
@@ -45,9 +44,8 @@ const Places: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await getPlacesNearby(coordQuery);
-            const data = response.data;
-            setPlaces(data.places || []);
+            const data = await getPlacesNearby(coordQuery);
+            setPlaces(data.stop_areas || []);
         } catch (err) {
             setError('Erreur lors de la recherche');
             console.error(err);

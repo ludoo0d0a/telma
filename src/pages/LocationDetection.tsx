@@ -155,14 +155,14 @@ const LocationDetection: React.FC = () => {
             const nowStr = formatDateTime(now);
 
             // Get both departures and arrivals to catch trains that are currently at the station
-            const [departuresResponse, arrivalsResponse] = await Promise.all([
+            const [departuresData, arrivalsData] = await Promise.all([
                 getDepartures(stopAreaId, nowStr, 'sncf', { count: 20, depth: 2 }),
                 getArrivals(stopAreaId, nowStr, 'sncf', { count: 20, depth: 2 })
             ]);
 
             const allTrains: Array<{ departure?: Departure; arrival?: Arrival; type: 'departure' | 'arrival' }> = [
-                ...(departuresResponse.data.departures || []).map(d => ({ departure: d, type: 'departure' as const })),
-                ...(arrivalsResponse.data.arrivals || []).map(a => ({ arrival: a, type: 'arrival' as const }))
+                ...(departuresData.departures || []).map(d => ({ departure: d, type: 'departure' as const })),
+                ...(arrivalsData.arrivals || []).map(a => ({ arrival: a, type: 'arrival' as const }))
             ];
 
             let bestMatch: DetectedTrain | null = null;
@@ -178,8 +178,8 @@ const LocationDetection: React.FC = () => {
                 if (!vehicleJourneyId) continue;
 
                 try {
-                    const vjResponse = await getVehicleJourney(vehicleJourneyId, 'sncf', 2);
-                    const vehicleJourney = vjResponse.data.vehicle_journeys?.[0];
+                    const vjData = await getVehicleJourney(vehicleJourneyId, 'sncf', 2);
+                    const vehicleJourney = vjData.data.vehicle_journeys?.[0];
 
                     if (!vehicleJourney?.stop_times) continue;
 

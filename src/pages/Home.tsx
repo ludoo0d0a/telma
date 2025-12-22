@@ -1,12 +1,10 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import LoginButton from '@/components/LoginButton';
-import Avatar from '@/components/Avatar';
-import { useAuth } from '@/contexts/AuthContext';
 import Footer from '@/components/Footer';
-import CurrentLocationWidget from '@/components/CurrentLocationWidget';
 import Ad from '@/components/Ad';
-import { LogIn, Crosshair, LayoutGrid, Route, List, Code, Train, MapPin, Clock, BarChart3, Map, Circle, Star, Bus, ArrowRight, Bookmark, Book } from 'lucide-react';
+import AuthenticationSection from '@/components/home/AuthenticationSection';
+import CurrentLocationSection from '@/components/home/CurrentLocationSection';
+import DashboardSection from '@/components/home/DashboardSection';
+import { LayoutGrid, Route, List, Code, Train, MapPin, Clock, BarChart3, Map, Circle, Star, Bus, ArrowRight, Bookmark, Book } from 'lucide-react';
 
 interface DashboardCard {
     title: string;
@@ -17,7 +15,6 @@ interface DashboardCard {
 }
 
 const Home: React.FC = () => {
-    const { user } = useAuth();
     const mainPages: DashboardCard[] = [
         {
             title: 'Train',
@@ -155,195 +152,53 @@ const Home: React.FC = () => {
                     </div>
 
                     {/* Authentication Section */}
-                    <div className='mb-6'>
-                        <h2 className='title is-3 mb-4'>
-                            <span className='icon mr-2'>
-                                <LogIn size={24} />
-                            </span>
-                            Authentification
-                        </h2>
-                        <div className='columns is-centered'>
-                            <div className='column is-half has-text-centered'>
-                                <p className='mb-4'>Connectez-vous pour accéder à des fonctionnalités supplémentaires.</p>
-                                {user ? <Avatar /> : <LoginButton />}
-                            </div>
-                        </div>
-                    </div>
+                    <AuthenticationSection />
 
                     {/* Current Location Widget */}
-                    <div className='mb-6'>
-                        <h2 className='title is-3 mb-4'>
-                            <span className='icon mr-2'>
-                                <Crosshair size={24} />
-                            </span>
-                            Votre Position Actuelle
-                        </h2>
-                        <div className='columns'>
-                            <div className='column is-full'>
-                                <CurrentLocationWidget />
-                            </div>
-                        </div>
-                    </div>
+                    <CurrentLocationSection />
 
                     {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-6" />
 
                     {/* Main Pages Section */}
-                    <div className='mb-6'>
-                        <h2 className='title is-3 mb-4'>
-                            <span className='icon mr-2'>
-                                <LayoutGrid size={24} />
-                            </span>
-                            Pages Principales
-                        </h2>
-                        <div className='columns is-multiline'>
-                            {mainPages.map((page) => (
-                                <div key={page.path} className='column is-one-third-tablet is-half-mobile'>
-                                    <Link to={page.path} className='dashboard-card-link'>
-                                        <div className={`card dashboard-card ${page.color === 'primary' ? 'has-background-primary' : ''}`}>
-                                            <div className='card-content'>
-                                                <div className='media'>
-                                                    <div className='media-left'>
-                                                        <span className={`icon is-large ${page.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            <page.icon size={32} />
-                                                        </span>
-                                                    </div>
-                                                    <div className='media-content'>
-                                                        <p className={`title is-5 ${page.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            {page.title}
-                                                        </p>
-                                                        <p className={`subtitle is-6 ${page.color === 'primary' ? 'has-text-white' : 'has-text-secondary'}`}>
-                                                            {page.description}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <DashboardSection
+                        title="Pages Principales"
+                        icon={LayoutGrid}
+                        cards={mainPages}
+                    />
 
                     {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-6" />
 
                     {/* Sample Routes Section */}
-                    <div className='mb-6'>
-                        <h2 className='title is-3 mb-4'>
-                            <span className='icon mr-2'>
-                                <Route size={24} />
-                            </span>
-                            Exemples de Trajets
-                        </h2>
-                        <div className='columns is-multiline'>
-                            {sampleRoutes.map((route) => (
-                                <div key={route.path} className='column is-half-tablet is-half-mobile'>
-                                    <Link to={route.path} className='dashboard-card-link'>
-                                        <div className={`card dashboard-card ${route.color === 'secondary' ? 'has-background-secondary' : ''}`}>
-                                            <div className='card-content'>
-                                                <div className='media'>
-                                                    <div className='media-left'>
-                                                        <span className={`icon is-large ${route.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            <route.icon size={32} />
-                                                        </span>
-                                                    </div>
-                                                    <div className='media-content'>
-                                                        <p className={`title is-5 ${route.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            {route.title}
-                                                        </p>
-                                                        <p className={`subtitle is-6 ${route.color === 'secondary' ? 'has-text-white' : 'has-text-secondary'}`}>
-                                                            {route.description}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <DashboardSection
+                        title="Exemples de Trajets"
+                        icon={Route}
+                        cards={sampleRoutes}
+                        columnsClass="is-half-tablet is-half-mobile"
+                    />
 
                     {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-6" />
 
                     {/* Sample Trips Section */}
-                    <div className='mb-6'>
-                        <h2 className='title is-3 mb-4'>
-                            <span className='icon mr-2'>
-                                <List size={24} />
-                            </span>
-                            Exemples de Trajets Détaillés
-                        </h2>
-                        <div className='columns is-multiline'>
-                            {sampleTrips.map((trip) => (
-                                <div key={trip.path} className='column is-half-tablet is-full-mobile'>
-                                    <Link to={trip.path} className='dashboard-card-link'>
-                                        <div className={`card dashboard-card ${trip.color === 'secondary' ? 'has-background-secondary' : ''}`}>
-                                            <div className='card-content'>
-                                                <div className='media'>
-                                                    <div className='media-left'>
-                                                        <span className={`icon is-large ${trip.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            <trip.icon size={32} />
-                                                        </span>
-                                                    </div>
-                                                    <div className='media-content'>
-                                                        <p className={`title is-5 ${trip.color === 'secondary' ? 'has-text-white' : ''}`}>
-                                                            {trip.title}
-                                                        </p>
-                                                        <p className={`subtitle is-6 ${trip.color === 'secondary' ? 'has-text-white' : 'has-text-secondary'}`}>
-                                                            {trip.description}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <DashboardSection
+                        title="Exemples de Trajets Détaillés"
+                        icon={List}
+                        cards={sampleTrips}
+                        columnsClass="is-half-tablet is-full-mobile"
+                    />
 
                     {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-6" />
 
                     {/* API Documentation Section */}
-                    <div className='mb-6'>
-                        <h2 className='title is-3 mb-4'>
-                            <span className='icon mr-2'>
-                                <Code size={24} />
-                            </span>
-                            Documentation
-                        </h2>
-                        <div className='columns'>
-                            {apiDocs.map((doc) => (
-                                <div key={doc.path} className='column is-half-tablet is-half-mobile'>
-                                    <Link to={doc.path} className='dashboard-card-link'>
-                                        <div className={`card dashboard-card ${doc.color === 'primary' ? 'has-background-primary' : ''}`}>
-                                            <div className='card-content'>
-                                                <div className='media'>
-                                                    <div className='media-left'>
-                                                        <span className={`icon is-large ${doc.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            <doc.icon size={32} />
-                                                        </span>
-                                                    </div>
-                                                    <div className='media-content'>
-                                                        <p className={`title is-5 ${doc.color === 'primary' ? 'has-text-white' : ''}`}>
-                                                            {doc.title}
-                                                        </p>
-                                                        <p className={`subtitle is-6 ${doc.color === 'primary' ? 'has-text-white' : 'has-text-secondary'}`}>
-                                                            {doc.description}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </Link>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <DashboardSection
+                        title="Documentation"
+                        icon={Code}
+                        cards={apiDocs}
+                        columnsClass="is-half-tablet is-half-mobile"
+                    />
 
                     {/* Advertisement */}
                     <Ad format="auto" size="responsive" className="mb-6" />

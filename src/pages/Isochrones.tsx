@@ -27,10 +27,9 @@ const Isochrones: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
-            const response = await getIsochrones(from, null, 'sncf', {
+            const data = await getIsochrones(from, null, 'sncf', {
                 max_duration: parseInt(maxDuration) || 3600,
             });
-            const data = response.data;
             setIsochrones(data);
         } catch (err) {
             setError('Erreur lors du calcul des isochrones');

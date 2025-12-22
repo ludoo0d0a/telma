@@ -12,8 +12,7 @@ const CommercialModes: React.FC = () => {
         const fetchModes = async (): Promise<void> => {
             try {
                 setLoading(true);
-                const response = await getCommercialModes();
-                const data = response.data;
+                const data = await getCommercialModes();
                 setModes(data.commercial_modes || []);
                 setError(null);
             } catch (err) {

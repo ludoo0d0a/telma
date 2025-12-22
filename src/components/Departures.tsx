@@ -36,13 +36,13 @@ const Departures: React.FC = () => {
         if (!codeStation) return;
         
         (async function () {
-            const response = await getDepartures(codeStation)
-            console.log(response)
+            const data = await getDepartures(codeStation)
+            console.log(data)
             
             // Extract disruptions from response
-            const allDisruptions = response.data.disruptions || []
+            const allDisruptions = data.disruptions || []
             
-            const nextDeparturesApi: ProcessedDeparture[] = (response.data.departures || []).map((departure: Departure) => {
+            const nextDeparturesApi: ProcessedDeparture[] = (data.departures || []).map((departure: Departure) => {
                 // Find vehicle_journey link instead of assuming it's at index 1
                 const vehicleJourneyLink = departure.links?.find(link => 
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')

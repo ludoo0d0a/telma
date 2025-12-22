@@ -30,11 +30,10 @@ const Stops: React.FC<StopsProps> = ({idDeparture}) => {
         }
         
         getVehicleJourney(vehicleJourneyId)
-            .then((response) => {
-                const stops = response.data.vehicle_journeys?.[0]?.stop_times?.map(
+            .then((data) => {
+                setNextStops(data.data.vehicle_journeys?.[0]?.stop_times?.map(
                     (stop) => cleanLocationName(stop.stop_point?.name) || ''
-                ) || []
-                setNextStops(stops)
+                ) || [])
             })
             .catch((error) => {
                 console.error('Error fetching stops:', error);

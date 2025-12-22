@@ -23,8 +23,7 @@ const CoveragePage: React.FC = () => {
         const fetchCoverages = async (): Promise<void> => {
             try {
                 setLoading(true);
-                const response = await getCoverage();
-                const data = response.data;
+                const data = await getCoverage();
                 setCoverages(data.regions || []);
                 setCoverageResponse(data);
                 setError(null);
@@ -44,8 +43,7 @@ const CoveragePage: React.FC = () => {
         
         try {
             setLoading(true);
-            const response = await getCoverageDetails(coverageId);
-            const data = response.data;
+            const data = await getCoverageDetails(coverageId);
             setSelectedCoverage({ id: coverageId, ...data } as SelectedCoverage);
             setError(null);
         } catch (err) {

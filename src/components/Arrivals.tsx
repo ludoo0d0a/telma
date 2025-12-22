@@ -36,12 +36,12 @@ const Arrivals: React.FC = () => {
         if (!codeStation) return;
         
         (async function () {
-            const response = await getArrivals(codeStation)
+            const data = await getArrivals(codeStation)
             
             // Extract disruptions from response
-            const allDisruptions = response.data.disruptions || []
+            const allDisruptions = data.disruptions || []
             
-            const arrivals: ProcessedArrival[] = (response.data.arrivals || []).map((arrival: Arrival) => {
+            const arrivals: ProcessedArrival[] = (data.arrivals || []).map((arrival: Arrival) => {
                 // Find vehicle_journey link instead of assuming it's at index 1
                 const vehicleJourneyLink = arrival.links?.find(link => 
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')

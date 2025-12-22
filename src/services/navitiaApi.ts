@@ -153,8 +153,7 @@ interface IsochronesParams {
  * Get commercial modes available in SNCF API
  */
 export const getCommercialModes = async (coverage: string = DEFAULT_COVERAGE): Promise<CommercialModesResponse> => {
-    const response = await getClient().transportModes.coverageCoverageCommercialModesGet(coverage);
-    return response.data;
+    return (await getClient().transportModes.coverageCoverageCommercialModesGet(coverage)).data;
 };
 
 /**
@@ -167,7 +166,7 @@ export const getJourneys = async (
     coverage: string = DEFAULT_COVERAGE,
     params: JourneyParams = {}
 ): Promise<Journey> => {
-    const response = await getClient().journeys.coverageCoverageJourneysGet(
+    return (await getClient().journeys.coverageCoverageJourneysGet(
         coverage,
         from,
         to,
@@ -178,8 +177,7 @@ export const getJourneys = async (
         params.max_duration || undefined,
         params.min_nb_journeys || undefined,
         params.timeframe_duration || undefined
-    );
-    return response.data;
+    )).data;
 };
 
 /**
@@ -191,14 +189,13 @@ export const getDepartures = async (
     coverage: string = DEFAULT_COVERAGE,
     params: DepartureArrivalParams = {}
 ): Promise<DeparturesResponse> => {
-    const response = await getClient().departures.coverageCoverageStopAreasIdDeparturesGet(
+    return (await getClient().departures.coverageCoverageStopAreasIdDeparturesGet(
         coverage,
         stopAreaId,
         datetime || undefined,
         params.count || undefined,
         params.depth || undefined
-    );
-    return response.data;
+    )).data;
 };
 
 /**
@@ -210,22 +207,20 @@ export const getArrivals = async (
     coverage: string = DEFAULT_COVERAGE,
     params: DepartureArrivalParams = {}
 ): Promise<ArrivalsResponse> => {
-    const response = await getClient().arrivals.coverageCoverageStopAreasIdArrivalsGet(
+    return (await getClient().arrivals.coverageCoverageStopAreasIdArrivalsGet(
         coverage,
         stopAreaId,
         datetime || undefined,
         params.count || undefined,
         params.depth || undefined
-    );
-    return response.data;
+    )).data;
 };
 
 /**
  * Get all available coverages
  */
 export const getCoverages = async (): Promise<CoverageResponse> => {
-    const response = await getClient().coverage.coverageGet();
-    return response.data;
+    return (await getClient().coverage.coverageGet()).data;
 };
 
 /**
@@ -237,32 +232,28 @@ export const getCoverage = getCoverages;
  * Get specific coverage area details
  */
 export const getCoverageDetails = async (coverage: string = DEFAULT_COVERAGE): Promise<Coverage> => {
-    const response = await getClient().coverage.coverageCoverageGet(coverage);
-    return response.data;
+    return (await getClient().coverage.coverageCoverageGet(coverage)).data;
 };
 
 /**
  * Get physical modes
  */
 export const getPhysicalModes = async (coverage: string = DEFAULT_COVERAGE): Promise<PhysicalModesResponse> => {
-    const response = await getClient().transportModes.coverageCoveragePhysicalModesGet(coverage);
-    return response.data;
+    return (await getClient().transportModes.coverageCoveragePhysicalModesGet(coverage)).data;
 };
 
 /**
  * Get all lines
  */
 export const getLines = async (coverage: string = DEFAULT_COVERAGE, params: LinesParams = {}): Promise<LinesResponse> => {
-    const response = await getClient().publicTransportObjects.coverageCoverageLinesGet(coverage);
-    return response.data;
+    return (await getClient().publicTransportObjects.coverageCoverageLinesGet(coverage)).data;
 };
 
 /**
  * Get all stop areas
  */
 export const getStopAreas = async (coverage: string = DEFAULT_COVERAGE, params: StopAreasParams = {}): Promise<StopAreasResponse> => {
-    const response = await getClient().publicTransportObjects.coverageCoverageStopAreasGet(coverage);
-    return response.data;
+    return (await getClient().publicTransportObjects.coverageCoverageStopAreasGet(coverage)).data;
 };
 
 /**
@@ -273,14 +264,13 @@ export const searchPlaces = async (
     coverage: string = DEFAULT_COVERAGE,
     params: PlacesParams = {}
 ): Promise<PlacesResponse> => {
-    const response = await getClient().places.coverageCoveragePlacesGet(
+    return (await getClient().places.coverageCoveragePlacesGet(
         coverage,
         query,
         params.count || undefined,
         params.type ? (Array.isArray(params.type) ? params.type as CoverageCoveragePlacesGetTypeEnum[] : [params.type] as CoverageCoveragePlacesGetTypeEnum[]) : undefined,
         params.depth || undefined
-    );
-    return response.data;
+    )).data;
 };
 
 /**
@@ -332,15 +322,13 @@ export const getPlacesNearby = async (
 
     // Use the generated client method with the stop_areas endpoint
     // Note: The stop_areas endpoint doesn't support type filtering, so we ignore the type parameter if provided
-    const axiosResponse = await getClient().places.coverageCoverageCoordCoordStopAreasGet(
+    return (await getClient().places.coverageCoverageCoordCoordStopAreasGet(
         coverage,
         coordStr,
         params.distance || undefined,
         params.count || undefined,
         params.depth || undefined
-    );
-    
-    return axiosResponse.data;
+    )).data;
 };
 
 /**
@@ -368,21 +356,21 @@ export const getStopSchedules = async (
     coverageOrParams: string | null = null,
     params: StopSchedulesParams = {}
 ): Promise<StopSchedulesResponse> => {
-    let response;
+    let data;
     if (filterOrStopPointId.includes('=') || filterOrStopPointId.startsWith('stop_area') || filterOrStopPointId.startsWith('stop_point')) {
-        response = await getClient().schedules.coverageCoverageStopSchedulesGet(
+        data = await getClient().schedules.coverageCoverageStopSchedulesGet(
             fromDatetimeOrCoverage,
             filterOrStopPointId,
             coverageOrParams || undefined
         );
     } else {
-        response = await getClient().schedules.coverageCoverageStopPointsIdStopSchedulesGet(
+        data = await getClient().schedules.coverageCoverageStopPointsIdStopSchedulesGet(
             coverageOrParams || DEFAULT_COVERAGE,
             filterOrStopPointId,
             fromDatetimeOrCoverage || undefined
         );
     }
-    return response.data;
+    return data.data;
 };
 
 /**
@@ -394,21 +382,21 @@ export const getRouteSchedules = async (
     coverageOrParams: string | null = null,
     params: RouteSchedulesParams = {}
 ): Promise<RouteSchedulesResponse> => {
-    let response;
+    let data;
     if (filterOrRouteId.includes('=') || filterOrRouteId.startsWith('line') || filterOrRouteId.startsWith('route')) {
-        response = await getClient().schedules.coverageCoverageRouteSchedulesGet(
+        data = await getClient().schedules.coverageCoverageRouteSchedulesGet(
             fromDatetimeOrCoverage,
             filterOrRouteId,
             coverageOrParams || undefined
         );
     } else {
-        response = await getClient().schedules.coverageCoverageRoutesIdRouteSchedulesGet(
+        data = await getClient().schedules.coverageCoverageRoutesIdRouteSchedulesGet(
             coverageOrParams || DEFAULT_COVERAGE,
             filterOrRouteId,
             fromDatetimeOrCoverage || undefined
         );
     }
-    return response.data;
+    return data.data;
 };
 
 /**
@@ -421,15 +409,15 @@ export const getTerminusSchedules = async (
     coverageOrParams: string | null = null,
     params: TerminusSchedulesParams = {}
 ): Promise<TerminusSchedulesResponse> => {
-    let response;
+    let data;
     if (filterOrLineId.includes('=')) {
-        response = await getClient().schedules.coverageCoverageTerminusSchedulesGet(
+        data = await getClient().schedules.coverageCoverageTerminusSchedulesGet(
             fromDatetimeOrCoverage,
             filterOrLineId,
             stopAreaIdOrFromDatetime || undefined
         );
     } else {
-        response = await getClient().schedules.coverageCoveragePhysicalModesPhysicalModeLinesLineStopAreasStopAreaTerminusSchedulesGet(
+        data = await getClient().schedules.coverageCoveragePhysicalModesPhysicalModeLinesLineStopAreasStopAreaTerminusSchedulesGet(
             coverageOrParams || DEFAULT_COVERAGE,
             'physical_mode:Bus',
             filterOrLineId,
@@ -437,7 +425,7 @@ export const getTerminusSchedules = async (
             fromDatetimeOrCoverage || undefined
         );
     }
-    return response.data;
+    return data.data;
 };
 
 /**
@@ -449,12 +437,11 @@ export const getIsochrones = async (
     coverage: string = DEFAULT_COVERAGE,
     params: IsochronesParams = {}
 ): Promise<CoverageCoverageIsochronesGet200Response> => {
-    const response = await getClient().isochrones.coverageCoverageIsochronesGet(
+    return (await getClient().isochrones.coverageCoverageIsochronesGet(
         coverage,
         from,
         params.max_duration || undefined
-    );
-    return response.data;
+    )).data;
 };
 
 /**
@@ -465,21 +452,20 @@ export const getLineReports = async (
     coverageOrParams: string = DEFAULT_COVERAGE,
     params: LineReportsParams = {}
 ): Promise<CoverageCoverageLineReportsGet200Response> => {
-    let response;
+    let data;
     if (filterOrLineId.includes('=')) {
-        response = await getClient().reports.coverageCoverageLineReportsGet(coverageOrParams, filterOrLineId);
+        data = await getClient().reports.coverageCoverageLineReportsGet(coverageOrParams, filterOrLineId);
     } else {
-        response = await getClient().reports.coverageCoverageLinesIdLineReportsGet(coverageOrParams, filterOrLineId);
+        data = await getClient().reports.coverageCoverageLinesIdLineReportsGet(coverageOrParams, filterOrLineId);
     }
-    return response.data;
+    return data.data;
 };
 
 /**
  * Get traffic reports
  */
 export const getTrafficReports = async (coverage: string = DEFAULT_COVERAGE, params: TrafficReportsParams = {}): Promise<CoverageCoverageTrafficReportsGet200Response> => {
-    const response = await getClient().reports.coverageCoverageTrafficReportsGet(coverage);
-    return response.data;
+    return (await getClient().reports.coverageCoverageTrafficReportsGet(coverage)).data;
 };
 
 /**
@@ -490,27 +476,24 @@ export const getEquipmentReports = async (
     filter: string | null = null,
     params: EquipmentReportsParams = {}
 ): Promise<CoverageCoverageEquipmentReportsGet200Response> => {
-    const response = await getClient().reports.coverageCoverageEquipmentReportsGet(
+    return (await getClient().reports.coverageCoverageEquipmentReportsGet(
         coverage,
         filter || undefined
-    );
-    return response.data;
+    )).data;
 };
 
 /**
  * Get datasets information
  */
 export const getDatasets = async (coverage: string = DEFAULT_COVERAGE): Promise<DatasetsResponse> => {
-    const response = await getClient().datasets.coverageCoverageDatasetsGet(coverage);
-    return response.data;
+    return (await getClient().datasets.coverageCoverageDatasetsGet(coverage)).data;
 };
 
 /**
  * Get contributors information
  */
 export const getContributors = async (coverage: string = DEFAULT_COVERAGE): Promise<ContributorsResponse> => {
-    const response = await getClient().contributors.coverageCoverageContributorsGet(coverage);
-    return response.data;
+    return (await getClient().contributors.coverageCoverageContributorsGet(coverage)).data;
 };
 
 /**
@@ -534,8 +517,7 @@ export const autocompletePT = async (
     coverage: string = DEFAULT_COVERAGE,
     count: number = 10
 ): Promise<PlacesResponse> => {
-    const response = await getClient().publicTransportObjects.coverageCoveragePtObjectsGet(coverage, q, count);
-    return response.data;
+    return (await getClient().publicTransportObjects.coverageCoveragePtObjectsGet(coverage, q, count)).data;
 };
 
 /**
@@ -547,32 +529,28 @@ export const invertedGeocoding = async (
     coverage: string = DEFAULT_COVERAGE
 ): Promise<PlacesResponse> => {
     const coord = `${lon};${lat}`;
-    const response = await getClient().places.coverageCoverageCoordCoordAddressesGet(coverage, coord);
-    return response.data;
+    return (await getClient().places.coverageCoverageCoordCoordAddressesGet(coverage, coord)).data;
 };
 
 /**
  * Get routes
  */
 export const getRoutes = async (coverage: string = DEFAULT_COVERAGE, params: RoutesParams = {}): Promise<CoverageCoverageRoutesGet200Response> => {
-    const response = await getClient().publicTransportObjects.coverageCoverageRoutesGet(coverage);
-    return response.data;
+    return (await getClient().publicTransportObjects.coverageCoverageRoutesGet(coverage)).data;
 };
 
 /**
  * Get stop points
  */
 export const getStopPoints = async (coverage: string = DEFAULT_COVERAGE, params: StopPointsParams = {}): Promise<CoverageCoverageStopPointsGet200Response> => {
-    const response = await getClient().publicTransportObjects.coverageCoverageStopPointsGet(coverage);
-    return response.data;
+    return (await getClient().publicTransportObjects.coverageCoverageStopPointsGet(coverage)).data;
 };
 
 /**
  * Get networks
  */
 export const getNetworks = async (coverage: string = DEFAULT_COVERAGE, params: NetworksParams = {}): Promise<CoverageCoverageNetworksGet200Response> => {
-    const response = await getClient().publicTransportObjects.coverageCoverageNetworksGet(coverage);
-    return response.data;
+    return (await getClient().publicTransportObjects.coverageCoverageNetworksGet(coverage)).data;
 };
 
 /**
@@ -585,7 +563,6 @@ export const getFreefloatingsNearby = async (
     distance: number = 200
 ): Promise<CoverageCoverageCoordCoordFreefloatingsGet200Response> => {
     const coord = `${lon};${lat}`;
-    const response = await getClient().places.coverageCoverageCoordCoordFreefloatingsGet(coverage, coord, distance);
-    return response.data;
+    return (await getClient().places.coverageCoverageCoordCoordFreefloatingsGet(coverage, coord, distance)).data;
 };
 
