@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '../services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '../services/vehicleJourneyService';
 import { cleanLocationName } from '../services/locationService';
-import { parseUTCDate } from './Utils';
+import { parseUTCDate } from '../utils/dateUtils';
 import { Loader2, AlertTriangle, MapPin, Train, Ruler } from 'lucide-react';
 
 interface CurrentLocationInfo {
