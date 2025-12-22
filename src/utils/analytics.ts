@@ -51,45 +51,5 @@ export const trackEvent = (
   }
 };
 
-/**
- * Load Google AdSense script conditionally
- * Only loads if ads are enabled and publisher ID is configured
- */
-let adsenseScriptLoaded = false;
 
-export const loadAdSenseScript = () => {
-  // Check if script is already loaded or being loaded
-  if (adsenseScriptLoaded || typeof window === 'undefined') {
-    return;
-  }
-
-  // Check if ads should be displayed
-  const showAds = import.meta.env.VITE_SHOW_ADS !== 'false';
-  const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
-  
-  // Only load script if ads are enabled and publisher ID is configured
-  if (!showAds || !publisherId || publisherId.trim() === '') {
-    return;
-  }
-
-  // Check if script already exists in DOM
-  const existingScript = document.querySelector('script[src*="adsbygoogle.js"]');
-  if (existingScript) {
-    adsenseScriptLoaded = true;
-    return;
-  }
-
-  // Load the AdSense script dynamically
-  const script = document.createElement('script');
-  script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-  script.async = true;
-  script.crossOrigin = 'anonymous';
-  script.onload = () => {
-    adsenseScriptLoaded = true;
-  };
-  script.onerror = () => {
-    console.warn('Failed to load Google AdSense script');
-  };
-  document.head.appendChild(script);
-};
 

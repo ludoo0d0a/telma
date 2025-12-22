@@ -1,7 +1,5 @@
-import React, { useEffect } from 'react';
-import AdSense from 'react-adsense';
+import React from 'react';
 import { Info } from 'lucide-react';
-import { loadAdSenseScript } from '../utils/analytics';
 
 interface AdProps {
     /**
@@ -30,15 +28,9 @@ interface AdProps {
 /**
  * Google AdSense Ad Component
  * 
- * Uses environment variable VITE_GOOGLE_ADSENSE_ID for publisher ID
- * Set it in .env file: VITE_GOOGLE_ADSENSE_ID=ca-pub-XXXXXXXXXXXXXXX
- * 
- * Use VITE_SHOW_ADS environment variable to control ad display:
- * Set VITE_SHOW_ADS=false to hide all ads, or VITE_SHOW_ADS=true to show them
- * 
- * Example usage:
- * <Ad format="auto" /> // Uses auto ads with publisher ID from env var
- * <Ad adSlot="1234567890" format="rectangle" /> // Uses specific ad unit
+ * Pure function implementation of AdSense ads.
+ * Uses environment variable VITE_GOOGLE_ADSENSE_ID for publisher ID.
+ * Set VITE_SHOW_ADS=false to hide all ads.
  */
 const Ad: React.FC<AdProps> = ({ 
     adSlot,
@@ -47,17 +39,15 @@ const Ad: React.FC<AdProps> = ({
     className = '',
     style = {}
 }) => {
-    // Check if ads should be displayed
     const showAds = import.meta.env.VITE_SHOW_ADS !== 'false';
     const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
     
-    // Load AdSense script conditionally when component mounts
-    useEffect(() => {
-        if (showAds && publisherId && publisherId.trim() !== '') {
-            loadAdSenseScript();
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run once on mount
+    // Enable test mode on localhost to see ads during development
+    const isLocalhost = typeof window !== 'undefined' && 
+        (window.location.hostname === 'localhost' || 
+         window.location.hostname === '127.0.0.1' ||
+         window.location.hostname.startsWith('192.168.'));
+    const enableTestMode = isLocalhost;
     
     // If ads are disabled, don't render anything
     if (!showAds) {
@@ -65,7 +55,7 @@ const Ad: React.FC<AdProps> = ({
     }
 
     // Show placeholder if no publisher ID is configured
-    if (!publisherId || publisherId === 'ca-pub-1234567890123456' || publisherId === 'ca-pub-XXXXXXXXXXXXXXXX' || publisherId.trim() === '') {
+    if (!publisherId || publisherId.trim() === '') {
         return (
             <div 
                 className={`ad-container ad-placeholder ${className}`}
@@ -86,16 +76,17 @@ const Ad: React.FC<AdProps> = ({
             className={`ad-container ${className}`}
             style={style}
         >
-            <AdSense.Google
-                client={publisherId}
-                slot={adSlot}
+            <ins
+                className="adsbygoogle"
                 style={{ display: 'block', ...style }}
-                format={format === 'auto' ? 'auto' : undefined}
-                responsive={size === 'responsive' ? 'true' : undefined}
+                data-ad-client={publisherId}
+                data-ad-slot={adSlot}
+                data-ad-format={format === 'auto' ? 'auto' : undefined}
+                data-full-width-responsive={size === 'responsive' ? 'true' : 'false'}
+                data-adtest={enableTestMode ? 'on' : undefined}
             />
         </div>
     );
 };
 
 export default Ad;
-
