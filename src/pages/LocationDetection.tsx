@@ -781,7 +781,7 @@ const LocationDetection: React.FC = () => {
                                                                     </div>
                                                                 </div>
                                                                 <p className='is-size-7 has-text-grey'>
-                                                                    <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
+                                                                    <span className='icon is-small'><MapPin size={16} /></span>
                                                                     Distance: {station.distance}m
                                                                 </p>
                                                                 {selectedStation?.id === station.id && (

@@ -87,9 +87,10 @@
           }
         }
 
-        .fa-bookmark {
+        svg {
           color: #ff8c00;
-          font-size: 20px;
+          width: 20px;
+          height: 20px;
         }
       }
 
@@ -172,7 +173,7 @@
                     border-top: 1px dashed #ccc;
                 }
 
-                .fa-plane {
+                svg {
                     color: #ff8c00;
                     position: absolute;
                     left: 50%;

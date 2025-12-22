@@ -369,7 +369,7 @@ const CurrentLocationWidget: React.FC = () => {
                                     Train {locationInfo.train.number}
                                 </p>
                                 <p className='subtitle is-6 has-text-white'>
-                                    <span className='icon is-small'><Icon name='fa-map-marker-alt' size={16} /></span>
+                                    <span className='icon is-small'><MapPin size={16} /></span>
                                     {locationInfo.station.name} • Destination: {locationInfo.train.destination}
                                 </p>
                             </>

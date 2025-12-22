@@ -739,7 +739,7 @@ const Trajet: React.FC = () => {
                                 style={{ cursor: 'pointer' }}
                             >
                                 <span className='icon has-text-warning mr-2'>
-                                    <Icon name='fa-exclamation-triangle' size={20} />
+                                    <AlertTriangle size={20} />
                                 </span>
                                 Perturbations ({disruptions.length})
                                 <span className='icon ml-2'>

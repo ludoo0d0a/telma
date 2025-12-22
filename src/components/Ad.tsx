@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import AdSense from 'react-adsense';
 import { Info } from 'lucide-react';
+import { loadAdSenseScript } from '../utils/analytics';
 
 interface AdProps {
     /**
@@ -48,16 +49,23 @@ const Ad: React.FC<AdProps> = ({
 }) => {
     // Check if ads should be displayed
     const showAds = import.meta.env.VITE_SHOW_ADS !== 'false';
+    const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
+    
+    // Load AdSense script conditionally when component mounts
+    useEffect(() => {
+        if (showAds && publisherId && publisherId.trim() !== '') {
+            loadAdSenseScript();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
     
     // If ads are disabled, don't render anything
     if (!showAds) {
         return null;
     }
 
-    const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
-
     // Show placeholder if no publisher ID is configured
-    if (!publisherId || publisherId === 'ca-pub-1234567890123456' || publisherId === 'ca-pub-XXXXXXXXXXXXXXXX') {
+    if (!publisherId || publisherId === 'ca-pub-1234567890123456' || publisherId === 'ca-pub-XXXXXXXXXXXXXXXX' || publisherId.trim() === '') {
         return (
             <div 
                 className={`ad-container ad-placeholder ${className}`}

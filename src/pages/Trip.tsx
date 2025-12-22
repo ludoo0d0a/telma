@@ -768,23 +768,23 @@ const Trip: React.FC = () => {
                                 
                                 const severityLevel = severityText.toLowerCase();
                                 let notificationClass = 'is-warning';
-                                let icon = 'fa-exclamation-triangle';
+                                let IconComponent = AlertTriangle;
                                 if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
                                     notificationClass = 'is-danger';
-                                    icon = 'fa-ban';
+                                    IconComponent = Ban;
                                 } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
                                     notificationClass = 'is-info';
-                                    icon = 'fa-info-circle';
+                                    IconComponent = Info;
                                 } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
                                     notificationClass = 'is-warning';
-                                    icon = 'fa-clock';
+                                    IconComponent = Clock;
                                 }
                                 
                                 return (
                                     <div key={index} className={`notification ${notificationClass} mb-3`}>
                                         <div className='is-flex is-align-items-center mb-2'>
                                             <span className='icon mr-2'>
-                                                <Icon name={icon} size={20} />
+                                                <IconComponent size={20} />
                                             </span>
                                             <strong>{severityText !== 'unknown' ? severityText : 'Perturbation'}</strong>
                                         </div>
@@ -917,7 +917,7 @@ const Trip: React.FC = () => {
                                                                     {hasDelay ? (
                                                                         <span className='tag is-danger is-small'>
                                                                             <span className='icon mr-1'>
-                                                                                <Icon name='fa-clock' size={16} />
+                                                                                <Clock size={16} />
                                                                             </span>
                                                                             {delay}
                                                                         </span>
