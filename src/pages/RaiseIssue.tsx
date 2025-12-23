@@ -1,13 +1,20 @@
 import React from 'react';
 import { Header } from '@/components/skytrip';
+import { Clock, Ban, Wrench, HeartPulse, DoorClosed, MessageSquareWarning } from 'lucide-react';
 
 const RaiseIssue: React.FC = () => {
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        console.log('Form submitted');
-        // Here you would typically handle the form submission,
-        // e.g., send the data to an API.
-        alert('Thank you for your feedback!');
+    const issues = [
+        { text: 'Delay', icon: <Clock size={48} /> },
+        { text: 'Cancellation', icon: <Ban size={48} /> },
+        { text: 'Broken Train', icon: <Wrench size={48} /> },
+        { text: 'Sick Person', icon: <HeartPulse size={48} /> },
+        { text: 'Closed Door', icon: <DoorClosed size={48} /> },
+        { text: 'Other', icon: <MessageSquareWarning size={48} /> },
+    ];
+
+    const handleIssueClick = (issueText: string) => {
+        console.log('Issue reported:', issueText);
+        alert(`Thank you for reporting the issue: ${issueText}`);
     };
 
     return (
@@ -16,35 +23,21 @@ const RaiseIssue: React.FC = () => {
 
             <main>
                 <div className="container" style={{ padding: '20px' }}>
-                    <h2 className="title is-2">Raise an Issue</h2>
-                    <form onSubmit={handleSubmit}>
-                        <div className="field">
-                            <label className="label">Name</label>
-                            <div className="control">
-                                <input className="input" type="text" placeholder="Your Name" required />
+                    <h2 className="title is-2 has-text-centered">Raise an Issue</h2>
+                    <div className="columns is-multiline is-mobile is-centered">
+                        {issues.map((issue, index) => (
+                            <div className="column is-half-mobile is-one-third-tablet" key={index}>
+                                <button
+                                    className="button is-large is-fullwidth is-flex is-flex-direction-column"
+                                    onClick={() => handleIssueClick(issue.text)}
+                                    style={{ height: '150px' }}
+                                >
+                                    <span className="icon is-large">{issue.icon}</span>
+                                    <span>{issue.text}</span>
+                                </button>
                             </div>
-                        </div>
-
-                        <div className="field">
-                            <label className="label">Email</label>
-                            <div className="control">
-                                <input className="input" type="email" placeholder="Your Email" required />
-                            </div>
-                        </div>
-
-                        <div className="field">
-                            <label className="label">Issue Description</label>
-                            <div className="control">
-                                <textarea className="textarea" placeholder="Describe the issue in detail" required></textarea>
-                            </div>
-                        </div>
-
-                        <div className="field">
-                            <div className="control">
-                                <button className="button is-primary" type="submit">Submit Issue</button>
-                            </div>
-                        </div>
-                    </form>
+                        ))}
+                    </div>
                 </div>
             </main>
         </div>
