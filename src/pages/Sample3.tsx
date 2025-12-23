@@ -38,6 +38,7 @@ const Sample3: React.FC = () => {
         <div className="app-flight">
             <PageHeader
                 title="Select Flight"
+                subtitle="Choisissez votre itinéraire"
                 onBack={() => navigate(-1)}
                 showBack={true}
             >

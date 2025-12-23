@@ -23,12 +23,21 @@
         margin-bottom: 30px;
         position: relative;
 
-        h1 {
-            font-size: 22px;
-            font-weight: bold;
-            margin: 0;
+        .title-block {
             text-align: center;
             justify-self: center;
+
+            h1 {
+                font-size: 22px;
+                font-weight: bold;
+                margin: 0 0 4px 0;
+            }
+
+            .subtitle {
+                margin: 0;
+                font-size: 14px;
+                opacity: 0.9;
+            }
         }
 
         .left-actions,

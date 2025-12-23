@@ -165,6 +165,7 @@ const Home: React.FC = () => {
                         title="Pages Principales"
                         icon={LayoutGrid}
                         cards={mainPages}
+                        columnsWrapperClassName="is-mobile"
                     />
 
                     {/* Advertisement */}

@@ -1,10 +1,15 @@
 import React from 'react';
-import { Header } from '@/components/skytrip';
+import { PageHeader } from '@/components/skytrip';
 
 const Stats: React.FC = () => {
     return (
         <div className="app-flight">
-            <Header />
+            <PageHeader
+                title="Statistics"
+                subtitle="Visualisez vos indicateurs clés"
+                showNotification={false}
+                showAvatar={false}
+            />
 
             <main>
                 <div className="flight-results-section">

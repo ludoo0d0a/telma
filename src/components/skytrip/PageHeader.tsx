@@ -7,6 +7,7 @@ import './PageHeader.scss';
 
 interface PageHeaderProps {
     title: string;
+    subtitle?: string;
     leftAction?: 'menu' | 'back';
     showBack?: boolean;
     backUrl?: string;
@@ -28,6 +29,7 @@ interface PageHeaderProps {
 
 const PageHeader: React.FC<PageHeaderProps> = ({
     title,
+    subtitle,
     leftAction,
     showBack = false,
     backUrl,
@@ -82,7 +84,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                     )}
                 </div>
 
-                <h1>{title}</h1>
+                <div className="title-block">
+                    <h1>{title}</h1>
+                    {subtitle && <p className="subtitle">{subtitle}</p>}
+                </div>
 
                 <div className="right-actions">
                     {showSearch && (

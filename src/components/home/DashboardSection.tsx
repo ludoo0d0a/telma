@@ -14,9 +14,16 @@ interface DashboardSectionProps {
     icon: React.ComponentType<{ size?: number | string; className?: string }>;
     cards: DashboardCardData[];
     columnsClass?: string;
+    columnsWrapperClassName?: string;
 }
 
-const DashboardSection: React.FC<DashboardSectionProps> = ({ title, icon: Icon, cards, columnsClass = 'is-one-third-tablet is-half-mobile' }) => {
+const DashboardSection: React.FC<DashboardSectionProps> = ({
+    title,
+    icon: Icon,
+    cards,
+    columnsClass = 'is-one-third-tablet is-half-mobile',
+    columnsWrapperClassName = ''
+}) => {
     return (
         <div className='mb-6'>
             <h2 className='title is-3 mb-4'>
@@ -25,7 +32,7 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({ title, icon: Icon, 
                 </span>
                 {title}
             </h2>
-            <div className='columns is-multiline'>
+            <div className={`columns is-multiline ${columnsWrapperClassName}`.trim()}>
                 {cards.map((card) => (
                     <div key={card.path} className={`column ${columnsClass}`}>
                         <DashboardCard {...card} />

@@ -89,6 +89,7 @@ const Sample2: React.FC = () => {
     <div className="app-flight">
       <PageHeader
         title="Saved Flights"
+        subtitle="Retrouvez vos vols enregistrés"
         backUrl="/"
         showSearch={true}
       />
