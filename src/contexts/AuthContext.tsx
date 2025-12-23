@@ -1,10 +1,12 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
+import { Omit, TokenResponse } from '@react-oauth/google';
+import googleDriveService from '@/services/googleDriveService';
+import axios from 'axios';
 
 interface AuthContextType {
   user: any;
-  login: (token: string) => void;
+  login: (tokenResponse: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => void;
   logout: () => void;
 }
 
@@ -14,27 +16,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
+    const token = localStorage.getItem('googleAccessToken');
     if (token) {
-      try {
-        const decodedUser = jwtDecode(token);
-        setUser(decodedUser);
-      } catch (error) {
-        console.error("Failed to decode token", error);
-        localStorage.removeItem('authToken');
-      }
+        axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${token}` }
+        }).then(response => {
+            setUser(response.data);
+            googleDriveService.setAccessToken(token);
+        }).catch(() => {
+            localStorage.removeItem('googleAccessToken');
+        });
     }
   }, []);
 
-  const login = (token: string) => {
-    const decodedUser = jwtDecode(token);
-    setUser(decodedUser);
-    localStorage.setItem('authToken', token);
+  const login = async (tokenResponse: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => {
+    localStorage.setItem('googleAccessToken', tokenResponse.access_token);
+    googleDriveService.setAccessToken(tokenResponse.access_token);
+    try {
+        const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        });
+        setUser(response.data);
+    } catch (error) {
+        console.error("Failed to fetch user info", error);
+    }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('authToken');
+    localStorage.removeItem('googleAccessToken');
   };
 
   return (

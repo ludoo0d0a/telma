@@ -1,30 +1,36 @@
 
 import React from 'react';
-import { GoogleLogin } from '@react-oauth/google';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '@/contexts/AuthContext';
+import { LogIn } from 'lucide-react';
 
 const LoginButton: React.FC = () => {
-  const { login } = useAuth();
-  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const hasValidClientId = googleClientId && googleClientId.trim() !== '';
+    const { login } = useAuth();
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+    const hasValidClientId = googleClientId && googleClientId.trim() !== '';
 
-  // Don't render GoogleLogin if client ID is not configured
-  if (!hasValidClientId) {
-    return null;
-  }
+    const handleLogin = useGoogleLogin({
+        onSuccess: tokenResponse => {
+            login(tokenResponse);
+        },
+        onError: () => {
+            console.log('Login Failed');
+        },
+        scope: 'https://www.googleapis.com/auth/drive.appdata'
+    });
 
-  return (
-    <GoogleLogin
-      onSuccess={credentialResponse => {
-        if (credentialResponse.credential) {
-          login(credentialResponse.credential);
-        }
-      }}
-      onError={() => {
-        console.log('Login Failed');
-      }}
-    />
-  );
+    if (!hasValidClientId) {
+        return null;
+    }
+
+    return (
+        <button className="button is-info is-rounded" onClick={() => handleLogin()}>
+            <span className="icon">
+                <LogIn />
+            </span>
+            <span>Sign in with Google</span>
+        </button>
+    );
 };
 
 export default LoginButton;

@@ -1,14 +1,14 @@
+
 import React from 'react';
 import type { FavoriteLocation } from '@/services/favoritesService';
 import FavoriteTableRow from './FavoriteTableRow';
 
 interface FavoritesTableProps {
     favorites: FavoriteLocation[];
-    onRemove: (id: string) => void;
-    formatDate: (dateString: string | undefined) => string;
+    onRemoveFavorite: (id: string) => void;
 }
 
-const FavoritesTable: React.FC<FavoritesTableProps> = ({ favorites, onRemove, formatDate }) => {
+const FavoritesTable: React.FC<FavoritesTableProps> = ({ favorites, onRemoveFavorite }) => {
     return (
         <div className='box'>
             <h2 className='title is-4 mb-5'>
@@ -29,8 +29,7 @@ const FavoritesTable: React.FC<FavoritesTableProps> = ({ favorites, onRemove, fo
                             <FavoriteTableRow
                                 key={favorite.id}
                                 favorite={favorite}
-                                onRemove={onRemove}
-                                formatDate={formatDate}
+                                onRemoveFavorite={onRemoveFavorite}
                             />
                         ))}
                     </tbody>
@@ -41,4 +40,3 @@ const FavoritesTable: React.FC<FavoritesTableProps> = ({ favorites, onRemove, fo
 };
 
 export default FavoritesTable;
-
