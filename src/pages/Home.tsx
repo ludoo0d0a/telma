@@ -145,7 +145,7 @@ const Home: React.FC = () => {
                 title="Dashboard"
                 subtitle="Accédez rapidement aux principales fonctionnalités"
                 showNotification={false}
-                
+
             />
 
             <main>
@@ -157,7 +157,7 @@ const Home: React.FC = () => {
                     <CurrentLocationSection />
 
                     {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" />
+                    <Ad format="horizontal" size="responsive" className="mb-6" adSlot='5391792359'/>
 
                     {/* Main Pages Section */}
                     <DashboardSection
@@ -168,7 +168,7 @@ const Home: React.FC = () => {
                     />
 
                     {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" />
+                    <Ad format="horizontal" size="responsive" className="mb-6" adSlot='2674307283'/>
 
                     {/* Sample Routes Section */}
                     <DashboardSection
@@ -178,9 +178,6 @@ const Home: React.FC = () => {
                         columnsClass="is-half-tablet is-half-mobile"
                     />
 
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" />
-
                     {/* Sample Trips Section */}
                     <DashboardSection
                         title="Exemples de Trajets Détaillés"
@@ -188,9 +185,6 @@ const Home: React.FC = () => {
                         cards={sampleTrips}
                         columnsClass="is-half-tablet is-full-mobile"
                     />
-
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" />
 
                     {/* API Documentation Section */}
                     <DashboardSection
@@ -201,8 +195,8 @@ const Home: React.FC = () => {
                     />
 
                     {/* Advertisement */}
-                    <Ad format="auto" size="responsive" className="mb-6" />
-                
+                    <Ad format="auto" size="responsive" className="mb-6" adSlot='4669737629'/>
+
             </main>
             {/*<Footer />*/}
         </div>

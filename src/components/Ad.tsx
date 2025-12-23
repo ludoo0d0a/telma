@@ -27,13 +27,13 @@ interface AdProps {
 
 /**
  * Google AdSense Ad Component
- * 
+ *
  * Pure function implementation of AdSense ads.
  * Uses environment variable VITE_GOOGLE_ADSENSE_ID for publisher ID.
  * Set VITE_SHOW_ADS=false to hide all ads.
  */
-const Ad: React.FC<AdProps> = ({ 
-    adSlot,
+const Ad: React.FC<AdProps> = ({
+    adSlot = '5391792359',
     format = 'auto',
     size = 'responsive',
     className = '',
@@ -41,14 +41,14 @@ const Ad: React.FC<AdProps> = ({
 }) => {
     const showAds = import.meta.env.VITE_SHOW_ADS !== 'false';
     const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
-    
+
     // Enable test mode on localhost to see ads during development
-    const isLocalhost = typeof window !== 'undefined' && 
-        (window.location.hostname === 'localhost' || 
+    const isLocalhost = typeof window !== 'undefined' &&
+        (window.location.hostname === 'localhost' ||
          window.location.hostname === '127.0.0.1' ||
          window.location.hostname.startsWith('192.168.'));
     const enableTestMode = isLocalhost;
-    
+
     // If ads are disabled, don't render anything
     if (!showAds) {
         return null;
@@ -57,7 +57,7 @@ const Ad: React.FC<AdProps> = ({
     // Show placeholder if no publisher ID is configured
     if (!publisherId || publisherId.trim() === '') {
         return (
-            <div 
+            <div
                 className={`ad-container ad-placeholder ${className}`}
                 style={style}
             >
@@ -72,7 +72,7 @@ const Ad: React.FC<AdProps> = ({
     }
 
     return (
-        <div 
+        <div
             className={`ad-container ${className}`}
             style={style}
         >

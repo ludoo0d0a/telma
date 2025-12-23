@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { Omit, TokenResponse } from '@react-oauth/google';
+import { TokenResponse } from '@react-oauth/google';
 import googleDriveService from '@/services/googleDriveService';
 import axios from 'axios';
 
