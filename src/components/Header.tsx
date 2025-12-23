@@ -5,7 +5,7 @@ import { useSidebar } from '@/contexts/SidebarContext';
 import LoginButton from './LoginButton';
 import Avatar from './Avatar';
 import { useAuth } from '@/contexts/AuthContext';
-import { X, Menu } from 'lucide-react';
+import { X, Menu, Bell } from 'lucide-react';
 
 const Header: React.FC = () => {
     const { user } = useAuth();
@@ -83,7 +83,16 @@ const Header: React.FC = () => {
                         Isochrones
                     </Link>
                 </div>
-                <div className="navbar-end">
+                <div className="navbar-end header-actions">
+                    <div className="navbar-item">
+                        <button
+                            type="button"
+                            className="notification-button"
+                            aria-label="Notifications"
+                        >
+                            <Bell size={20} />
+                        </button>
+                    </div>
                     <div className="navbar-item">
                         <div className="buttons">
                             {user ? <Avatar /> : <LoginButton />}

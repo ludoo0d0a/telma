@@ -1,0 +1,36 @@
+.navbar {
+  .header-actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    .navbar-item {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  .notification-button {
+    border: none;
+    background: transparent;
+    padding: 0.35rem;
+    border-radius: 9999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    transition: background-color 0.2s ease, transform 0.2s ease;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--background-dark);
+      transform: translateY(-1px);
+    }
+
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
