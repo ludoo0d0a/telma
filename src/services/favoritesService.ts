@@ -1,5 +1,5 @@
 
-import googleDriveService from './googleDriveService';
+import firebaseStorageService from './firebaseStorageService';
 
 const FAVORITES_KEY = 'sncf_favorite_locations';
 const FAVORITES_FILE_NAME = 'favorites.json';
@@ -11,30 +11,8 @@ export interface FavoriteLocation {
     addedAt?: string;
 }
 
-let favoritesFileId: string | null = null;
-
-async function getFavoritesFileId() {
-    if (favoritesFileId) {
-        return favoritesFileId;
-    }
-    const files = await googleDriveService.listFiles();
-    const favoritesFile = files.find((file: any) => file.name === FAVORITES_FILE_NAME);
-    if (favoritesFile) {
-        favoritesFileId = favoritesFile.id;
-        return favoritesFileId;
-    }
-    return null;
-}
-
-async function createFavoritesFile(favorites: FavoriteLocation[]) {
-    const file = await googleDriveService.createFile(FAVORITES_FILE_NAME, favorites);
-    if (file) {
-        favoritesFileId = file.id;
-    }
-}
-
 /**
- * Get all favorite locations from cache or Google Drive
+ * Get all favorite locations from cache or Firebase Storage
  */
 export const getFavorites = async (): Promise<FavoriteLocation[]> => {
     const cachedFavorites = localStorage.getItem(FAVORITES_KEY);
@@ -42,13 +20,10 @@ export const getFavorites = async (): Promise<FavoriteLocation[]> => {
         return JSON.parse(cachedFavorites);
     }
 
-    const fileId = await getFavoritesFileId();
-    if (fileId) {
-        const favorites = await googleDriveService.readFile(fileId);
-        if (favorites) {
-            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-            return favorites;
-        }
+    const favorites = await firebaseStorageService.readFile(FAVORITES_FILE_NAME);
+    if (favorites) {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+        return favorites;
     }
 
     return [];
@@ -62,13 +37,7 @@ export const addFavorite = async (id: string, name: string, type: string): Promi
     if (!favorites.find(fav => fav.id === id)) {
         favorites.push({ id, name, type, addedAt: new Date().toISOString() });
         localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-
-        const fileId = await getFavoritesFileId();
-        if (fileId) {
-            await googleDriveService.updateFile(fileId, favorites);
-        } else {
-            await createFavoritesFile(favorites);
-        }
+        await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
     }
 };
 
@@ -79,11 +48,7 @@ export const removeFavorite = async (id: string): Promise<void> => {
     let favorites = await getFavorites();
     favorites = favorites.filter(fav => fav.id !== id);
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-
-    const fileId = await getFavoritesFileId();
-    if (fileId) {
-        await googleDriveService.updateFile(fileId, favorites);
-    }
+    await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
 };
 
 /**
