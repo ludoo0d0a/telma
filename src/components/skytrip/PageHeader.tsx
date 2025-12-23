@@ -1,40 +1,45 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, MoreVertical, Plane } from 'lucide-react';
+import {ArrowLeft, Menu, Search, MoreVertical, Bell} from 'lucide-react';
 import './PageHeader.scss';
 
 interface PageHeaderProps {
     title: string;
+    leftAction?: 'menu' | 'back';
     showBack?: boolean;
     backUrl?: string;
     onBack?: () => void;
+    onMenu?: () => void;
     showSearch?: boolean;
     onSearch?: () => void;
     showMenu?: boolean;
-    onMenu?: () => void;
+    showAvatar?: boolean;
+    showNotification?: boolean;
+    avatarUrl?: string;
+    onAvatarClick?: () => void;
+    onNotificationClick?: () => void;
     variant?: 'default' | 'with-route';
-    route?: {
-        from: { name: string; code: string };
-        to: { name: string; code: string };
-        duration?: string;
-    };
-    selectedDate?: string;
+    children?: React.ReactNode;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
     title,
-    showBack = true,
+    leftAction,
+    showBack = false,
     backUrl,
     onBack,
+    onMenu,
     showSearch = false,
     onSearch,
-    showMenu = false,
-    onMenu,
-    variant = 'default',
-    route,
-    selectedDate
+    showAvatar = true,
+    showNotification = true,
+    avatarUrl = 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+    onAvatarClick,
+    onNotificationClick,
+    children
 }) => {
     const navigate = useNavigate();
+    const resolvedLeftAction = leftAction ?? (showBack ? 'back' : 'menu');
 
     const handleBack = () => {
         if (onBack) {
@@ -47,53 +52,42 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     };
 
     return (
-        <header className={`skytrip-page-header ${variant}`}>
+        <header className='skytrip-page-header'>
             <div className="header-top">
-                {showBack && (
-                    <button onClick={handleBack} className="back-button">
-                        <ArrowLeft size={20} strokeWidth={2} />
-                    </button>
-                )}
+                <div className="left-actions">
+                    {resolvedLeftAction === 'back' ? (
+                        <button onClick={handleBack} className="icon-button back-button">
+                            <ArrowLeft size={20} strokeWidth={2} />
+                        </button>
+                    ) : (
+                        <button onClick={onMenu} className="icon-button menu-button">
+                            <Menu size={20} strokeWidth={2} />
+                        </button>
+                    )}
+                </div>
+
                 <h1>{title}</h1>
-                {showSearch && (
-                    <button className="search-button" onClick={onSearch}>
-                        <Search size={20} strokeWidth={2} />
-                    </button>
-                )}
-                {showMenu && (
-                    <button className="menu-button" onClick={onMenu}>
-                        <MoreVertical size={20} strokeWidth={2} />
-                    </button>
-                )}
+
+                <div className="right-actions">
+                    {showSearch && (
+                        <button className="icon-button search-button" onClick={onSearch}>
+                            <Search size={20} strokeWidth={2} />
+                        </button>
+                    )}
+                    {showNotification && (
+                        <button className="icon-button notification" onClick={onNotificationClick}>
+                            <Bell size={20} />
+                        </button>
+                    )}
+                    {showAvatar && (
+                        <button className="icon-button avatar-button" onClick={onAvatarClick}>
+                            <img src={avatarUrl} alt="User avatar" />
+                        </button>
+                    )}
+                </div>
             </div>
 
-            {variant === 'with-route' && route && (
-                <>
-                    <div className="flight-route">
-                        <div className="location">
-                            <h2>{route.from.name}</h2>
-                            <p className="code">{route.from.code}</p>
-                        </div>
-                        <div className="route-connector">
-                            <div className="dotted-line"></div>
-                            <div className="plane-icon">
-                                <Plane size={20} strokeWidth={2} />
-                            </div>
-                            {route.duration && <p className="duration">{route.duration}</p>}
-                        </div>
-                        <div className="location">
-                            <h2>{route.to.name}</h2>
-                            <p className="code">{route.to.code}</p>
-                        </div>
-                    </div>
-
-                    {selectedDate && (
-                        <div className="selected-date">
-                            <p>{selectedDate}</p>
-                        </div>
-                    )}
-                </>
-            )}
+        {children}
         </header>
     );
 };
