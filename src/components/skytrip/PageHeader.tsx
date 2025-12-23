@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import {ArrowLeft, Menu, Search, MoreVertical, Bell} from 'lucide-react';
+import { ArrowLeft, Menu, Search, Bell } from 'lucide-react';
+import { useSidebar } from '@/contexts/SidebarContext';
+import Avatar from '@/components/Avatar';
 import './PageHeader.scss';
 
 interface PageHeaderProps {
@@ -39,6 +41,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     children
 }) => {
     const navigate = useNavigate();
+    const { toggleSidebar } = useSidebar();
     const resolvedLeftAction = leftAction ?? (showBack ? 'back' : 'menu');
 
     const handleBack = () => {
@@ -51,6 +54,16 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         }
     };
 
+    const handleMenu = () => {
+        if (onMenu) {
+            onMenu();
+            return;
+        }
+
+        // Default to toggling the shared sidebar drawer when no handler is provided.
+        toggleSidebar();
+    };
+
     return (
         <header className='skytrip-page-header'>
             <div className="header-top">
@@ -60,7 +73,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                             <ArrowLeft size={20} strokeWidth={2} />
                         </button>
                     ) : (
-                        <button onClick={onMenu} className="icon-button menu-button">
+                        <button onClick={handleMenu} className="icon-button menu-button">
                             <Menu size={20} strokeWidth={2} />
                         </button>
                     )}
@@ -80,9 +93,13 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                         </button>
                     )}
                     {showAvatar && (
-                        <button className="icon-button avatar-button" onClick={onAvatarClick}>
-                            <img src={avatarUrl} alt="User avatar" />
-                        </button>
+                        <div className="avatar-wrapper">
+                            <Avatar
+                                variant="compact"
+                                fallbackPicture={avatarUrl}
+                                fallbackName={title}
+                            />
+                        </div>
                     )}
                 </div>
             </div>

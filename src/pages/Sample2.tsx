@@ -93,12 +93,14 @@ const Sample2: React.FC = () => {
         showSearch={true}
       />
       <main>
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          variant="rounded"
-        />
+          <div className="skytrip-flight-card">
+              <Tabs
+              tabs={tabs}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              variant="rounded"
+            />
+          </div>
         <div className="saved-flights">
           {flights.map((flight, index) => (
             <FlightCard

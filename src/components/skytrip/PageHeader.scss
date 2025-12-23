@@ -45,6 +45,48 @@
 
         .right-actions {
             justify-content: flex-end;
+            gap: 10px;
+
+            .avatar-wrapper {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .avatar-menu {
+                position: relative;
+
+                .avatar-trigger {
+                    background: rgba(255, 255, 255, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.35);
+                    color: white;
+
+                    .avatar-caret {
+                        color: white;
+                    }
+                }
+
+                .avatar-dropdown {
+                    background: white;
+                    color: #0f172a;
+                }
+
+                .avatar-menu-item {
+                    color: #0f172a;
+
+                    &:hover {
+                        background: rgba(15, 23, 42, 0.08);
+                    }
+                }
+
+                .avatar-menu-item.is-danger {
+                    color: #ef4444;
+
+                    &:hover {
+                        background: rgba(239, 68, 68, 0.08);
+                    }
+                }
+            }
         }
 
         .icon-button,
