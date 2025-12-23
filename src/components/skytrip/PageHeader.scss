@@ -113,6 +113,32 @@
         }
 
         .icon-button {
+            &.notification {
+                position: relative;
+
+                &.is-pending {
+                    background: white;
+                    color: #ff6f00;
+
+                    svg {
+                        stroke: #ff6f00 !important;
+                    }
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        top: 6px;
+                        right: 6px;
+                        width: 10px;
+                        height: 10px;
+                        background: #ef4444;
+                        border: 2px solid white;
+                        border-radius: 50%;
+                        box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.05);
+                    }
+                }
+            }
+
             svg {
                 width: 20px;
                 height: 20px;

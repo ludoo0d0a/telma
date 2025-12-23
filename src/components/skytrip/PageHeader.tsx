@@ -17,6 +17,8 @@ interface PageHeaderProps {
     showMenu?: boolean;
     showAvatar?: boolean;
     showNotification?: boolean;
+    /** When true, highlights the bell with a badge to indicate pending notifications. */
+    hasPendingNotifications?: boolean;
     avatarUrl?: string;
     onAvatarClick?: () => void;
     onNotificationClick?: () => void;
@@ -35,6 +37,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
     onSearch,
     showAvatar = true,
     showNotification = true,
+    hasPendingNotifications = false,
     avatarUrl = 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
     onAvatarClick,
     onNotificationClick,
@@ -88,7 +91,10 @@ const PageHeader: React.FC<PageHeaderProps> = ({
                         </button>
                     )}
                     {showNotification && (
-                        <button className="icon-button notification" onClick={onNotificationClick}>
+                        <button
+                            className={`icon-button notification${hasPendingNotifications ? ' is-pending' : ''}`}
+                            onClick={onNotificationClick}
+                        >
                             <Bell size={20} />
                         </button>
                     )}

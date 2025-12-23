@@ -29,6 +29,7 @@ const Sample1: React.FC = () => {
                 title="Good morning!"
                 backUrl="/"
                 showNotification={true}
+                hasPendingNotifications={true}
             />
 
             <main>
