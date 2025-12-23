@@ -15,7 +15,7 @@ const City: React.FC = () => {
             title={`Gares de ${cityName}`}
             subtitle="Découvrez les stations et horaires disponibles"
             showNotification={false}
-            showAvatar={false}
+            
         />
         <div className='city'>
           <h2 className='city__name'>{cityName}</h2>

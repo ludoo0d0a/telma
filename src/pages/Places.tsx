@@ -62,7 +62,7 @@ const Places: React.FC = () => {
                 title="Recherche de lieux"
                 subtitle="Trouvez les gares et arrêts à proximité ou par mot-clé"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

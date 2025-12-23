@@ -47,7 +47,7 @@ const Isochrones: React.FC = () => {
                 title="Isochrones"
                 subtitle="Visualisez les zones accessibles selon un temps de trajet"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

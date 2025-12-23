@@ -73,7 +73,7 @@ const Train: React.FC = () => {
             title={headerTitle}
             subtitle="Consultez un train précis ou lancez une recherche"
             showNotification={false}
-            showAvatar={false}
+            
         />
     );
 

@@ -448,7 +448,7 @@ const Trip: React.FC = () => {
             title="Détails du trajet"
             subtitle="Horaires, arrêts et perturbations détaillés"
             showNotification={false}
-            showAvatar={false}
+            
         />
     );
 

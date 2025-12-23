@@ -56,7 +56,7 @@ const Schedules: React.FC = () => {
                 title="Horaires et planning"
                 subtitle="Consultez les horaires par arrêt, ligne ou terminus"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

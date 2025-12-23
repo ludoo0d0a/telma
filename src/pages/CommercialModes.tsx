@@ -36,7 +36,7 @@ const CommercialModes: React.FC = () => {
                 title="Modes de transport SNCF"
                 subtitle="Découvrez les modes commerciaux disponibles dans l'API"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

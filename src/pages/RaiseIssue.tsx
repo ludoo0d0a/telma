@@ -23,7 +23,7 @@ const RaiseIssue: React.FC = () => {
                 title="Raise an Issue"
                 subtitle="Signalez un problème en quelques secondes"
                 showNotification={false}
-                showAvatar={false}
+                
             />
 
             <main>

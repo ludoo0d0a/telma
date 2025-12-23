@@ -32,7 +32,7 @@ const Favorites: React.FC = () => {
                 title="Vos favoris"
                 subtitle="Retrouvez rapidement vos gares et lieux sauvegardés"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

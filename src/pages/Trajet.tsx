@@ -579,7 +579,7 @@ const Trajet: React.FC = () => {
                 title="Recherche de trains"
                 subtitle="Planifiez vos trajets TER et visualisez les perturbations"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

@@ -61,7 +61,7 @@ const CoveragePage: React.FC = () => {
                 title="Zones de couverture"
                 subtitle="Consultez les régions et réseaux disponibles"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

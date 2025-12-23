@@ -153,7 +153,7 @@ const About: React.FC = () => {
                 title="À propos"
                 subtitle="SNCF API Explorer - horaires, trajets et outils open data"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section about-page'>
                 <div className='container'>

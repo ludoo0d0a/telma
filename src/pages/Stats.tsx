@@ -8,7 +8,7 @@ const Stats: React.FC = () => {
                 title="Statistics"
                 subtitle="Visualisez vos indicateurs clés"
                 showNotification={false}
-                showAvatar={false}
+                
             />
 
             <main>

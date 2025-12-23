@@ -640,7 +640,7 @@ const LocationDetection: React.FC = () => {
                 title="Détection de localisation"
                 subtitle="Identifiez votre position, la gare la plus proche et le train en cours"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

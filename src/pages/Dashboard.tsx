@@ -15,7 +15,7 @@ const Dashboard: React.FC = () => {
                 title="Dashboard"
                 subtitle="Accédez rapidement aux principales fonctionnalités"
                 showNotification={false}
-                showAvatar={false}
+                
             />
 
             <main>

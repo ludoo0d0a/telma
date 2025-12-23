@@ -57,7 +57,7 @@ const Reports: React.FC = () => {
                 title="Rapports et informations"
                 subtitle="Téléchargez les rapports de ligne, trafic ou équipements"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

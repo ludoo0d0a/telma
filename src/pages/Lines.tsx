@@ -38,7 +38,7 @@ const Lines: React.FC = () => {
                 title="Lignes de transport"
                 subtitle="Consultez les lignes disponibles et leurs informations"
                 showNotification={false}
-                showAvatar={false}
+                
             />
             <section className='section'>
                 <div className='container'>

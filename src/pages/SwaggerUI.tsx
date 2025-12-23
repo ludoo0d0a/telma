@@ -12,7 +12,7 @@ const SwaggerUIPage: React.FC = () => {
                     title="API Documentation"
                     subtitle="Swagger UI pour explorer l'API Telma"
                     showNotification={false}
-                    showAvatar={false}
+                    
                 />
                 <div className='swagger-page__content'>
                     <SwaggerUI
