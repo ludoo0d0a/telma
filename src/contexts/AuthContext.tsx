@@ -1,12 +1,11 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import { TokenResponse } from '@react-oauth/google';
-import googleDriveService from '@/services/googleDriveService';
-import axios from 'axios';
+import { CredentialResponse } from '@react-oauth/google';
+import firebaseStorageService from '@/services/firebaseStorageService';
 
 interface AuthContextType {
   user: any;
-  login: (tokenResponse: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => void;
+  login: (credentialResponse: CredentialResponse) => void;
   logout: () => void;
 }
 
@@ -16,35 +15,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('googleAccessToken');
+    const token = localStorage.getItem('googleIdToken');
     if (token) {
-        axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: { Authorization: `Bearer ${token}` }
-        }).then(response => {
-            setUser(response.data);
-            googleDriveService.setAccessToken(token);
+        firebaseStorageService.signInWithGoogle(token)
+        .then(() => {
+            const userObject = JSON.parse(atob(token.split('.')[1]));
+            setUser(userObject);
         }).catch(() => {
-            localStorage.removeItem('googleAccessToken');
+            localStorage.removeItem('googleIdToken');
         });
     }
   }, []);
 
-  const login = async (tokenResponse: Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>) => {
-    localStorage.setItem('googleAccessToken', tokenResponse.access_token);
-    googleDriveService.setAccessToken(tokenResponse.access_token);
-    try {
-        const response = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-            headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
-        });
-        setUser(response.data);
-    } catch (error) {
-        console.error("Failed to fetch user info", error);
+  const login = async (credentialResponse: CredentialResponse) => {
+    if (credentialResponse.credential) {
+        const idToken = credentialResponse.credential;
+        await firebaseStorageService.signInWithGoogle(idToken);
+        const userObject = JSON.parse(atob(idToken.split('.')[1]));
+        setUser(userObject);
+        localStorage.setItem('googleIdToken', idToken);
     }
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('googleAccessToken');
+    localStorage.removeItem('googleIdToken');
+    firebaseStorageService.signOut();
   };
 
   return (
