@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MapPin, Route, Flag, Loader2, Search } from 'lucide-react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '@/services/navitiaApi';
 import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '@/client/models';
 
@@ -51,18 +52,14 @@ const Schedules: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Horaires et planning"
+                subtitle="Consultez les horaires par arrêt, ligne ou terminus"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Horaires et <span>planning</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className='box mb-5'>
                         <h3 className='title is-5 mb-4'>Type de planning</h3>
                         <div className='tabs is-boxed mb-4'>

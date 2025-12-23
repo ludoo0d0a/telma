@@ -27,14 +27,11 @@ import Snowfall from 'react-snowfall'
 import { trackPageView } from '@/utils/analytics'
 import BottomNavbar from '@/components/BottomNavbar'
 import Sidebar from '@/components/Sidebar'
-import { PageHeader } from '@/components/skytrip'
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
 
 const AppContent: React.FC = () => {
     const location = useLocation()
     const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
-    const skytripRoutes = ['/', '/dashboard', '/stats', '/raise-issue', '/sample1', '/sample2', '/sample3'];
-    const hideGlobalHeader = skytripRoutes.some(path => location.pathname === path || (path !== '/' && location.pathname.startsWith(path)));
 
     useEffect(() => {
         // Track page view on route change
@@ -44,13 +41,6 @@ const AppContent: React.FC = () => {
     return (
         <div className='App'>
             <Sidebar isOpen={isOpen} onClose={closeSidebar} />
-            {!hideGlobalHeader && (
-                <PageHeader
-                    title="Telma"
-                    showNotification={false}
-                    showAvatar={false}
-                />
-            )}
               { /*  <Snowfall
                 style={{
                     position: 'fixed',

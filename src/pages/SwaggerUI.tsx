@@ -2,16 +2,18 @@ import React from 'react';
 import SwaggerUI from 'swagger-ui-react';
 import 'swagger-ui-react/swagger-ui.css';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 
 const SwaggerUIPage: React.FC = () => {
     return (
         <>
             <div className='swagger-page'>
-                <div className='swagger-page__header'>
-                    <h1 className='swagger-page__title'>
-                        API <span>Documentation</span>
-                    </h1>
-                </div>
+                <PageHeader
+                    title="API Documentation"
+                    subtitle="Swagger UI pour explorer l'API Telma"
+                    showNotification={false}
+                    showAvatar={false}
+                />
                 <div className='swagger-page__content'>
                     <SwaggerUI
                         url={`${import.meta.env.BASE_URL || ''}/openapi.json`}

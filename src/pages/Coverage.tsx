@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import { getCoverage, getCoverageDetails } from '@/services/navitiaApi';
 import type { CoverageResponse, Coverage } from '@/client/models';
 import type { Link } from '@/client/models/link';
@@ -56,18 +57,14 @@ const CoveragePage: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Zones de couverture"
+                subtitle="Consultez les régions et réseaux disponibles"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Zones de <span>couverture</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     {loading && !selectedCoverage && (
                         <div className='box has-text-centered'>
                             <div className='loader-wrapper'>

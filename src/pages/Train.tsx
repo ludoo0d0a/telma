@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import TrainWaypointsMap from '@/components/TrainWaypointsMap';
 import Ad from '@/components/Ad';
 import { getVehicleJourney } from '@/services/vehicleJourneyService';
@@ -66,10 +67,21 @@ const Train: React.FC = () => {
         fetchTrainDetails(true);
     };
 
+    const headerTitle = id ? 'Détails du train' : 'Recherche de train';
+    const TrainPageHeader = (
+        <PageHeader
+            title={headerTitle}
+            subtitle="Consultez un train précis ou lancez une recherche"
+            showNotification={false}
+            showAvatar={false}
+        />
+    );
+
     // Show search interface when no ID is provided
     if (!id) {
         return (
             <>
+                {TrainPageHeader}
                 <TrainSearch />
                 <Footer />
             </>
@@ -77,16 +89,24 @@ const Train: React.FC = () => {
     }
 
     if (loading) {
-        return <TrainLoadingState />;
+        return (
+            <>
+                {TrainPageHeader}
+                <TrainLoadingState />
+            </>
+        );
     }
 
     if (error || !trainData) {
         return (
-            <TrainErrorState 
-                error={error}
-                onRefresh={handleRefresh}
-                refreshing={refreshing}
-            />
+            <>
+                {TrainPageHeader}
+                <TrainErrorState 
+                    error={error}
+                    onRefresh={handleRefresh}
+                    refreshing={refreshing}
+                />
+            </>
         );
     }
 
@@ -125,6 +145,7 @@ const Train: React.FC = () => {
 
     return (
         <>
+            {TrainPageHeader}
             <section className='section'>
                 <div className='container'>
                     <div className='box'>

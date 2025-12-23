@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import GeoJSONMap from '@/components/GeoJSONMap';
 import { Loader2, Calculator } from 'lucide-react';
 import { getIsochrones } from '@/services/navitiaApi';
@@ -42,18 +43,14 @@ const Isochrones: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Isochrones"
+                subtitle="Visualisez les zones accessibles selon un temps de trajet"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Isochrones <span className='tag is-warning'>Beta</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className='notification is-warning mb-5'>
                         <p><strong>⚠️ Cette fonctionnalité est en version Beta</strong></p>
                     </div>
