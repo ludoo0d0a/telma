@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSidebar } from '@/contexts/SidebarContext';
-import { Home, Route, Clock, MapPin, Star } from 'lucide-react';
+import { Home, Star, LayoutDashboard, BarChart2, MessageSquareWarning } from 'lucide-react';
 
 interface BottomNavbarProps {
     onMoreClick: () => void;
@@ -15,17 +15,17 @@ const BottomNavbar: React.FC<BottomNavbarProps> = ({ onMoreClick }) => {
                     <span className='icon'><Home size={20} /></span>
                     <span className='bottom-navbar-item-label'>Home</span>
                 </NavLink>
-                <NavLink to='/itinerary' className='bottom-navbar-item'>
-                    <span className='icon'><Route size={20} /></span>
-                    <span className='bottom-navbar-item-label'>Trajet</span>
+                <NavLink to='/dashboard' className='bottom-navbar-item'>
+                    <span className='icon'><LayoutDashboard size={20} /></span>
+                    <span className='bottom-navbar-item-label'>Dashboard</span>
                 </NavLink>
-                <NavLink to='/schedules' className='bottom-navbar-item'>
-                    <span className='icon'><Clock size={20} /></span>
-                    <span className='bottom-navbar-item-label'>Horaires</span>
+                <NavLink to='/stats' className='bottom-navbar-item'>
+                    <span className='icon'><BarChart2 size={20} /></span>
+                    <span className='bottom-navbar-item-label'>Stats</span>
                 </NavLink>
-                <NavLink to='/places' className='bottom-navbar-item'>
-                    <span className='icon'><MapPin size={20} /></span>
-                    <span className='bottom-navbar-item-label'>Lieux</span>
+                <NavLink to='/raise-issue' className='bottom-navbar-item'>
+                    <span className='icon'><MessageSquareWarning size={20} /></span>
+                    <span className='bottom-navbar-item-label'>Issue</span>
                 </NavLink>
                 <NavLink to='/favorites' className='bottom-navbar-item'>
                     <span className='icon'><Star size={20} /></span>

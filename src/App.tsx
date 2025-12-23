@@ -20,6 +20,9 @@ import LocationDetection from '@/pages/LocationDetection'
 import Sample1 from '@/pages/Sample1'
 import Sample2 from '@/pages/Sample2'
 import Sample3 from '@/pages/Sample3'
+import Stats from '@/pages/Stats'
+import RaiseIssue from '@/pages/RaiseIssue'
+import Dashboard from '@/pages/Dashboard'
 import Snowfall from 'react-snowfall'
 import { trackPageView } from '@/utils/analytics'
 import BottomNavbar from '@/components/BottomNavbar'
@@ -72,6 +75,9 @@ const AppContent: React.FC = () => {
                 <Route path='/sample1' element={<Sample1 />} />
                 <Route path='/sample2' element={<Sample2 />} />
                 <Route path='/sample3' element={<Sample3 />} />
+                <Route path='/stats' element={<Stats />} />
+                <Route path='/raise-issue' element={<RaiseIssue />} />
+                <Route path='/dashboard' element={<Dashboard />} />
                 <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
             {!useMobileView && <BottomNavbar onMoreClick={toggleSidebar} />}

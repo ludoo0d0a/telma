@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useSidebar } from '@/contexts/SidebarContext';
-import { X, Home, Route, Clock, MapPin, Crosshair, Star, Train, BarChart3, Map, Circle, Bus, Book, Info } from 'lucide-react';
+import { X, Home, Route, Clock, MapPin, Crosshair, Star, Train, BarChart3, Map, Circle, Bus, Book, Info, LayoutDashboard, BarChart2, MessageSquareWarning } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -59,6 +59,24 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
               <NavLink to='/favorites' className="sidebar-link" onClick={onClose}>
                 <span className='icon'><Star size={20} /></span>
                 <span>Favoris</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to='/dashboard' className="sidebar-link" onClick={onClose}>
+                <span className='icon'><LayoutDashboard size={20} /></span>
+                <span>Dashboard</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to='/stats' className="sidebar-link" onClick={onClose}>
+                <span className='icon'><BarChart2 size={20} /></span>
+                <span>Stats</span>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to='/raise-issue' className="sidebar-link" onClick={onClose}>
+                <span className='icon'><MessageSquareWarning size={20} /></span>
+                <span>Raise an issue</span>
               </NavLink>
             </li>
             <li>
