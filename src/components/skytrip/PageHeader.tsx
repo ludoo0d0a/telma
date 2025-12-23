@@ -1,40 +1,53 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Search, MoreVertical, Plane } from 'lucide-react';
+import { ArrowLeft, Menu, Search, Bell } from 'lucide-react';
+import { useSidebar } from '@/contexts/SidebarContext';
+import Avatar from '@/components/Avatar';
 import './PageHeader.scss';
 
 interface PageHeaderProps {
     title: string;
+    subtitle?: string;
+    leftAction?: 'menu' | 'back';
     showBack?: boolean;
     backUrl?: string;
     onBack?: () => void;
+    onMenu?: () => void;
     showSearch?: boolean;
     onSearch?: () => void;
     showMenu?: boolean;
-    onMenu?: () => void;
+    showAvatar?: boolean;
+    showNotification?: boolean;
+    /** When true, highlights the bell with a badge to indicate pending notifications. */
+    hasPendingNotifications?: boolean;
+    avatarUrl?: string;
+    onAvatarClick?: () => void;
+    onNotificationClick?: () => void;
     variant?: 'default' | 'with-route';
-    route?: {
-        from: { name: string; code: string };
-        to: { name: string; code: string };
-        duration?: string;
-    };
-    selectedDate?: string;
+    children?: React.ReactNode;
 }
 
 const PageHeader: React.FC<PageHeaderProps> = ({
     title,
-    showBack = true,
+    subtitle,
+    leftAction,
+    showBack = false,
     backUrl,
     onBack,
+    onMenu,
     showSearch = false,
     onSearch,
-    showMenu = false,
-    onMenu,
-    variant = 'default',
-    route,
-    selectedDate
+    showAvatar = true,
+    showNotification = true,
+    hasPendingNotifications = false,
+    avatarUrl = 'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+    onAvatarClick,
+    onNotificationClick,
+    children
 }) => {
     const navigate = useNavigate();
+    const { toggleSidebar } = useSidebar();
+    const resolvedLeftAction = leftAction ?? (showBack ? 'back' : 'menu');
 
     const handleBack = () => {
         if (onBack) {
@@ -46,54 +59,63 @@ const PageHeader: React.FC<PageHeaderProps> = ({
         }
     };
 
+    const handleMenu = () => {
+        if (onMenu) {
+            onMenu();
+            return;
+        }
+
+        // Default to toggling the shared sidebar drawer when no handler is provided.
+        toggleSidebar();
+    };
+
     return (
-        <header className={`skytrip-page-header ${variant}`}>
+        <header className='skytrip-page-header'>
             <div className="header-top">
-                {showBack && (
-                    <button onClick={handleBack} className="back-button">
-                        <ArrowLeft size={20} strokeWidth={2} />
-                    </button>
-                )}
-                <h1>{title}</h1>
-                {showSearch && (
-                    <button className="search-button" onClick={onSearch}>
-                        <Search size={20} strokeWidth={2} />
-                    </button>
-                )}
-                {showMenu && (
-                    <button className="menu-button" onClick={onMenu}>
-                        <MoreVertical size={20} strokeWidth={2} />
-                    </button>
-                )}
-            </div>
+                <div className="left-actions">
+                    {resolvedLeftAction === 'back' ? (
+                        <button onClick={handleBack} className="icon-button back-button">
+                            <ArrowLeft size={20} strokeWidth={2} />
+                        </button>
+                    ) : (
+                        <button onClick={handleMenu} className="icon-button menu-button">
+                            <Menu size={20} strokeWidth={2} />
+                        </button>
+                    )}
+                </div>
 
-            {variant === 'with-route' && route && (
-                <>
-                    <div className="flight-route">
-                        <div className="location">
-                            <h2>{route.from.name}</h2>
-                            <p className="code">{route.from.code}</p>
-                        </div>
-                        <div className="route-connector">
-                            <div className="dotted-line"></div>
-                            <div className="plane-icon">
-                                <Plane size={20} strokeWidth={2} />
-                            </div>
-                            {route.duration && <p className="duration">{route.duration}</p>}
-                        </div>
-                        <div className="location">
-                            <h2>{route.to.name}</h2>
-                            <p className="code">{route.to.code}</p>
-                        </div>
-                    </div>
+                <div className="title-block">
+                    <h1>{title}</h1>
+                    {subtitle && <p className="subtitle">{subtitle}</p>}
+                </div>
 
-                    {selectedDate && (
-                        <div className="selected-date">
-                            <p>{selectedDate}</p>
+                <div className="right-actions">
+                    {showSearch && (
+                        <button className="icon-button search-button" onClick={onSearch}>
+                            <Search size={20} strokeWidth={2} />
+                        </button>
+                    )}
+                    {showNotification && (
+                        <button
+                            className={`icon-button notification${hasPendingNotifications ? ' is-pending' : ''}`}
+                            onClick={onNotificationClick}
+                        >
+                            <Bell size={20} />
+                        </button>
+                    )}
+                    {showAvatar && (
+                        <div className="avatar-wrapper">
+                            <Avatar
+                                variant="compact"
+                                fallbackPicture={avatarUrl}
+                                fallbackName={title}
+                            />
                         </div>
                     )}
-                </>
-            )}
+                </div>
+            </div>
+
+        {children}
         </header>
     );
 };

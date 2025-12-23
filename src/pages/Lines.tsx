@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import { ArrowDown } from 'lucide-react';
 import { getLines } from '@/services/navitiaApi';
 import type { Line } from '@/client/models/line';
@@ -33,18 +34,14 @@ const Lines: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Lignes de transport"
+                subtitle="Consultez les lignes disponibles et leurs informations"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Lignes de <span>transport</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     {loading && lines.length === 0 && (
                         <div className='box has-text-centered'>
                             <div className='loader-wrapper'>

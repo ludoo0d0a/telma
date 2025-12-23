@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import Ad from '@/components/Ad';
 import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
 import type { Place } from '@/client/models/place';
@@ -57,18 +58,14 @@ const Places: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Recherche de lieux"
+                subtitle="Trouvez les gares et arrêts à proximité ou par mot-clé"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Recherche de <span>lieux</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-5" />
 

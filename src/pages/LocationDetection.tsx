@@ -4,6 +4,7 @@ import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-m
 import type { MapRef, ViewState } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
 import { encodeVehicleJourneyId } from '@/utils/uriUtils';
@@ -635,18 +636,14 @@ const LocationDetection: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Détection de localisation"
+                subtitle="Identifiez votre position, la gare la plus proche et le train en cours"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Détection de <span>localisation</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className='box mb-5'>
                         <h3 className='title is-5 mb-4'>Détecter votre position</h3>
                         <p className='mb-4'>

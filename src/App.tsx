@@ -27,13 +27,11 @@ import Snowfall from 'react-snowfall'
 import { trackPageView } from '@/utils/analytics'
 import BottomNavbar from '@/components/BottomNavbar'
 import Sidebar from '@/components/Sidebar'
-import Header from '@/components/Header'
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
 
 const AppContent: React.FC = () => {
     const location = useLocation()
     const { isOpen, toggleSidebar, closeSidebar } = useSidebar();
-    const useMobileView = location.pathname === '/sample1' || location.pathname === '/sample2' || location.pathname === '/sample3';
 
     useEffect(() => {
         // Track page view on route change
@@ -42,8 +40,7 @@ const AppContent: React.FC = () => {
 
     return (
         <div className='App'>
-            {!useMobileView && <Sidebar isOpen={isOpen} onClose={closeSidebar} />}
-            {!useMobileView && <Header />}
+            <Sidebar isOpen={isOpen} onClose={closeSidebar} />
               { /*  <Snowfall
                 style={{
                     position: 'fixed',
@@ -80,7 +77,7 @@ const AppContent: React.FC = () => {
                 <Route path='/dashboard' element={<Dashboard />} />
                 <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
-            {!useMobileView && <BottomNavbar onMoreClick={toggleSidebar} />}
+            <BottomNavbar onMoreClick={toggleSidebar} />
         </div>
     )
 }

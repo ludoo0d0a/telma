@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header } from '@/components/skytrip';
+import { PageHeader } from '@/components/skytrip';
 import { Clock, Ban, Wrench, HeartPulse, DoorClosed, MessageSquareWarning } from 'lucide-react';
 
 const RaiseIssue: React.FC = () => {
@@ -19,7 +19,12 @@ const RaiseIssue: React.FC = () => {
 
     return (
         <div className="app-flight">
-            <Header />
+            <PageHeader
+                title="Raise an Issue"
+                subtitle="Signalez un problème en quelques secondes"
+                showNotification={false}
+                showAvatar={false}
+            />
 
             <main>
                 <div className="container" style={{ padding: '20px' }}>

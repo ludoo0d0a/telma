@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Footer from '@/components/Footer';
 import Ad from '@/components/Ad';
+import { PageHeader } from '@/components/skytrip';
 import ItinerarySearchForm from '@/components/itinerary/ItinerarySearchForm';
 import DisruptionsList from '@/components/itinerary/DisruptionsList';
 import JourneyTable from '@/components/itinerary/JourneyTable';
@@ -574,29 +575,26 @@ const Trajet: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Recherche de trains"
+                subtitle="Planifiez vos trajets TER et visualisez les perturbations"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Recherche de trains
-                                </h1>
-                            </div>
-                        </div>
-                        <div className='level-right'>
-                            <div className='level-item'>
-                                <button
-                                    className='button is-primary'
-                                    onClick={handleRefresh}
-                                    disabled={loading}
-                                >
-                                    <span className='icon'>
-                                        {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
-                                    </span>
-                                    <span>Actualiser</span>
-                                </button>
-                            </div>
+                    <div className='level mb-5 is-justify-content-flex-end'>
+                        <div className='level-item'>
+                            <button
+                                className='button is-primary'
+                                onClick={handleRefresh}
+                                disabled={loading}
+                            >
+                                <span className='icon'>
+                                    {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
+                                </span>
+                                <span>Actualiser</span>
+                            </button>
                         </div>
                     </div>
 

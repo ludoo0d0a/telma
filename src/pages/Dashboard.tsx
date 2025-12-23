@@ -1,5 +1,5 @@
 import React from 'react';
-import { Header } from '@/components/skytrip';
+import { PageHeader } from '@/components/skytrip';
 
 const Dashboard: React.FC = () => {
     // Placeholder for favorite stations
@@ -11,7 +11,12 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className="app-flight">
-            <Header />
+            <PageHeader
+                title="Dashboard"
+                subtitle="Accédez rapidement aux principales fonctionnalités"
+                showNotification={false}
+                showAvatar={false}
+            />
 
             <main>
                 <div className="container" style={{ padding: '20px' }}>

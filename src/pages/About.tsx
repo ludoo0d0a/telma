@@ -1,5 +1,6 @@
 import React from 'react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import packageJson from '../../package.json';
 import { Info, Tag, ExternalLink, Star, Settings, CheckSquare, History, Train, Route, MapPin, Bus, Map, Search, Circle, BarChart3, Book, Code, Network, Palette, BookOpen, Wrench, Smartphone, TrendingUp, FlaskConical } from 'lucide-react';
 
@@ -148,20 +149,14 @@ const About: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="À propos"
+                subtitle="SNCF API Explorer - horaires, trajets et outils open data"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section about-page'>
                 <div className='container'>
-                    <div className='has-text-centered mb-6'>
-                        <h1 className='title is-1 mb-4'>
-                            <span className='icon has-text-primary mr-3'>
-                                <Info size={24} />
-                            </span>
-                            About
-                        </h1>
-                        <p className='subtitle is-5 has-text-secondary'>
-                            SNCF API Explorer - Real-time train schedules and information
-                        </p>
-                    </div>
-
                     {/* Version and Author */}
                     <div className='box mb-5'>
                         <h2 className='title is-3 mb-4'>

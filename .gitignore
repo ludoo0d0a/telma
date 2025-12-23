@@ -31,3 +31,5 @@ npm_output.log
 *.log
 debug.log
 
+# Vue app
+/vue-app

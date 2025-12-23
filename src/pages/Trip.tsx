@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import GeoJSONMap from '@/components/GeoJSONMap';
 import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
 import { cleanLocationName } from '@/services/locationService';
@@ -442,6 +443,15 @@ const Trip: React.FC = () => {
         return sections.filter((section: Section) => section.geojson);
     }, [sections]);
 
+    const TripHeader = (
+        <PageHeader
+            title="Détails du trajet"
+            subtitle="Horaires, arrêts et perturbations détaillés"
+            showNotification={false}
+            showAvatar={false}
+        />
+    );
+
     // Get markers for all waypoints (stops) from stop_date_times
     const journeyMarkers = useMemo<JourneyMarker[]>(() => {
         if (!allStops || allStops.length === 0) {
@@ -493,6 +503,7 @@ const Trip: React.FC = () => {
     if (loading) {
         return (
             <>
+                {TripHeader}
                 <section className='section'>
                     <div className='container'>
                         <div className='box has-text-centered'>
@@ -520,9 +531,9 @@ const Trip: React.FC = () => {
             
             return (
                 <>
+                    {TripHeader}
                     <section className='section'>
                         <div className='container'>
-                            <h1 className='title is-2 mb-5'>Détails du trajet</h1>
                             <div className='box has-text-centered mb-5'>
                                 <span className='icon is-large has-text-info'>
                                     <Route size={48} />
@@ -568,6 +579,7 @@ const Trip: React.FC = () => {
         
         return (
             <>
+                {TripHeader}
                 <section className='section'>
                     <div className='container'>
                         <div className='box has-text-centered'>
@@ -651,15 +663,11 @@ const Trip: React.FC = () => {
 
     return (
         <>
+            {TripHeader}
             <section className='section'>
                 <div className='container'>
                     <div className='level mb-5'>
                         <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Détails du trajet
-                                </h1>
-                            </div>
                         </div>
                         <div className='level-right'>
                             <div className='level-item'>

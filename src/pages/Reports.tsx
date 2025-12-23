@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Route, TrafficCone, Settings, Loader2, Download } from 'lucide-react';
 import Footer from '@/components/Footer';
+import { PageHeader } from '@/components/skytrip';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '@/services/navitiaApi';
 import type { 
     CoverageCoverageLineReportsGet200Response,
@@ -52,18 +53,14 @@ const Reports: React.FC = () => {
 
     return (
         <>
+            <PageHeader
+                title="Rapports et informations"
+                subtitle="Téléchargez les rapports de ligne, trafic ou équipements"
+                showNotification={false}
+                showAvatar={false}
+            />
             <section className='section'>
                 <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                            <div className='level-item'>
-                                <h1 className='title is-2'>
-                                    Rapports et <span>informations</span>
-                                </h1>
-                            </div>
-                        </div>
-                    </div>
-
                     <div className='box mb-5'>
                         <h3 className='title is-5 mb-4'>Type de rapport</h3>
                         <div className='tabs is-boxed mb-4'>

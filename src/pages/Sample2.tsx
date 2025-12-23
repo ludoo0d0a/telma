@@ -89,16 +89,19 @@ const Sample2: React.FC = () => {
     <div className="app-flight">
       <PageHeader
         title="Saved Flights"
+        subtitle="Retrouvez vos vols enregistrés"
         backUrl="/"
         showSearch={true}
       />
       <main>
-        <Tabs
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={setActiveTab}
-          variant="rounded"
-        />
+          <div className="skytrip-flight-card">
+              <Tabs
+              tabs={tabs}
+              activeTab={activeTab}
+              onTabChange={setActiveTab}
+              variant="rounded"
+            />
+          </div>
         <div className="saved-flights">
           {flights.map((flight, index) => (
             <FlightCard

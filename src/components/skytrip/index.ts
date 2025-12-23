@@ -1,4 +1,3 @@
-export { default as Header } from './Header';
 export { default as PageHeader } from './PageHeader';
 export { default as Tabs } from './Tabs';
 export { default as SearchCard } from './SearchCard';
