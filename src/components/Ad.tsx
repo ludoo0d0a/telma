@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Info } from 'lucide-react';
 
 interface AdProps {
@@ -41,6 +41,7 @@ const Ad: React.FC<AdProps> = ({
 }) => {
     const showAds = import.meta.env.VITE_SHOW_ADS !== 'false';
     const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
+    const adRef = useRef<HTMLModElement>(null);
     
     // Enable test mode on localhost to see ads during development
     const isLocalhost = typeof window !== 'undefined' && 
@@ -48,6 +49,20 @@ const Ad: React.FC<AdProps> = ({
          window.location.hostname === '127.0.0.1' ||
          window.location.hostname.startsWith('192.168.'));
     const enableTestMode = isLocalhost;
+
+    useEffect(() => {
+        // Check if the ad has already been initialized in this container
+        // This prevents "adsbygoogle.push() error: All ins elements in the DOM with class=adsbygoogle already have ads in them."
+        const adElement = adRef.current;
+        if (showAds && publisherId && adElement && !adElement.getAttribute('data-adsbygoogle-status')) {
+            try {
+                // @ts-ignore
+                (window.adsbygoogle = window.adsbygoogle || []).push({});
+            } catch (err) {
+                console.error('AdSense error:', err);
+            }
+        }
+    }, [showAds, publisherId, adSlot]);
     
     // If ads are disabled, don't render anything
     if (!showAds) {
@@ -77,6 +92,7 @@ const Ad: React.FC<AdProps> = ({
             style={style}
         >
             <ins
+                ref={adRef}
                 className="adsbygoogle"
                 style={{ display: 'block', ...style }}
                 data-ad-client={publisherId}
