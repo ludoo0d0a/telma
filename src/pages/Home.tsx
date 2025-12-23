@@ -145,7 +145,7 @@ const Home: React.FC = () => {
                 title="Dashboard"
                 subtitle="Accédez rapidement aux principales fonctionnalités"
                 showNotification={false}
-                
+
             />
 
             <main>
@@ -157,7 +157,7 @@ const Home: React.FC = () => {
                     <CurrentLocationSection />
 
                     {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" />
+                    <Ad format="horizontal" size="responsive" className="mb-6" adSlot='5391792359'/>
 
                     {/* Main Pages Section */}
                     <DashboardSection
@@ -202,7 +202,7 @@ const Home: React.FC = () => {
 
                     {/* Advertisement */}
                     <Ad format="auto" size="responsive" className="mb-6" />
-                
+
             </main>
             {/*<Footer />*/}
         </div>
