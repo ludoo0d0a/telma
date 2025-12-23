@@ -78,6 +78,7 @@
   .avatar-image {
     width: 36px;
     height: 36px;
+    aspect-ratio: 1 / 1;
     border-radius: 50%;
     object-fit: cover;
     border: 1px solid var(--background-darker);
@@ -157,9 +158,6 @@
     }
 
     .avatar-dropdown {
-      width: 100%;
-      left: 0;
-      right: 0;
     }
   }
 }
