@@ -25,7 +25,7 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({
     columnsWrapperClassName = ''
 }) => {
     return (
-        <div className='mb-6'>
+        <div className='skytrip-search-card mb-6'>
             <h2 className='title is-3 mb-4'>
                 <span className='icon mr-2'>
                     <Icon size={24} />

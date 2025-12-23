@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { ChevronDown, LogOut, Settings, Star } from 'lucide-react';
+import { ChevronDown, LogIn, LogOut, Settings, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useGoogleLogin } from '@react-oauth/google';
 import { useAuth } from '@/contexts/AuthContext';
 
 type AvatarVariant = 'default' | 'compact';
@@ -18,10 +19,12 @@ const Avatar: React.FC<AvatarProps> = ({
   fallbackName,
   fallbackEmail,
 }) => {
-  const { user, logout } = useAuth();
+  const { user, login, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const hasValidClientId = Boolean(googleClientId && googleClientId.trim());
   const hasFallback = Boolean(fallbackPicture || fallbackName || fallbackEmail);
   const displayUser =
     user ??
@@ -53,6 +56,17 @@ const Avatar: React.FC<AvatarProps> = ({
     setIsOpen(false);
   };
 
+  const handleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      login(tokenResponse);
+      setIsOpen(false);
+    },
+    onError: () => {
+      console.log('Login Failed');
+    },
+    scope: 'https://www.googleapis.com/auth/drive.appdata',
+  });
+
   const handleLogout = () => {
     logout();
     setIsOpen(false);
@@ -79,6 +93,16 @@ const Avatar: React.FC<AvatarProps> = ({
 
       {isOpen && (
         <div className="avatar-dropdown" role="menu">
+          {!user && hasValidClientId && (
+            <button
+              type="button"
+              className="avatar-menu-item"
+              onClick={() => handleLogin()}
+            >
+              <LogIn size={18} />
+              <span>Sign in with Google</span>
+            </button>
+          )}
           <button
             type="button"
             className="avatar-menu-item"
@@ -95,14 +119,16 @@ const Avatar: React.FC<AvatarProps> = ({
             <Star size={18} />
             <span>Favorites</span>
           </button>
-          <button
-            type="button"
-            className="avatar-menu-item is-danger"
-            onClick={handleLogout}
-          >
-            <LogOut size={18} />
-            <span>Logout</span>
-          </button>
+          {user && (
+            <button
+              type="button"
+              className="avatar-menu-item is-danger"
+              onClick={handleLogout}
+            >
+              <LogOut size={18} />
+              <span>Logout</span>
+            </button>
+          )}
         </div>
       )}
     </div>

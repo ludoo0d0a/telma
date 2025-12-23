@@ -5,6 +5,7 @@ import AuthenticationSection from '@/components/home/AuthenticationSection';
 import CurrentLocationSection from '@/components/home/CurrentLocationSection';
 import DashboardSection from '@/components/home/DashboardSection';
 import { LayoutGrid, Route, List, Code, Train, MapPin, Clock, BarChart3, Map, Circle, Star, Bus, ArrowRight, Bookmark, Book } from 'lucide-react';
+import {PageHeader} from "@/components/skytrip";
 
 interface DashboardCard {
     title: string;
@@ -139,20 +140,18 @@ const Home: React.FC = () => {
     ];
 
     return (
-        <>
-            <section className='section'>
-                <div className='container'>
-                    <div className='has-text-centered mb-6'>
-                        <h1 className='title is-1 mb-4'>
-                            Dashboard
-                        </h1>
-                        <p className='subtitle is-4 has-text-secondary'>
-                            Accédez rapidement aux principales fonctionnalités
-                        </p>
-                    </div>
+        <div className="app-flight">
+            <PageHeader
+                title="Dashboard"
+                subtitle="Accédez rapidement aux principales fonctionnalités"
+                showNotification={false}
+                showAvatar={false}
+            />
+
+            <main>
 
                     {/* Authentication Section */}
-                    <AuthenticationSection />
+                    {/*<AuthenticationSection />*/}
 
                     {/* Current Location Widget */}
                     <CurrentLocationSection />
@@ -203,10 +202,10 @@ const Home: React.FC = () => {
 
                     {/* Advertisement */}
                     <Ad format="auto" size="responsive" className="mb-6" />
-                </div>
-            </section>
-            <Footer />
-        </>
+                
+            </main>
+            {/*<Footer />*/}
+        </div>
     );
 };
 
