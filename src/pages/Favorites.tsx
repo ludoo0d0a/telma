@@ -1,72 +1,67 @@
+
 import React, { useState, useEffect } from 'react';
-import Footer from '@/components/Footer';
-import {
-    FavoritesHeader,
-    FavoritesLoadingState,
-    FavoritesEmptyState,
-    FavoritesTable
-} from '@/components/favorites';
 import { getFavorites, removeFavorite, type FavoriteLocation } from '@/services/favoritesService';
+import { Favorite, MapPin, Loader2 } from 'lucide-react';
+import FavoritesTable from '@/components/favorites/FavoritesTable';
 
 const Favorites: React.FC = () => {
     const [favorites, setFavorites] = useState<FavoriteLocation[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        loadFavorites();
+        const fetchFavorites = async () => {
+            setLoading(true);
+            const favs = await getFavorites();
+            setFavorites(favs);
+            setLoading(false);
+        };
+        fetchFavorites();
     }, []);
 
-    const loadFavorites = (): void => {
-        setLoading(true);
-        const favs = getFavorites();
-        setFavorites(favs);
-        setLoading(false);
-    };
-
-    const handleRemoveFavorite = (id: string): void => {
-        removeFavorite(id);
-        loadFavorites();
-    };
-
-    const formatDate = (dateString: string | undefined): string => {
-        if (!dateString) return 'Date inconnue';
-        try {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        } catch {
-            return 'Date inconnue';
-        }
+    const handleRemoveFavorite = async (id: string) => {
+        await removeFavorite(id);
+        const updatedFavorites = await getFavorites();
+        setFavorites(updatedFavorites);
     };
 
     return (
-        <>
-            <section className='section'>
-                <div className='container'>
-                    <FavoritesHeader />
+        <section className='section'>
+            <div className='container'>
+                <h1 className='title is-1'>
+                    <Favorite className='icon' />
+                    Vos Favoris
+                </h1>
+                <p className='subtitle'>
+                    Retrouvez ici vos lieux et gares favoris pour un accès rapide.
+                </p>
 
-                    {loading ? (
-                        <FavoritesLoadingState />
-                    ) : favorites.length === 0 ? (
-                        <FavoritesEmptyState />
-                    ) : (
-                        <FavoritesTable
-                            favorites={favorites}
-                            onRemove={handleRemoveFavorite}
-                            formatDate={formatDate}
-                        />
-                    )}
-                </div>
-            </section>
-            <Footer />
-        </>
+                {loading ? (
+                    <div className="has-text-centered">
+                        <Loader2 className="animate-spin" size={48} />
+                        <p className="is-size-4 mt-4">Chargement des favoris...</p>
+                    </div>
+                ) : favorites.length > 0 ? (
+                    <FavoritesTable
+                        favorites={favorites}
+                        onRemoveFavorite={handleRemoveFavorite}
+                    />
+                ) : (
+                    <div className='message is-info'>
+                        <div className='message-body'>
+                            <p className='is-size-5'>
+                                <MapPin className='icon' />
+                                Vous n'avez pas encore de favoris.
+                            </p>
+                            <p>
+                                Pour ajouter un favori, recherchez un lieu ou une gare et cliquez sur l'étoile.
+                            </p>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </section>
+        <Footer />
     );
 };
 
 export default Favorites;
-

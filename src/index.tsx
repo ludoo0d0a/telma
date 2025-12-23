@@ -1,3 +1,4 @@
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import '@/styles/index.scss';
@@ -16,27 +17,17 @@ console.log('VITE_GOOGLE_ADSENSE_ID:', import.meta.env.VITE_GOOGLE_ADSENSE_ID);
 console.log('VITE_GOOGLE_CLIENT_ID:', import.meta.env.VITE_GOOGLE_CLIENT_ID);
 console.log('VITE_SHOW_ADS:', import.meta.env.VITE_SHOW_ADS);
 
-const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-const hasValidClientId = googleClientId && googleClientId.trim() !== '';
-
-const AppContent = () => (
-    <BrowserRouter basename={import.meta.env.BASE_URL}>
-        <AuthProvider>
-            <App />
-        </AuthProvider>
-    </BrowserRouter>
-);
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
     <React.StrictMode>
-        {hasValidClientId ? (
-            <GoogleOAuthProvider clientId={googleClientId}>
-                <AppContent />
-            </GoogleOAuthProvider>
-        ) : (
-            <AppContent />
-        )}
+        <GoogleOAuthProvider clientId={googleClientId}>
+            <BrowserRouter basename={import.meta.env.BASE_URL}>
+                <AuthProvider>
+                    <App />
+                </AuthProvider>
+            </BrowserRouter>
+        </GoogleOAuthProvider>
     </React.StrictMode>
 );
-

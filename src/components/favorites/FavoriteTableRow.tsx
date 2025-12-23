@@ -1,14 +1,24 @@
+
 import React from 'react';
 import { Trash2 } from 'lucide-react';
 import type { FavoriteLocation } from '@/services/favoritesService';
 
 interface FavoriteTableRowProps {
     favorite: FavoriteLocation;
-    onRemove: (id: string) => void;
-    formatDate: (dateString: string | undefined) => string;
+    onRemoveFavorite: (id: string) => void;
 }
 
-const FavoriteTableRow: React.FC<FavoriteTableRowProps> = ({ favorite, onRemove, formatDate }) => {
+const formatDate = (dateString: string | undefined): string => {
+    if (!dateString) return 'Date inconnue';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+    });
+};
+
+const FavoriteTableRow: React.FC<FavoriteTableRowProps> = ({ favorite, onRemoveFavorite }) => {
     return (
         <tr>
             <td>
@@ -25,7 +35,7 @@ const FavoriteTableRow: React.FC<FavoriteTableRowProps> = ({ favorite, onRemove,
             <td>
                 <button
                     className='button is-small is-danger is-light'
-                    onClick={() => onRemove(favorite.id)}
+                    onClick={() => onRemoveFavorite(favorite.id)}
                     title='Retirer des favoris'
                 >
                     <span className='icon'>
@@ -39,4 +49,3 @@ const FavoriteTableRow: React.FC<FavoriteTableRowProps> = ({ favorite, onRemove,
 };
 
 export default FavoriteTableRow;
-

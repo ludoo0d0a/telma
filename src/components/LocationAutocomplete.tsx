@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Loader2, CheckCircle2, Navigation, Star } from 'lucide-react';
 import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
@@ -32,42 +33,43 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     const [geolocating, setGeolocating] = useState<boolean>(false);
     const [geolocationError, setGeolocationError] = useState<string | null>(null);
     const [selectedStation, setSelectedStation] = useState<Place | null>(null);
-    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set(getFavorites().map(f => f.id)));
+    const [favoriteIds, setFavoriteIds] = useState<Set<string>>(new Set());
     const wrapperRef = useRef<HTMLDivElement>(null);
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-    // Internal input state - user has full control while typing
     const [inputValue, setInputValue] = useState<string>(value);
     const hasUserInteractedRef = useRef<boolean>(false);
+
+    useEffect(() => {
+        const fetchFavorites = async () => {
+            const favorites = await getFavorites();
+            setFavoriteIds(new Set(favorites.map(f => f.id)));
+        };
+        fetchFavorites();
+    }, []);
 
     const handleSelectStation = useCallback((station: Place): void => {
         const cleanedName = cleanLocationName(station.name);
         const newValue = cleanedName || '';
-        setInputValue(newValue); // Update internal state
-        onValueChange(newValue); // Update parent's state
+        setInputValue(newValue);
+        onValueChange(newValue);
         setSelectedStation(station);
         setIsOpen(false);
-        setGeolocationError(null); // Clear geolocation error when station is selected
-        onChange(station.id); // Notify parent of ID change
-        hasUserInteractedRef.current = false; // Reset interaction flag after selection
+        setGeolocationError(null);
+        onChange(station.id);
+        hasUserInteractedRef.current = false;
         if (onStationFound) {
             onStationFound({ ...station, name: cleanedName });
         }
     }, [onValueChange, onChange, onStationFound]);
 
-    // Sync inputValue with value prop only when user hasn't interacted
     useEffect(() => {
         if (!hasUserInteractedRef.current) {
             setInputValue(value);
         }
     }, [value]);
 
-    // Effect to perform search for the default term (only on mount, not when user types)
     useEffect(() => {
         const performDefaultSearch = async () => {
-            // Only run default search if:
-            // 1. defaultSearchTerm is provided
-            // 2. No station is selected yet
-            // 3. User hasn't interacted with the input
             if (defaultSearchTerm && defaultSearchTerm.length >= 2 && !selectedStation && !hasUserInteractedRef.current) {
                 setLoading(true);
                 try {
@@ -77,9 +79,9 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                     ) || [];
 
                     if (stations.length > 0) {
-                        const sortedStations = sortFavoritesFirst(stations);
+                        const sortedStations = await sortFavoritesFirst(stations);
                         const firstStation = sortedStations[0];
-                        handleSelectStation(firstStation); // Select the first station
+                        handleSelectStation(firstStation);
                     }
                 } catch (error) {
                     console.error('Error searching default place:', error);
@@ -92,7 +94,6 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         performDefaultSearch();
     }, [defaultSearchTerm, handleSelectStation, selectedStation]);
 
-    // Effect to close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
@@ -116,16 +117,14 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         setLoading(true);
         try {
             const data = await searchPlaces(searchTerm, 'sncf', { count: 20 });
-            const stations = data.places?.filter(place => 
+            const stations = data.places?.filter(place =>
                 place.embedded_type === 'stop_area' || place.embedded_type === 'stop_point'
             ) || [];
-            
-            // Sort favorites first
-            const sortedStations = sortFavoritesFirst(stations);
+
+            const sortedStations = await sortFavoritesFirst(stations);
             setSuggestions(sortedStations);
             setIsOpen(sortedStations.length > 0 && !autoSelect);
-            
-            // Auto-select first station if autoSelect is true and we have results
+
             if (autoSelect && sortedStations.length > 0 && !selectedStation) {
                 const firstStation = sortedStations[0];
                 handleSelectStation(firstStation);
@@ -141,11 +140,11 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const newValue = e.target.value;
-        setInputValue(newValue); // Update internal state immediately
-        hasUserInteractedRef.current = true; // Mark that user has interacted
-        onValueChange(newValue); // Notify parent of value change
-        setSelectedStation(null); // Reset selection
-        setGeolocationError(null); // Clear geolocation error when user types
+        setInputValue(newValue);
+        hasUserInteractedRef.current = true;
+        onValueChange(newValue);
+        setSelectedStation(null);
+        setGeolocationError(null);
 
         if (searchTimeoutRef.current) {
             clearTimeout(searchTimeoutRef.current);
@@ -161,25 +160,23 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         }, 300);
     };
 
-
-    const handleToggleFavorite = (e: React.MouseEvent, station: Place): void => {
-        e.stopPropagation(); // Prevent selecting the station when clicking star
+    const handleToggleFavorite = async (e: React.MouseEvent, station: Place): Promise<void> => {
+        e.stopPropagation();
         const stationId = station.id;
         if (!stationId) return;
-        
-        const isFav = isFavorite(stationId);
-        
+
+        const isFav = await isFavorite(stationId);
+
         if (isFav) {
-            removeFavorite(stationId);
+            await removeFavorite(stationId);
         } else {
-            addFavorite(stationId, station.name || '', station.embedded_type || '');
+            await addFavorite(stationId, station.name || '', station.embedded_type || '');
         }
+
+        const favorites = await getFavorites();
+        setFavoriteIds(new Set(favorites.map(f => f.id)));
         
-        // Update favoriteIds state
-        setFavoriteIds(new Set(getFavorites().map(f => f.id)));
-        
-        // Re-sort suggestions
-        const sortedStations = sortFavoritesFirst(suggestions);
+        const sortedStations = await sortFavoritesFirst(suggestions);
         setSuggestions(sortedStations);
     };
 
@@ -213,16 +210,14 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             });
 
             const { latitude, longitude } = position.coords;
-            
-            // Find nearby stations using coordinates
+
             const coordStr = `${longitude};${latitude}`;
             const data = await getPlacesNearby(coordStr, 'sncf', {
                 type: ['stop_area', 'stop_point'],
                 count: 20,
-                distance: 2000 // Search within 2km
+                distance: 2000
             });
 
-            // getPlacesNearby returns StopAreasResponse with stop_areas, convert to Place-like format
             const stations = (data.stop_areas || []).map(stopArea => ({
                 ...stopArea,
                 embedded_type: 'stop_area' as const
@@ -231,12 +226,10 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
             );
 
             if (stations.length > 0) {
-                // Sort favorites first
-                const sortedStations = sortFavoritesFirst(stations);
+                const sortedStations = await sortFavoritesFirst(stations);
                 setSuggestions(sortedStations);
                 setIsOpen(true);
-                
-                // Auto-select the closest station (first in results)
+
                 if (sortedStations.length > 0) {
                     handleSelectStation(sortedStations[0]);
                 }
@@ -316,7 +309,7 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                     <div className='dropdown-menu' style={{ width: '100%' }}>
                         <div className='dropdown-content' style={{ maxHeight: '200px', overflowY: 'auto' }}>
                             {suggestions.map((station, index) => {
-                                const isFav = station.id ? isFavorite(station.id) : false;
+                                const isFav = station.id ? favoriteIds.has(station.id) : false;
                                 return (
                                     <a
                                         key={station.id || index}
@@ -351,4 +344,3 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
 };
 
 export default LocationAutocomplete;
-
