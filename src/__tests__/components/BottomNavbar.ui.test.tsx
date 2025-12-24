@@ -21,7 +21,7 @@ describe('BottomNavbar', () => {
     expect(screen.getByText('Home')).toBeInTheDocument();
     expect(screen.getByText('Trajet')).toBeInTheDocument();
     expect(screen.getByText('Horaires')).toBeInTheDocument();
-    expect(screen.getByText('Lieux')).toBeInTheDocument();
+    expect(screen.getByText('More')).toBeInTheDocument();
     expect(screen.getByText('Favoris')).toBeInTheDocument();
   });
 
@@ -36,9 +36,6 @@ describe('BottomNavbar', () => {
     
     const schedulesLink = screen.getByText('Horaires').closest('a');
     expect(schedulesLink).toHaveAttribute('href', '/schedules');
-    
-    const placesLink = screen.getByText('Lieux').closest('a');
-    expect(placesLink).toHaveAttribute('href', '/places');
     
     const favoritesLink = screen.getByText('Favoris').closest('a');
     expect(favoritesLink).toHaveAttribute('href', '/favorites');
