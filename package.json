@@ -9,6 +9,7 @@
     "@react-oauth/google": "0.13.0",
     "axios": "^1.13.2",
     "bulma": "^1.0.4",
+    "firebase": "^12.7.0",
     "jwt-decode": "^4.0.0",
     "lucide-react": "^0.562.0",
     "maplibre-gl": "^5.15.0",
