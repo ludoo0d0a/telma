@@ -51,7 +51,6 @@ export default defineConfig({
   base: BASE_URL,
   resolve: {
     alias: {
-      '\\.scss$': path.resolve(__dirname, './src/__mocks__/styleMock.js'),
       '@': path.resolve(__dirname, './src'),
     },
   },

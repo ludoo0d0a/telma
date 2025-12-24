@@ -468,7 +468,7 @@ const LocationDetection: React.FC = () => {
         }
     }, []);
 
-    const handleDetectLocation = () => {
+    const handleDetectLocation = async () => {
         if (!navigator.geolocation) {
             setError('La géolocalisation n\'est pas supportée par votre navigateur');
             return;
@@ -477,19 +477,21 @@ const LocationDetection: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        navigator.geolocation.getCurrentPosition(
-            detectLocation,
-            (err) => {
-                console.error('Geolocation error:', err);
-                setError(`Erreur de géolocalisation: ${err.message}`);
-                setLoading(false);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            }
-        );
+        try {
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                });
+            });
+            await detectLocation(position);
+        } catch (err: any) {
+            console.error('Geolocation error:', err);
+            setError(`Erreur de géolocalisation: ${err.message}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleStartWatching = () => {
