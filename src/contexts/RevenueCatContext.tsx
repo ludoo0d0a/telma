@@ -1,6 +1,7 @@
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-import Purchases, { PurchasesOfferings, CustomerInfo, PurchasesPackage } from '@revenuecat/purchases-js';
+import { PurchasesOfferings, CustomerInfo, PurchasesPackage } from '@revenuecat/purchases-js';
+import * as Purchases from '@revenuecat/purchases-js';
 import { useAuth } from './AuthContext';
 
 interface RevenueCatContextType {
