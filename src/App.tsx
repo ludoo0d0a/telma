@@ -25,9 +25,14 @@ import RaiseIssue from '@/pages/RaiseIssue'
 import Dashboard from '@/pages/Dashboard'
 import Snowfall from 'react-snowfall'
 import { trackPageView } from '@/utils/analytics'
+import Paywall from './components/Paywall'
+import PremiumPage from './pages/PremiumPage'
+import ProtectedRoute from './components/ProtectedRoute'
 import BottomNavbar from '@/components/BottomNavbar'
 import Sidebar from '@/components/Sidebar'
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
+import { AuthProvider } from './contexts/AuthContext'
+import { RevenueCatProvider } from './contexts/RevenueCatContext'
 
 const AppContent: React.FC = () => {
     const location = useLocation()
@@ -75,6 +80,10 @@ const AppContent: React.FC = () => {
                 <Route path='/stats' element={<Stats />} />
                 <Route path='/raise-issue' element={<RaiseIssue />} />
                 <Route path='/dashboard' element={<Dashboard />} />
+                <Route path='/paywall' element={<Paywall />} />
+                <Route element={<ProtectedRoute />}>
+                    <Route path='/premium' element={<PremiumPage />} />
+                </Route>
                 <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
             <BottomNavbar onMoreClick={toggleSidebar} />
@@ -84,9 +93,13 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
     return (
-        <SidebarProvider>
-            <AppContent />
-        </SidebarProvider>
+        <AuthProvider>
+            <RevenueCatProvider>
+                <SidebarProvider>
+                    <AppContent />
+                </SidebarProvider>
+            </RevenueCatProvider>
+        </AuthProvider>
     )
 }
 
