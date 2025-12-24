@@ -17,11 +17,8 @@ test.describe('LocationDetection', () => {
       });
     });
 
-    // Listen for console messages and log them to the test output
-    page.on('console', msg => console.log(`[Browser Console] ${msg.type()}: ${msg.text()}`));
-
     // Navigate to the correct location page using a relative path
-    await page.goto('/location-detection');
+    await page.goto('location-detection');
 
     // Take a screenshot to debug the initial state
     await page.screenshot({ path: '/home/jules/verification/before-click-debug.png' });
