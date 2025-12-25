@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Info } from 'lucide-react';
 
 interface AdProps {
@@ -41,6 +41,8 @@ const Ad: React.FC<AdProps> = ({
 }) => {
     const showAds = import.meta.env.VITE_SHOW_ADS !== 'false';
     const publisherId = import.meta.env.VITE_GOOGLE_ADSENSE_ID;
+    const adRef = useRef<HTMLDivElement>(null);
+    const initializedRef = useRef(false);
 
     // Enable test mode on localhost to see ads during development
     const isLocalhost = typeof window !== 'undefined' &&
@@ -48,6 +50,33 @@ const Ad: React.FC<AdProps> = ({
          window.location.hostname === '127.0.0.1' ||
          window.location.hostname.startsWith('192.168.'));
     const enableTestMode = isLocalhost;
+
+    // Initialize AdSense ad only once per component instance
+    useEffect(() => {
+        if (!showAds || !publisherId || initializedRef.current) {
+            return;
+        }
+
+        // Wait for the ins element to be in the DOM
+        const insElement = adRef.current?.querySelector('.adsbygoogle') as HTMLElement;
+        if (!insElement) {
+            return;
+        }
+
+        // Check if ad has already been initialized (has adsbygoogle data attribute)
+        if (insElement.getAttribute('data-adsbygoogle-status')) {
+            initializedRef.current = true;
+            return;
+        }
+
+        // Initialize the ad
+        try {
+            (window.adsbygoogle = window.adsbygoogle || []).push({});
+            initializedRef.current = true;
+        } catch (e) {
+            console.error('AdSense initialization error:', e);
+        }
+    }, [showAds, publisherId]);
 
     // If ads are disabled, don't render anything
     if (!showAds) {
@@ -73,6 +102,7 @@ const Ad: React.FC<AdProps> = ({
 
     return (
         <div
+            ref={adRef}
             className={`ad-container ${className}`}
             style={style}
         >
