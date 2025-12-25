@@ -30,10 +30,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (credentialResponse: CredentialResponse) => {
     if (credentialResponse.credential) {
         const idToken = credentialResponse.credential;
-        await firebaseStorageService.signInWithGoogle(idToken);
-        const userObject = JSON.parse(atob(idToken.split('.')[1]));
-        setUser(userObject);
-        localStorage.setItem('googleIdToken', idToken);
+        try {
+            await firebaseStorageService.signInWithGoogle(idToken);
+            const userObject = JSON.parse(atob(idToken.split('.')[1]));
+            setUser(userObject);
+            localStorage.setItem('googleIdToken', idToken);
+        } catch (error) {
+            console.error('Firebase authentication failed:', error);
+            // Still set user from token even if Firebase sync fails
+            const userObject = JSON.parse(atob(idToken.split('.')[1]));
+            setUser(userObject);
+            localStorage.setItem('googleIdToken', idToken);
+        }
     }
   };
 

@@ -20,10 +20,14 @@ export const getFavorites = async (): Promise<FavoriteLocation[]> => {
         return JSON.parse(cachedFavorites);
     }
 
-    const favorites = await firebaseStorageService.readFile(FAVORITES_FILE_NAME);
-    if (favorites) {
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-        return favorites;
+    try {
+        const favorites = await firebaseStorageService.readFile(FAVORITES_FILE_NAME);
+        if (favorites) {
+            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+            return favorites;
+        }
+    } catch (error) {
+        console.warn('Could not load favorites from Firebase Storage:', error);
     }
 
     return [];
@@ -37,7 +41,11 @@ export const addFavorite = async (id: string, name: string, type: string): Promi
     if (!favorites.find(fav => fav.id === id)) {
         favorites.push({ id, name, type, addedAt: new Date().toISOString() });
         localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-        await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
+        try {
+            await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
+        } catch (error) {
+            console.warn('Could not sync favorites to Firebase Storage:', error);
+        }
     }
 };
 
@@ -48,7 +56,11 @@ export const removeFavorite = async (id: string): Promise<void> => {
     let favorites = await getFavorites();
     favorites = favorites.filter(fav => fav.id !== id);
     localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-    await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
+    try {
+        await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
+    } catch (error) {
+        console.warn('Could not sync favorites to Firebase Storage:', error);
+    }
 };
 
 /**
