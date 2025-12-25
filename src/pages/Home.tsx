@@ -175,7 +175,7 @@ const Home: React.FC = () => {
                         title="Exemples de Trajets"
                         icon={Route}
                         cards={sampleRoutes}
-                        columnsClass="is-half-tablet is-half-mobile"
+                        columnsWrapperClassName="is-mobile"
                     />
 
                     {/* Sample Trips Section */}
@@ -183,7 +183,7 @@ const Home: React.FC = () => {
                         title="Exemples de Trajets Détaillés"
                         icon={List}
                         cards={sampleTrips}
-                        columnsClass="is-half-tablet is-full-mobile"
+                        columnsWrapperClassName="is-mobile"
                     />
 
                     {/* API Documentation Section */}
@@ -191,7 +191,7 @@ const Home: React.FC = () => {
                         title="Documentation"
                         icon={Code}
                         cards={apiDocs}
-                        columnsClass="is-half-tablet is-half-mobile"
+                        columnsWrapperClassName="is-mobile"
                     />
 
                     {/* Advertisement */}
