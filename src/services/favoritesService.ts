@@ -1,74 +1,134 @@
+import firebaseFavoritesService from './firebaseFavoritesService';
+import localStorageFavoritesService from './localStorageFavoritesService';
+import type { IFavoritesStorageService, FavoriteLocation } from './favoritesStorageService.interface';
 
-import firebaseStorageService from './firebaseStorageService';
-
-const FAVORITES_KEY = 'sncf_favorite_locations';
-const FAVORITES_FILE_NAME = 'favorites.json';
-
-export interface FavoriteLocation {
-    id: string;
-    name: string;
-    type: string;
-    addedAt?: string;
-}
+// Re-export the interface for convenience
+export type { FavoriteLocation } from './favoritesStorageService.interface';
 
 /**
- * Get all favorite locations from cache or Firebase Storage
+ * Determine which storage service to use based on authentication state
+ * Uses Firebase if user is authenticated, localStorage otherwise
+ */
+const getStorageService = (): IFavoritesStorageService => {
+    // Check if user is authenticated by looking for Google ID token
+    const hasAuthToken = localStorage.getItem('googleIdToken') !== null;
+    
+    if (hasAuthToken) {
+        try {
+            // Try to use Firebase service
+            return firebaseFavoritesService;
+        } catch (error) {
+            console.warn('Firebase service not available, falling back to localStorage:', error);
+            return localStorageFavoritesService;
+        }
+    }
+    
+    // Use localStorage for unauthenticated users
+    return localStorageFavoritesService;
+};
+
+/**
+ * Get all favorite locations
+ * Uses Firebase if authenticated, localStorage otherwise
  */
 export const getFavorites = async (): Promise<FavoriteLocation[]> => {
-    const cachedFavorites = localStorage.getItem(FAVORITES_KEY);
-    if (cachedFavorites) {
-        return JSON.parse(cachedFavorites);
-    }
-
+    const storageService = getStorageService();
     try {
-        const favorites = await firebaseStorageService.readFile(FAVORITES_FILE_NAME);
-        if (favorites) {
-            localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-            return favorites;
-        }
+        return await storageService.getFavorites();
     } catch (error) {
-        console.warn('Could not load favorites from Firebase Storage:', error);
+        console.error('Error getting favorites:', error);
+        // Fallback to localStorage if Firebase fails
+        if (storageService !== localStorageFavoritesService) {
+            try {
+                return await localStorageFavoritesService.getFavorites();
+            } catch (fallbackError) {
+                console.error('Error getting favorites from localStorage fallback:', fallbackError);
+            }
+        }
+        return [];
     }
-
-    return [];
 };
 
 /**
  * Add a location to favorites
+ * Uses Firebase if authenticated, localStorage otherwise
  */
 export const addFavorite = async (id: string, name: string, type: string): Promise<void> => {
-    const favorites = await getFavorites();
-    if (!favorites.find(fav => fav.id === id)) {
-        favorites.push({ id, name, type, addedAt: new Date().toISOString() });
-        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-        try {
-            await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
-        } catch (error) {
-            console.warn('Could not sync favorites to Firebase Storage:', error);
+    const storageService = getStorageService();
+    const favorite: FavoriteLocation = {
+        id,
+        name,
+        type,
+        addedAt: new Date().toISOString(),
+    };
+
+    try {
+        await storageService.addFavorite(favorite);
+    } catch (error) {
+        console.error('Error adding favorite:', error);
+        // Fallback to localStorage if Firebase fails
+        if (storageService !== localStorageFavoritesService) {
+            try {
+                await localStorageFavoritesService.addFavorite(favorite);
+            } catch (fallbackError) {
+                console.error('Error adding favorite to localStorage fallback:', fallbackError);
+                throw fallbackError;
+            }
+        } else {
+            throw error;
         }
     }
 };
 
 /**
  * Remove a location from favorites
+ * Uses Firebase if authenticated, localStorage otherwise
  */
 export const removeFavorite = async (id: string): Promise<void> => {
-    let favorites = await getFavorites();
-    favorites = favorites.filter(fav => fav.id !== id);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    const storageService = getStorageService();
+    
     try {
-        await firebaseStorageService.uploadFile(FAVORITES_FILE_NAME, favorites);
+        await storageService.removeFavorite(id);
     } catch (error) {
-        console.warn('Could not sync favorites to Firebase Storage:', error);
+        console.error('Error removing favorite:', error);
+        // Fallback to localStorage if Firebase fails
+        if (storageService !== localStorageFavoritesService) {
+            try {
+                await localStorageFavoritesService.removeFavorite(id);
+            } catch (fallbackError) {
+                console.error('Error removing favorite from localStorage fallback:', fallbackError);
+                throw fallbackError;
+            }
+        } else {
+            throw error;
+        }
     }
 };
 
 /**
  * Check if a location is in favorites
+ * Uses Firebase if authenticated, localStorage otherwise
  */
 export const isFavorite = async (id: string): Promise<boolean> => {
-    const favorites = await getFavorites();
-    return favorites.some(fav => fav.id === id);
+    const storageService = getStorageService();
+    
+    try {
+        const favorite = await storageService.getFavorite(id);
+        return favorite !== null;
+    } catch (error) {
+        console.warn('Error checking favorite:', error);
+        // Fallback to localStorage if Firebase fails
+        if (storageService !== localStorageFavoritesService) {
+            try {
+                const favorite = await localStorageFavoritesService.getFavorite(id);
+                return favorite !== null;
+            } catch (fallbackError) {
+                console.error('Error checking favorite in localStorage fallback:', fallbackError);
+                return false;
+            }
+        }
+        return false;
+    }
 };
 
 /**
