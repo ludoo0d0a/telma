@@ -20,9 +20,6 @@ test.describe('LocationDetection', () => {
     // Navigate to the correct location page using a relative path
     await page.goto('location-detection');
 
-    // Take a screenshot to debug the initial state
-    await page.screenshot({ path: '/home/jules/verification/before-click-debug.png' });
-
     // Click the "Detect Now" button
     const detectButton = page.getByRole('button', { name: /Détecter maintenant/i });
 
@@ -33,9 +30,6 @@ test.describe('LocationDetection', () => {
     // Wait for the map container to have the 'data-map-loaded' attribute set to 'true'
     const mapContainer = page.locator('.map-container[data-map-loaded="true"]');
     await expect(mapContainer).toBeVisible({ timeout: 15000 }); // Increased timeout for map loading
-
-    // Take a final screenshot of the result
-    await page.screenshot({ path: '/home/jules/verification/location-detection-result.png' });
 
     // Explicitly assert that the map is loaded
     await expect(mapContainer).toHaveAttribute('data-map-loaded', 'true');

@@ -6,6 +6,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { AuthProvider } from '@/contexts/AuthContext';
+import { SidebarProvider } from '@/contexts/SidebarContext';
 import Home from '@/pages/Home';
 
 const renderWithRouter = (component: React.ReactElement) => {
@@ -13,7 +14,9 @@ const renderWithRouter = (component: React.ReactElement) => {
     <GoogleOAuthProvider clientId="test">
       <BrowserRouter>
         <AuthProvider>
-          {component}
+          <SidebarProvider>
+            {component}
+          </SidebarProvider>
         </AuthProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>

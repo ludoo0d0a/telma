@@ -77,6 +77,12 @@ export default defineConfig({
     setupFiles: ['./src/setupTests.jsx'],
     testTimeout: 30000,
     hookTimeout: 30000,
+    exclude: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/e2e/**',
+      '**/.{idea,git,cache,output,temp}/**',
+    ],
     css: {
       modules: {
         classNameStrategy: 'non-scoped',

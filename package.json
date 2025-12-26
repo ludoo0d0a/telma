@@ -34,6 +34,11 @@
     "deploy-preview": "BRANCH_PATH=$(git rev-parse --abbrev-ref HEAD | sed 's,^.*/,,') && export PUBLIC_URL=/telma/preview/$BRANCH_PATH/ && vite build && gh-pages -d dist -t --dest preview/$BRANCH_PATH",
     "test": "vitest",
     "test:local": "dotenv -e .env.test.local -- vitest",
+    "test:e2e": "playwright test",
+    "test:e2e:local": "dotenv -e .env.test.local -- playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:all": "npm run test && npm run test:e2e",
     "generate-client": "npx @openapitools/openapi-generator-cli generate -i public/openapi.json -g typescript-axios -o src/client --additional-properties=supportsES6=true,withInterfaces=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api",
     "generate-favicons": "node scripts/generate-favicons.js"
   },

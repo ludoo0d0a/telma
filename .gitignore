@@ -12,6 +12,11 @@
 # test artifacts (HTTP request/response dumps from Vitest)
 /test-artifacts
 
+# Playwright
+/test-results
+/playwright-report
+/playwright/.cache
+
 # production
 /build
 /dist
