@@ -60,4 +60,8 @@ installHttpArtifactsRecorder({ runId: 'api-artifacts-pre' });
 vi.mock('@react-oauth/google', () => ({
   GoogleOAuthProvider: ({ children }) => children,
   GoogleLogin: () => <button>Login with Google</button>,
+  useGoogleLogin: () => () => {
+    // Mock function that does nothing when called
+    console.log('Mock useGoogleLogin called');
+  },
 }));

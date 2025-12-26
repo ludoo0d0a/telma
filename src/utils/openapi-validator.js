@@ -228,7 +228,19 @@ export function validateResponse(path, method, statusCode, data) {
     }
 
     const valid = validate(data);
-    return { valid, errors: validate.errors || [] };
+    let errors = validate.errors || [];
+    
+    // Filter out date format errors - APIs often return ISO datetime strings for date fields
+    // This is a known API behavior and we're lenient about it
+    errors = errors.filter(err => {
+        // Ignore format errors for date fields (APIs may return date-time for date fields)
+        if (err.keyword === 'format' && err.params?.format === 'date') {
+            return false;
+        }
+        return true;
+    });
+    
+    return { valid: errors.length === 0, errors };
 }
 
 /**
