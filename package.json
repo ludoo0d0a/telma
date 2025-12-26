@@ -33,6 +33,7 @@
     "deploy": "gh-pages -d dist",
     "deploy-preview": "BRANCH_PATH=$(git rev-parse --abbrev-ref HEAD | sed 's,^.*/,,') && export PUBLIC_URL=/telma/preview/$BRANCH_PATH/ && vite build && gh-pages -d dist -t --dest preview/$BRANCH_PATH",
     "test": "vitest",
+    "test:local": "dotenv -e .env.test.local -- vitest",
     "generate-client": "npx @openapitools/openapi-generator-cli generate -i public/openapi.json -g typescript-axios -o src/client --additional-properties=supportsES6=true,withInterfaces=true,withSeparateModelsAndApi=true,modelPackage=models,apiPackage=api",
     "generate-favicons": "node scripts/generate-favicons.js"
   },
@@ -55,7 +56,7 @@
     ]
   },
   "devDependencies": {
-    "@openapitools/openapi-generator-cli": "^2.25.2",
+    "@openapitools/openapi-generator-cli": "^2.26.0",
     "@playwright/test": "^1.57.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.1",
@@ -67,6 +68,7 @@
     "@vitejs/plugin-react": "^5.1.2",
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
+    "dotenv-cli": "^7.4.2",
     "gh-pages": "^6.3.0",
     "happy-dom": "^20.0.11",
     "jsdom": "^27.3.0",
