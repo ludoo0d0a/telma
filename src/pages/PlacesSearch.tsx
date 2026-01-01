@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
 import Ad from '@/components/Ad';
-import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
-import type { Place } from '@/client/models/place';
 import { Search, MapPin, Loader2 } from 'lucide-react';
 
-const Places: React.FC = () => {
+const PlacesSearch: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [coordQuery, setCoordQuery] = useState<string>('');
-    const [places, setPlaces] = useState<Place[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [searchType, setSearchType] = useState<'text' | 'nearby'>('text'); // 'text' or 'nearby'
+    const [searchType, setSearchType] = useState<'text' | 'nearby'>('text');
+    const navigate = useNavigate();
 
     const handleTextSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -20,19 +19,8 @@ const Places: React.FC = () => {
             setError('Veuillez entrer un terme de recherche');
             return;
         }
-
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await searchPlaces(searchQuery);
-            setPlaces(data.places || []);
-        } catch (err) {
-            setError('Erreur lors de la recherche');
-            console.error(err);
-            setPlaces([]);
-        } finally {
-            setLoading(false);
-        }
+        setLoading(true);
+        navigate(`/places/results?q=${encodeURIComponent(searchQuery)}`);
     };
 
     const handleNearbySearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -41,19 +29,8 @@ const Places: React.FC = () => {
             setError('Veuillez entrer des coordonnées (format: lon;lat)');
             return;
         }
-
-        try {
-            setLoading(true);
-            setError(null);
-            const data = await getPlacesNearby(coordQuery);
-            setPlaces(data.stop_areas || []);
-        } catch (err) {
-            setError('Erreur lors de la recherche');
-            console.error(err);
-            setPlaces([]);
-        } finally {
-            setLoading(false);
-        }
+        setLoading(true);
+        navigate(`/places/results?coord=${encodeURIComponent(coordQuery)}`);
     };
 
     return (
@@ -62,11 +39,9 @@ const Places: React.FC = () => {
                 title="Recherche de lieux"
                 subtitle="Trouvez les gares et arrêts à proximité ou par mot-clé"
                 showNotification={false}
-                
             />
             <section className='section'>
                 <div className='container'>
-                    {/* Advertisement */}
                     <Ad format="horizontal" size="responsive" className="mb-5" />
 
                     <div className='box mb-5'>
@@ -74,21 +49,13 @@ const Places: React.FC = () => {
                         <div className='tabs is-boxed mb-4'>
                             <ul>
                                 <li className={searchType === 'text' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setSearchType('text');
-                                        setPlaces([]);
-                                        setError(null);
-                                    }}>
+                                    <a onClick={() => setSearchType('text')}>
                                         <span className='icon is-small'><Search size={16} /></span>
                                         <span>Recherche par texte</span>
                                     </a>
                                 </li>
                                 <li className={searchType === 'nearby' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setSearchType('nearby');
-                                        setPlaces([]);
-                                        setError(null);
-                                    }}>
+                                    <a onClick={() => setSearchType('nearby')}>
                                         <span className='icon is-small'><MapPin size={16} /></span>
                                         <span>Recherche par coordonnées</span>
                                     </a>
@@ -149,67 +116,11 @@ const Places: React.FC = () => {
                             </form>
                         )}
                     </div>
-
-                    {loading && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des lieux...</p>
-                        </div>
-                    )}
-
-                    {error && (
+                     {error && (
                         <div className='notification is-danger'>
                             <button className='delete' onClick={() => setError(null)}></button>
                             <p className='title is-5'>Erreur</p>
                             <p>{error}</p>
-                        </div>
-                    )}
-
-                    {!loading && places.length > 0 && (
-                        <>
-                            {/* Advertisement */}
-                            <Ad format="auto" size="responsive" className="mb-5" />
-                            
-                            <div className='box'>
-                                <h2 className='title is-4 mb-5'>
-                                    Résultats <span className='tag is-primary is-medium'>{places.length}</span>
-                                </h2>
-                            <div className='columns is-multiline'>
-                                {places.map((place, index) => (
-                                    <div key={place.id || index} className='column is-half is-half-mobile'>
-                                        <div className='box'>
-                                            <h3 className='title is-5 mb-3'>{place.name || 'Sans nom'}</h3>
-                                            <div className='content'>
-                                                <p><strong>Type:</strong> {place.embedded_type || 'N/A'}</p>
-                                                {place.id && (
-                                                    <p><strong>ID:</strong> <code>{place.id}</code></p>
-                                                )}
-                                                {place.administrative_regions && place.administrative_regions.length > 0 && (
-                                                    <p><strong>Région:</strong> {place.administrative_regions[0].name}</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        
-                        {/* Advertisement */}
-                        <Ad format="rectangle" size="responsive" className="mb-5" />
-                        </>
-                    )}
-
-                    {!loading && places.length === 0 && !error && searchQuery && (
-                        <div className='box has-text-centered'>
-                            <div className='content'>
-                                <span className='icon is-large has-text-warning mb-4' style={{fontSize: '4rem'}}>📍</span>
-                                <h2 className='title is-4'>Aucun résultat trouvé</h2>
-                                <p className='subtitle is-6 has-text-grey'>
-                                    Aucun lieu ne correspond à votre recherche.
-                                </p>
-                            </div>
                         </div>
                     )}
                 </div>
@@ -219,5 +130,4 @@ const Places: React.FC = () => {
     );
 };
 
-export default Places;
-
+export default PlacesSearch;
