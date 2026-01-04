@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Route, TrafficCone, Settings, Loader2, Download } from 'lucide-react';
+import { Route, TrafficCone, Settings, Loader2, Download, ChevronLeft } from 'lucide-react';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '@/services/navitiaApi';
@@ -10,11 +10,12 @@ import type {
 } from '@/client/models';
 
 const Reports: React.FC = () => {
-    const [reportType, setReportType] = useState<'line' | 'traffic' | 'equipment'>('traffic'); // 'line', 'traffic', 'equipment'
+    const [reportType, setReportType] = useState<'line' | 'traffic' | 'equipment'>('traffic');
     const [filter, setFilter] = useState<string>('');
     const [reports, setReports] = useState<CoverageCoverageLineReportsGet200Response | CoverageCoverageTrafficReportsGet200Response | CoverageCoverageEquipmentReportsGet200Response | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -42,6 +43,7 @@ const Reports: React.FC = () => {
             }
 
             setReports(response);
+            setShowResults(true);
         } catch (err) {
             setError('Erreur lors de la récupération des rapports');
             console.error(err);
@@ -51,14 +53,82 @@ const Reports: React.FC = () => {
         }
     };
 
+    if (showResults) {
+        return (
+            <>
+                <nav className="navbar is-fixed-top">
+                    <PageHeader
+                        title="Résultats des rapports"
+                        subtitle="Données récupérées"
+                        showNotification={false}
+                    />
+                </nav>
+                <section className='section'>
+                    <div className='container'>
+                        <div className="box mb-5">
+                            <button onClick={() => setShowResults(false)} className="button is-light is-fullwidth">
+                                <span className="icon"><ChevronLeft size={16} /></span>
+                                <span>Modifier la recherche</span>
+                            </button>
+                            <div className="mt-4 content is-small">
+                                <p><strong>Type:</strong> {reportType}</p>
+                                {filter && <p><strong>Filtre:</strong> {filter}</p>}
+                            </div>
+                        </div>
+
+                        {loading && (
+                            <div className='box has-text-centered'>
+                                <div className='loader-wrapper'>
+                                    <div className='loader is-loading'></div>
+                                </div>
+                                <p className='mt-4 subtitle is-5'>Chargement des rapports...</p>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className='notification is-danger'>
+                                <button className='delete' onClick={() => setError(null)}></button>
+                                <p className='title is-5'>Erreur</p>
+                                <p>{error}</p>
+                            </div>
+                        )}
+
+                        {!loading && reports && (
+                            <div className='box'>
+                                <h2 className='title is-4 mb-5'>Résultats</h2>
+                                <div className='content'>
+                                    <div className='table-container'>
+                                        <pre style={{
+                                            background: 'rgba(0, 0, 0, 0.3)',
+                                            borderRadius: '10px',
+                                            padding: '1.5rem',
+                                            overflow: 'auto',
+                                            color: '#ccc',
+                                            fontFamily: "'Roboto Mono', monospace",
+                                            fontSize: '0.9rem',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}>{JSON.stringify(reports, null, 2)}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
+                <Footer />
+            </>
+        )
+    }
+
     return (
         <>
-            <PageHeader
-                title="Rapports et informations"
-                subtitle="Téléchargez les rapports de ligne, trafic ou équipements"
-                showNotification={false}
-                
-            />
+            <nav className="navbar is-fixed-top">
+                <PageHeader
+                    title="Rapports et informations"
+                    subtitle="Téléchargez les rapports de ligne, trafic ou équipements"
+                    showNotification={false}
+                />
+            </nav>
             <section className='section'>
                 <div className='container'>
                     <div className='box mb-5'>

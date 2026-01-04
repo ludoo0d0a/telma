@@ -5,8 +5,7 @@ import City from '@/pages/City'
 import Home from '@/pages/Home'
 import CommercialModes from '@/pages/CommercialModes'
 import Coverage from '@/pages/Coverage'
-import PlacesSearch from '@/pages/PlacesSearch'
-import PlacesResults from '@/pages/PlacesResults'
+import Places from '@/pages/Places'
 import Schedules from '@/pages/Schedules'
 import Reports from '@/pages/Reports'
 import Lines from '@/pages/Lines'
@@ -58,9 +57,7 @@ const AppContent: React.FC = () => {
                 <Route path='/' element={<Home />} />
                 <Route path='/commercial-modes' element={<CommercialModes />} />
                 <Route path='/coverage' element={<Coverage />} />
-                <Route path='/places' element={<Navigate to='/places/search' replace />} />
-                <Route path='/places/search' element={<PlacesSearch />} />
-                <Route path='/places/results' element={<PlacesResults />} />
+                <Route path='/places' element={<Places />} />
                 <Route path='/schedules' element={<Schedules />} />
                 <Route path='/reports' element={<Reports />} />
                 <Route path='/lines' element={<Lines />} />
