@@ -17,7 +17,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       base: BASE_URL,
       workbox: {
-        maximumFileSizeToCacheInBytes: 3000000
+        maximumFileSizeToCacheInBytes: 5000000
       },
       includeAssets: ['favicons/favicon.ico', 'favicons/apple-touch-icon.png', 'favicons/pwa-maskable-512x512.png'],
       manifest: {
