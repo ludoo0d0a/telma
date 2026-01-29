@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { MapPin, Route, Flag, Loader2, Search } from 'lucide-react';
+import { MapPin, Route, Flag, Loader2, Search, ChevronLeft } from 'lucide-react';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '@/services/navitiaApi';
 import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '@/client/models';
 
 const Schedules: React.FC = () => {
-    const [scheduleType, setScheduleType] = useState<'stop' | 'route' | 'terminus'>('stop'); // 'stop', 'route', 'terminus'
+    const [scheduleType, setScheduleType] = useState<'stop' | 'route' | 'terminus'>('stop');
     const [filter, setFilter] = useState<string>('');
     const [datetime, setDatetime] = useState<string>('');
     const [schedules, setSchedules] = useState<StopSchedulesResponse | RouteSchedulesResponse | TerminusSchedulesResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -41,6 +42,7 @@ const Schedules: React.FC = () => {
             }
 
             setSchedules(response);
+            setShowResults(true);
         } catch (err) {
             setError('Erreur lors de la récupération des horaires');
             console.error(err);
@@ -50,14 +52,83 @@ const Schedules: React.FC = () => {
         }
     };
 
+    if (showResults) {
+        return (
+            <>
+                <nav className="navbar is-fixed-top">
+                    <PageHeader
+                        title="Résultats de la recherche"
+                        subtitle="Horaires trouvés"
+                        showNotification={false}
+                    />
+                </nav>
+                <section className='section'>
+                    <div className='container'>
+                        <div className="box mb-5">
+                            <button onClick={() => setShowResults(false)} className="button is-light is-fullwidth">
+                                <span className="icon"><ChevronLeft size={16} /></span>
+                                <span>Modifier la recherche</span>
+                            </button>
+                            <div className="mt-4 content is-small">
+                                <p><strong>Type:</strong> {scheduleType}</p>
+                                <p><strong>Filtre:</strong> {filter}</p>
+                                {datetime && <p><strong>Date/Heure:</strong> {datetime}</p>}
+                            </div>
+                        </div>
+
+                        {loading && (
+                            <div className='box has-text-centered'>
+                                <div className='loader-wrapper'>
+                                    <div className='loader is-loading'></div>
+                                </div>
+                                <p className='mt-4 subtitle is-5'>Chargement des horaires...</p>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className='notification is-danger'>
+                                <button className='delete' onClick={() => setError(null)}></button>
+                                <p className='title is-5'>Erreur</p>
+                                <p>{error}</p>
+                            </div>
+                        )}
+
+                        {!loading && schedules && (
+                            <div className='box'>
+                                <h2 className='title is-4 mb-5'>Résultats</h2>
+                                <div className='content'>
+                                    <div className='table-container'>
+                                        <pre style={{
+                                            background: 'rgba(0, 0, 0, 0.3)',
+                                            borderRadius: '10px',
+                                            padding: '1.5rem',
+                                            overflow: 'auto',
+                                            color: '#ccc',
+                                            fontFamily: "'Roboto Mono', monospace",
+                                            fontSize: '0.9rem',
+                                            whiteSpace: 'pre-wrap',
+                                            wordWrap: 'break-word'
+                                        }}>{JSON.stringify(schedules, null, 2)}</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </section>
+                <Footer />
+            </>
+        )
+    }
+
     return (
         <>
-            <PageHeader
-                title="Horaires et planning"
-                subtitle="Consultez les horaires par arrêt, ligne ou terminus"
-                showNotification={false}
-                
-            />
+            <nav className="navbar is-fixed-top">
+                <PageHeader
+                    title="Horaires et planning"
+                    subtitle="Consultez les horaires par arrêt, ligne ou terminus"
+                    showNotification={false}
+                />
+            </nav>
             <section className='section'>
                 <div className='container'>
                     <div className='box mb-5'>

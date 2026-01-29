@@ -1,3 +1,20 @@
+body {
+  padding-top: 52px; // Same as navbar height
+}
+
+.navbar.is-fixed-top {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  z-index: 30;
+  width: 100% !important;
+}
+
+.section {
+  padding: 1.5rem; // Reduced padding for mobile
+}
+
 .navbar {
   .header-actions {
     margin-left: auto;
