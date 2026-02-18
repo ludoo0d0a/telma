@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, Route, Flag, Loader2, Search } from 'lucide-react';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
+import QueryOverview from '@/components/shared/QueryOverview';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '@/services/navitiaApi';
 import type { StopSchedulesResponse, RouteSchedulesResponse, TerminusSchedulesResponse } from '@/client/models';
 
@@ -12,6 +13,7 @@ const Schedules: React.FC = () => {
     const [schedules, setSchedules] = useState<StopSchedulesResponse | RouteSchedulesResponse | TerminusSchedulesResponse | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -23,6 +25,7 @@ const Schedules: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
+            setShowResults(false);
             const searchDatetime = datetime || formatDateTime(new Date());
             let response;
 
@@ -41,12 +44,27 @@ const Schedules: React.FC = () => {
             }
 
             setSchedules(response);
+            setShowResults(true);
         } catch (err) {
             setError('Erreur lors de la récupération des horaires');
             console.error(err);
             setSchedules(null);
+            setShowResults(false);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const getScheduleTypeLabel = (): string => {
+        switch (scheduleType) {
+            case 'stop':
+                return 'Horaires d\'arrêt';
+            case 'route':
+                return 'Horaires de ligne';
+            case 'terminus':
+                return 'Horaires terminus';
+            default:
+                return 'Horaires';
         }
     };
 
@@ -58,131 +76,170 @@ const Schedules: React.FC = () => {
                 showNotification={false}
                 
             />
-            <section className='section'>
-                <div className='container'>
-                    <div className='box mb-5'>
-                        <h3 className='title is-5 mb-4'>Type de planning</h3>
-                        <div className='tabs is-boxed mb-4'>
-                            <ul>
-                                <li className={scheduleType === 'stop' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setScheduleType('stop');
-                                        setSchedules(null);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><MapPin size={16} /></span>
-                                        <span>Horaires d'arrêt</span>
-                                    </a>
-                                </li>
-                                <li className={scheduleType === 'route' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setScheduleType('route');
-                                        setSchedules(null);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><Route size={16} /></span>
-                                        <span>Horaires de ligne</span>
-                                    </a>
-                                </li>
-                                <li className={scheduleType === 'terminus' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setScheduleType('terminus');
-                                        setSchedules(null);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><Flag size={16} /></span>
-                                        <span>Horaires terminus</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <form onSubmit={handleSearch}>
-                            <div className='field'>
-                                <label className='label' htmlFor='filter'>
-                                    Filtre
-                                </label>
-                                <div className='control'>
-                                    <input
-                                        id='filter'
-                                        className='input'
-                                        type='text'
-                                        value={filter}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
-                                        placeholder='stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1'
-                                        disabled={loading}
-                                    />
+            <section className='section' style={{ 
+                minHeight: showResults ? 'auto' : 'calc(100vh - 200px)',
+                display: 'flex',
+                flexDirection: 'column'
+            }}>
+                <div className='container' style={{ 
+                    flex: showResults ? '0 1 auto' : '1 1 auto',
+                    display: 'flex',
+                    flexDirection: 'column'
+                }}>
+                    {/* Search Form - Fullscreen when not showing results */}
+                    {!showResults && (
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                            <div className='box mb-5' style={{ flex: 1 }}>
+                                <h3 className='title is-5 mb-4'>Type de planning</h3>
+                                <div className='tabs is-boxed mb-4'>
+                                    <ul>
+                                        <li className={scheduleType === 'stop' ? 'is-active' : ''}>
+                                            <a onClick={() => {
+                                                setScheduleType('stop');
+                                                setSchedules(null);
+                                                setError(null);
+                                                setShowResults(false);
+                                            }}>
+                                                <span className='icon is-small'><MapPin size={16} /></span>
+                                                <span>Horaires d'arrêt</span>
+                                            </a>
+                                        </li>
+                                        <li className={scheduleType === 'route' ? 'is-active' : ''}>
+                                            <a onClick={() => {
+                                                setScheduleType('route');
+                                                setSchedules(null);
+                                                setError(null);
+                                                setShowResults(false);
+                                            }}>
+                                                <span className='icon is-small'><Route size={16} /></span>
+                                                <span>Horaires de ligne</span>
+                                            </a>
+                                        </li>
+                                        <li className={scheduleType === 'terminus' ? 'is-active' : ''}>
+                                            <a onClick={() => {
+                                                setScheduleType('terminus');
+                                                setSchedules(null);
+                                                setError(null);
+                                                setShowResults(false);
+                                            }}>
+                                                <span className='icon is-small'><Flag size={16} /></span>
+                                                <span>Horaires terminus</span>
+                                            </a>
+                                        </li>
+                                    </ul>
                                 </div>
-                                <p className='help'>
-                                    Exemples: stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1
-                                </p>
+
+                                <form onSubmit={handleSearch}>
+                                    <div className='field'>
+                                        <label className='label' htmlFor='filter'>
+                                            Filtre
+                                        </label>
+                                        <div className='control'>
+                                            <input
+                                                id='filter'
+                                                className='input'
+                                                type='text'
+                                                value={filter}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
+                                                placeholder='stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1'
+                                                disabled={loading}
+                                            />
+                                        </div>
+                                        <p className='help'>
+                                            Exemples: stop_area.id=stop_area:SNCF:87391003 ou line.id=line:SNCF:1
+                                        </p>
+                                    </div>
+
+                                    <div className='field'>
+                                        <label className='label' htmlFor='datetime'>
+                                            Date et heure (optionnel)
+                                        </label>
+                                        <div className='control'>
+                                            <input
+                                                id='datetime'
+                                                className='input'
+                                                type='text'
+                                                value={datetime}
+                                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDatetime(e.target.value)}
+                                                placeholder='20250113T152944'
+                                                disabled={loading}
+                                            />
+                                        </div>
+                                        <p className='help'>Format: YYYYMMDDTHHmmss (ex: 20250113T152944)</p>
+                                    </div>
+
+                                    <div className='field'>
+                                        <div className='control'>
+                                            <button type='submit' className='button is-primary' disabled={loading}>
+                                                <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
+                                                <span>{loading ? 'Chargement...' : 'Rechercher'}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
                             </div>
 
-                            <div className='field'>
-                                <label className='label' htmlFor='datetime'>
-                                    Date et heure (optionnel)
-                                </label>
-                                <div className='control'>
-                                    <input
-                                        id='datetime'
-                                        className='input'
-                                        type='text'
-                                        value={datetime}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDatetime(e.target.value)}
-                                        placeholder='20250113T152944'
-                                        disabled={loading}
-                                    />
+                            {error && !loading && (
+                                <div className='notification is-danger mt-4'>
+                                    <button className='delete' onClick={() => setError(null)}></button>
+                                    <p className='title is-5'>Erreur</p>
+                                    <p>{error}</p>
                                 </div>
-                                <p className='help'>Format: YYYYMMDDTHHmmss (ex: 20250113T152944)</p>
-                            </div>
-
-                            <div className='field'>
-                                <div className='control'>
-                                    <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
-                                        <span>{loading ? 'Chargement...' : 'Rechercher'}</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-
-                    {loading && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des horaires...</p>
+                            )}
                         </div>
                     )}
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                        </div>
-                    )}
+                    {/* Results View - Hide search form, show results */}
+                    {showResults && (
+                        <>
+                            {/* Compact Query Overview */}
+                            <QueryOverview
+                                query={filter}
+                                queryLabel={getScheduleTypeLabel()}
+                                onClick={() => setShowResults(false)}
+                            />
 
-                    {!loading && schedules && (
-                        <div className='box'>
-                            <h2 className='title is-4 mb-5'>Résultats</h2>
-                            <div className='content'>
-                                <div className='table-container'>
-                                    <pre style={{
-                                        background: 'rgba(0, 0, 0, 0.3)',
-                                        borderRadius: '10px',
-                                        padding: '1.5rem',
-                                        overflow: 'auto',
-                                        color: '#ccc',
-                                        fontFamily: "'Roboto Mono', monospace",
-                                        fontSize: '0.9rem',
-                                        whiteSpace: 'pre-wrap',
-                                        wordWrap: 'break-word'
-                                    }}>{JSON.stringify(schedules, null, 2)}</pre>
+                            {/* Loading state */}
+                            {loading && (
+                                <div className='box has-text-centered'>
+                                    <div className='loader-wrapper'>
+                                        <div className='loader is-loading'></div>
+                                    </div>
+                                    <p className='mt-4 subtitle is-5'>Chargement des horaires...</p>
                                 </div>
-                            </div>
-                        </div>
+                            )}
+
+                            {/* Error state */}
+                            {error && !loading && (
+                                <div className='notification is-danger'>
+                                    <button className='delete' onClick={() => setError(null)}></button>
+                                    <p className='title is-5'>Erreur</p>
+                                    <p>{error}</p>
+                                </div>
+                            )}
+
+                            {/* Results */}
+                            {!loading && schedules && (
+                                <div className='box'>
+                                    <h2 className='title is-4 mb-5'>Résultats</h2>
+                                    <div className='content'>
+                                        <div className='table-container'>
+                                            <pre style={{
+                                                background: 'rgba(0, 0, 0, 0.3)',
+                                                borderRadius: '10px',
+                                                padding: '1.5rem',
+                                                overflow: 'auto',
+                                                color: '#ccc',
+                                                fontFamily: "'Roboto Mono', monospace",
+                                                fontSize: '0.9rem',
+                                                whiteSpace: 'pre-wrap',
+                                                wordWrap: 'break-word'
+                                            }}>{JSON.stringify(schedules, null, 2)}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
             </section>
