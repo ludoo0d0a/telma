@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Paper, Typography, CircularProgress, Alert } from '@mui/material';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
+import PageLayout from '@/components/shared/PageLayout';
 import { getCoverage, getCoverageDetails } from '@/services/navitiaApi';
 import type { CoverageResponse, Coverage } from '@/client/models';
 import type { Link } from '@/client/models/link';
@@ -41,7 +43,7 @@ const CoveragePage: React.FC = () => {
 
     const handleCoverageClick = async (coverageId: string | undefined): Promise<void> => {
         if (!coverageId) return;
-        
+
         try {
             setLoading(true);
             const data = await getCoverageDetails(coverageId);
@@ -61,52 +63,44 @@ const CoveragePage: React.FC = () => {
                 title="Zones de couverture"
                 subtitle="Consultez les régions et réseaux disponibles"
                 showNotification={false}
-                
             />
-            <section className='section'>
-                <div className='container'>
-                    {loading && !selectedCoverage && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des zones de couverture...</p>
-                        </div>
-                    )}
+            <PageLayout>
+                {loading && !selectedCoverage && (
+                    <Paper sx={{ p: 4, textAlign: 'center' }}>
+                        <CircularProgress />
+                        <Typography sx={{ mt: 2 }}>Chargement des zones de couverture...</Typography>
+                    </Paper>
+                )}
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                        </div>
-                    )}
+                {error && (
+                    <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
 
-                    {!loading && !selectedCoverage && (
-                        <>
-                            {coverageResponse?.context && (
-                                <CoverageContext context={coverageResponse.context} />
-                            )}
-                            <CoverageList
-                                coverages={coverages}
-                                coverageResponse={coverageResponse}
-                                onCoverageClick={handleCoverageClick}
-                            />
-                        </>
-                    )}
-
-                    {selectedCoverage && (
-                        <CoverageDetail
-                            selectedCoverage={selectedCoverage}
-                            onBack={() => setSelectedCoverage(null)}
+                {!loading && !selectedCoverage && (
+                    <>
+                        {coverageResponse?.context && (
+                            <CoverageContext context={coverageResponse.context} />
+                        )}
+                        <CoverageList
+                            coverages={coverages}
+                            coverageResponse={coverageResponse}
+                            onCoverageClick={handleCoverageClick}
                         />
-                    )}
-                </div>
-            </section>
+                    </>
+                )}
+
+                {selectedCoverage && (
+                    <CoverageDetail
+                        selectedCoverage={selectedCoverage}
+                        onBack={() => setSelectedCoverage(null)}
+                    />
+                )}
+            </PageLayout>
             <Footer />
         </>
     );
 };
 
 export default CoveragePage;
-

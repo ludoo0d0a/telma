@@ -1,4 +1,5 @@
 import React from 'react';
+import { Paper, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip } from '@mui/material';
 import { parseUTCDate, formatTime } from '@/utils/dateUtils';
 import { calculateDelay } from '@/services/delayService';
 import type { ExtendedVehicleJourney } from './types';
@@ -13,32 +14,30 @@ const TrainStopTimesTable: React.FC<TrainStopTimesTableProps> = ({ stopTimes }) 
     }
 
     return (
-        <div className='box'>
-            <h3 className='title is-4 mb-4'>Arrêts et horaires</h3>
-            <div className='table-container'>
-                <table className='table is-fullwidth is-striped is-hoverable'>
-                    <thead>
-                        <tr>
-                            <th>Gare</th>
-                            <th>Horaire prévu</th>
-                            <th>Horaire réel</th>
-                            <th>Retard</th>
-                            <th>Quai/Voie</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <Paper sx={{ p: 2, mb: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>Arrêts et horaires</Typography>
+            <TableContainer>
+                <Table size="small">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Gare</strong></TableCell>
+                            <TableCell><strong>Horaire prévu</strong></TableCell>
+                            <TableCell><strong>Horaire réel</strong></TableCell>
+                            <TableCell><strong>Retard</strong></TableCell>
+                            <TableCell><strong>Quai/Voie</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {stopTimes.map((stop, index) => {
                             const extendedStop = stop as NonNullable<ExtendedVehicleJourney['stop_times']>[0];
                             const baseArrival = extendedStop?.base_arrival_date_time;
                             const realArrival = extendedStop?.arrival_date_time;
                             const baseDeparture = extendedStop?.base_departure_date_time;
                             const realDeparture = extendedStop?.departure_date_time;
-                            
-                            // Use arrival for intermediate stops, departure for last stop
+
                             const baseTime = index === stopTimes.length - 1 ? baseDeparture : baseArrival;
                             const realTime = index === stopTimes.length - 1 ? realDeparture : realArrival;
 
-                            // Only calculate delay if both times are available
                             let delay: string | null = null;
                             if (baseTime && realTime) {
                                 try {
@@ -46,7 +45,7 @@ const TrainStopTimesTable: React.FC<TrainStopTimesTableProps> = ({ stopTimes }) 
                                         parseUTCDate(baseTime),
                                         parseUTCDate(realTime)
                                     );
-                                } catch (err) {
+                                } catch {
                                     delay = null;
                                 }
                             }
@@ -57,47 +56,42 @@ const TrainStopTimesTable: React.FC<TrainStopTimesTableProps> = ({ stopTimes }) 
                             const platform = (stopPoint as { label?: string | null }).label || 'N/A';
 
                             return (
-                                <tr key={index}>
-                                    <td>
+                                <TableRow key={index}>
+                                    <TableCell>
                                         <strong>{stopName}</strong>
-                                        {index === 0 && (
-                                            <span className='tag is-success is-dark ml-2'>Départ</span>
-                                        )}
-                                        {index === stopTimes.length - 1 && (
-                                            <span className='tag is-danger is-dark ml-2'>Arrivée</span>
-                                        )}
-                                    </td>
-                                    <td>{baseTime ? formatTime(parseUTCDate(baseTime)) : 'N/A'}</td>
-                                    <td>
+                                        {index === 0 && <Chip label="Départ" color="success" size="small" sx={{ ml: 1 }} />}
+                                        {index === stopTimes.length - 1 && <Chip label="Arrivée" color="error" size="small" sx={{ ml: 1 }} />}
+                                    </TableCell>
+                                    <TableCell>{baseTime ? formatTime(parseUTCDate(baseTime)) : 'N/A'}</TableCell>
+                                    <TableCell>
                                         {realTime && realTime !== baseTime ? (
-                                            <span className='has-text-danger'>{formatTime(parseUTCDate(realTime))}</span>
+                                            <span style={{ color: 'var(--primary)' }}>{formatTime(parseUTCDate(realTime))}</span>
                                         ) : baseTime ? (
                                             formatTime(parseUTCDate(baseTime))
                                         ) : (
                                             'N/A'
                                         )}
-                                    </td>
-                                    <td>
+                                    </TableCell>
+                                    <TableCell>
                                         {delay ? (
-                                            delay !== 'À l\'heure' && delay !== 'à l\'heure' ? (
-                                                <span className='tag is-danger'>{delay}</span>
+                                            delay !== "À l'heure" && delay !== "à l'heure" ? (
+                                                <Chip label={delay} color="error" size="small" />
                                             ) : (
-                                                <span className='tag is-success'>À l'heure</span>
+                                                <Chip label="À l'heure" color="success" size="small" />
                                             )
                                         ) : (
-                                            <span className='tag is-dark'>N/A</span>
+                                            <Chip label="N/A" variant="outlined" size="small" />
                                         )}
-                                    </td>
-                                    <td>{platform}</td>
-                                </tr>
+                                    </TableCell>
+                                    <TableCell>{platform}</TableCell>
+                                </TableRow>
                             );
                         })}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
     );
 };
 
 export default TrainStopTimesTable;
-

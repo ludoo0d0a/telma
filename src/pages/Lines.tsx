@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
+import {
+    Box,
+    Paper,
+    Typography,
+    Button,
+    Grid,
+    CircularProgress,
+    Alert,
+} from '@mui/material';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
+import PageLayout from '@/components/shared/PageLayout';
 import { ArrowDown } from 'lucide-react';
 import { getLines } from '@/services/navitiaApi';
 import type { Line } from '@/client/models/line';
@@ -38,81 +48,75 @@ const Lines: React.FC = () => {
                 title="Lignes de transport"
                 subtitle="Consultez les lignes disponibles et leurs informations"
                 showNotification={false}
-                
             />
-            <section className='section'>
-                <div className='container'>
-                    {loading && lines.length === 0 && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des lignes...</p>
-                        </div>
-                    )}
+            <PageLayout>
+                {loading && lines.length === 0 && (
+                    <Paper sx={{ p: 4, textAlign: 'center' }}>
+                        <CircularProgress />
+                        <Typography sx={{ mt: 2 }}>Chargement des lignes...</Typography>
+                    </Paper>
+                )}
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                        </div>
-                    )}
+                {error && (
+                    <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
 
-                    {!loading && lines.length > 0 && (
-                        <div className='box'>
-                            <h2 className='title is-4 mb-5'>
-                                Lignes disponibles <span className='tag is-primary is-medium'>{lines.length}</span>
-                            </h2>
-                            <div className='columns is-multiline'>
-                                {lines.map((line) => (
-                                    <div key={line.id} className='column is-half-tablet is-one-third-desktop is-half-mobile'>
-                                        <div className='box'>
-                                            <h3 className='title is-5 mb-3'>
-                                                {line.name || line.code || 'Sans nom'}
-                                            </h3>
-                                            <div className='content'>
-                                                <p><strong>ID:</strong> <code>{line.id}</code></p>
-                                                {line.commercial_mode && typeof line.commercial_mode === 'object' && 'name' in line.commercial_mode && (
-                                                    <p><strong>Mode:</strong> {(line.commercial_mode as { name?: string }).name}</p>
-                                                )}
-                                                {line.network && typeof line.network === 'object' && 'name' in line.network && (
-                                                    <p><strong>Réseau:</strong> {(line.network as { name?: string }).name}</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                {!loading && lines.length > 0 && (
+                    <Paper sx={{ p: 2 }}>
+                        <Typography variant="h5" sx={{ mb: 2 }}>
+                            Lignes disponibles <Box component="span" sx={{ color: 'primary.main' }}>{lines.length}</Box>
+                        </Typography>
+                        <Grid container spacing={2}>
+                            {lines.map((line) => (
+                                <Grid item key={line.id} xs={12} sm={6} md={4}>
+                                    <Paper variant="outlined" sx={{ p: 2 }}>
+                                        <Typography variant="h6" sx={{ mb: 1 }}>
+                                            {line.name || line.code || 'Sans nom'}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <strong>ID:</strong> <code>{line.id}</code>
+                                        </Typography>
+                                        {line.commercial_mode && typeof line.commercial_mode === 'object' && 'name' in line.commercial_mode && (
+                                            <Typography variant="body2">
+                                                <strong>Mode:</strong> {(line.commercial_mode as { name?: string }).name}
+                                            </Typography>
+                                        )}
+                                        {line.network && typeof line.network === 'object' && 'name' in line.network && (
+                                            <Typography variant="body2">
+                                                <strong>Réseau:</strong> {(line.network as { name?: string }).name}
+                                            </Typography>
+                                        )}
+                                    </Paper>
+                                </Grid>
+                            ))}
+                        </Grid>
+                    </Paper>
+                )}
 
-                    {hasMore && !loading && (
-                        <div className='has-text-centered mt-5'>
-                            <button
-                                className='button is-primary'
-                                onClick={() => setPage((prev) => prev + 1)}
-                            >
-                                <span className='icon'><ArrowDown size={20} /></span>
-                                <span>Charger plus</span>
-                            </button>
-                        </div>
-                    )}
+                {hasMore && !loading && (
+                    <Box sx={{ textAlign: 'center', mt: 3 }}>
+                        <Button
+                            variant="contained"
+                            onClick={() => setPage((prev) => prev + 1)}
+                            startIcon={<ArrowDown size={20} />}
+                        >
+                            Charger plus
+                        </Button>
+                    </Box>
+                )}
 
-                    {loading && lines.length > 0 && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4'>Chargement...</p>
-                        </div>
-                    )}
-                </div>
-            </section>
+                {loading && lines.length > 0 && (
+                    <Paper sx={{ p: 4, textAlign: 'center', mt: 2 }}>
+                        <CircularProgress />
+                        <Typography sx={{ mt: 2 }}>Chargement...</Typography>
+                    </Paper>
+                )}
+            </PageLayout>
             <Footer />
         </>
     );
 };
 
 export default Lines;
-

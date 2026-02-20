@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Button, Alert, Paper, Typography, CircularProgress } from '@mui/material';
 import Footer from '@/components/Footer';
 import Ad from '@/components/Ad';
 import { PageHeader } from '@/components/skytrip';
@@ -7,6 +8,8 @@ import ItinerarySearchForm from '@/components/itinerary/ItinerarySearchForm';
 import DisruptionsList from '@/components/itinerary/DisruptionsList';
 import JourneyTable from '@/components/itinerary/JourneyTable';
 import EmptyState from '@/components/itinerary/EmptyState';
+import QueryOverview from '@/components/shared/QueryOverview';
+import PageLayout from '@/components/shared/PageLayout';
 import { getJourneys, formatDateTime } from '@/services/navitiaApi';
 import { parseUTCDate } from '@/utils/dateUtils';
 import { cleanLocationName } from '@/services/locationService';
@@ -37,6 +40,7 @@ const Trajet: React.FC = () => {
     const [fromId, setFromId] = useState<string | undefined>(undefined);
     const [toId, setToId] = useState<string | undefined>(undefined);
     const [disruptions, setDisruptions] = useState<Disruption[]>([]);
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     // Track if we should auto-search on initial load
     const hasAutoSearchedRef = useRef<boolean>(false);
@@ -101,6 +105,13 @@ const Trajet: React.FC = () => {
         ) {
             hasAutoSearchedRef.current = true;
             fetchTerTrains(fromId, toId);
+        }
+    }, [fromId, toId]);
+
+    // Reset showResults when stations change (user manually changed)
+    useEffect(() => {
+        if (userHasChangedValuesRef.current) {
+            setShowResults(false);
         }
     }, [fromId, toId]);
 
@@ -190,6 +201,7 @@ const Trajet: React.FC = () => {
 
     const handleSearch = (): void => {
         if (fromId && toId) {
+            setShowResults(false); // Hide results while loading
             fetchTerTrains(fromId, toId);
         } else {
             setError('Veuillez sélectionner les gares de départ et d\'arrivée');
@@ -307,10 +319,15 @@ const Trajet: React.FC = () => {
             });
 
             setTerTrains(uniqueTrains);
+            // Show results after successful search (only if we have results or if it was an auto-search)
+            if (uniqueTrains.length > 0 || isInitialLoadFromUrlRef.current) {
+                setShowResults(true);
+            }
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
             setError('Erreur lors de la récupération des trains TER: ' + errorMessage);
             console.error(err);
+            setShowResults(false); // Don't show results on error
         } finally {
             setLoading(false);
         }
@@ -581,120 +598,158 @@ const Trajet: React.FC = () => {
                 showNotification={false}
                 
             />
-            <section className='section'>
-                <div className='container'>
-                    <div className='level mb-5 is-justify-content-flex-end'>
-                        <div className='level-item'>
-                            <button
-                                className='button is-primary'
+            <PageLayout fullHeight={!showResults}>
+                {!showResults && (
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                            <Button
+                                variant="contained"
                                 onClick={handleRefresh}
                                 disabled={loading}
+                                startIcon={loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
                             >
-                                <span className='icon'>
-                                    {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
-                                </span>
-                                <span>Actualiser</span>
-                            </button>
-                        </div>
-                    </div>
+                                Actualiser
+                            </Button>
+                        </Box>
 
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-5" />
+                        <Box sx={{ mb: 2 }}>
+                            <Ad format="horizontal" size="responsive" />
+                        </Box>
 
-                    <ItinerarySearchForm
-                        fromName={fromName}
-                        toName={toName}
-                        fromId={fromId}
-                        toId={toId}
-                        filterDate={filterDate}
-                        filterTime={filterTime}
-                        loading={loading}
-                        onFromChange={(id: string | undefined) => setFromId(id)}
-                        onToChange={(id: string | undefined) => setToId(id)}
-                        onFromValueChange={(value) => {
-                                        setFromName(value);
-                                        // Mark as user change if they typed something different
-                                        if (hasAutoSearchedRef.current || value !== initialFromNameRef.current) {
-                                            userHasChangedValuesRef.current = true;
-                                        }
-                                    }}
-                        onToValueChange={(value) => {
-                                        setToName(value);
-                                        // Mark as user change if they typed something different
-                                        if (hasAutoSearchedRef.current || value !== initialToNameRef.current) {
-                                            userHasChangedValuesRef.current = true;
-                                        }
-                                    }}
-                        onFromStationFound={handleFromStationFound}
-                        onToStationFound={handleToStationFound}
-                        onFilterDateChange={setFilterDate}
-                        onFilterTimeChange={setFilterTime}
-                        onSearch={handleSearch}
-                        onInvertItinerary={handleInvertItinerary}
-                    />
+                        <Box sx={{ flex: 1 }}>
+                            <ItinerarySearchForm
+                                    fromName={fromName}
+                                    toName={toName}
+                                    fromId={fromId}
+                                    toId={toId}
+                                    filterDate={filterDate}
+                                    filterTime={filterTime}
+                                    loading={loading}
+                                    onFromChange={(id: string | undefined) => setFromId(id)}
+                                    onToChange={(id: string | undefined) => setToId(id)}
+                                    onFromValueChange={(value) => {
+                                                    setFromName(value);
+                                                    // Mark as user change if they typed something different
+                                                    if (hasAutoSearchedRef.current || value !== initialFromNameRef.current) {
+                                                        userHasChangedValuesRef.current = true;
+                                                    }
+                                                }}
+                                    onToValueChange={(value) => {
+                                                    setToName(value);
+                                                    // Mark as user change if they typed something different
+                                                    if (hasAutoSearchedRef.current || value !== initialToNameRef.current) {
+                                                        userHasChangedValuesRef.current = true;
+                                                    }
+                                                }}
+                                    onFromStationFound={handleFromStationFound}
+                                    onToStationFound={handleToStationFound}
+                                    onFilterDateChange={setFilterDate}
+                                    onFilterTimeChange={setFilterTime}
+                                    onSearch={handleSearch}
+                                    onInvertItinerary={handleInvertItinerary}
+                                />
+                        </Box>
 
-                    {loading && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des trains...</p>
-                            <p className='has-text-grey'>Recherche des gares et des horaires en cours...</p>
-                        </div>
-                    )}
+                        {error && !loading && (
+                                <Alert severity="error" onClose={() => setError(null)} sx={{ mt: 2 }}>
+                                    {error}
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                        {fromId && toId ? (
+                                            <>Gares trouvées mais impossible de récupérer les horaires.</>
+                                        ) : (
+                                            <>Vérifiez votre connexion et réessayez.</>
+                                        )}
+                                    </Typography>
+                                </Alert>
+                            )}
+                    </Box>
+                )}
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                            <p className='mt-3 has-text-grey-light'>
-                                {fromId && toId ? (
-                                    <>Gares trouvées mais impossible de récupérer les horaires.</>
-                                ) : (
-                                    <>Vérifiez votre connexion et réessayez.</>
-                                )}
-                            </p>
-                        </div>
-                    )}
-
-                    {!loading && <DisruptionsList disruptions={disruptions} />}
-
-                    {!loading && !error && terTrains.length > 0 && (
+                {/* Results View - Hide search form, show results */}
+                    {showResults && (
                         <>
-                            {/* Advertisement */}
-                            <Ad format="auto" size="responsive" className="mb-5" />
-
-                            <JourneyTable
-                                journeys={terTrains}
-                                getJourneyInfo={(journey) => getJourneyInfo(journey, fromName, toName)}
-                                getJourneyDisruptions={getJourneyDisruptions}
-                                generateTripId={generateTripId}
-                                onDetailClick={(journey, journeyInfo, journeyDisruptions, tripId) => {
-                                            // Store journey data in sessionStorage for the Trip page
-                                                sessionStorage.setItem(`trip_${tripId}`, JSON.stringify({
-                                                    journey,
-                                        info: journeyInfo,
-                                                    disruptions: journeyDisruptions
-                                                }));
-                                }}
+                            {/* Compact Query Overview */}
+                            <QueryOverview
+                                fromName={fromName}
+                                toName={toName}
+                                filterDate={filterDate}
+                                filterTime={filterTime}
+                                onClick={() => setShowResults(false)}
                             />
 
-                        {/* Advertisement */}
-                        <Ad format="rectangle" size="responsive" className="mb-5" />
+                            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                                <Button
+                                    variant="contained"
+                                    onClick={handleRefresh}
+                                    disabled={loading}
+                                    startIcon={loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
+                                >
+                                    Actualiser
+                                </Button>
+                            </Box>
+
+                            {loading && (
+                                <Paper sx={{ p: 4, textAlign: 'center' }}>
+                                    <CircularProgress />
+                                    <Typography sx={{ mt: 2 }}>Chargement des trains...</Typography>
+                                    <Typography color="text.secondary">Recherche des gares et des horaires en cours...</Typography>
+                                </Paper>
+                            )}
+
+                            {error && !loading && (
+                                <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                                    {error}
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                        {fromId && toId ? (
+                                            <>Gares trouvées mais impossible de récupérer les horaires.</>
+                                        ) : (
+                                            <>Vérifiez votre connexion et réessayez.</>
+                                        )}
+                                    </Typography>
+                                </Alert>
+                            )}
+
+                            {/* Disruptions */}
+                            {!loading && <DisruptionsList disruptions={disruptions} />}
+
+                            {/* Results */}
+                            {!loading && !error && terTrains.length > 0 && (
+                                <>
+                                    <Box sx={{ mb: 2 }}>
+                                        <Ad format="auto" size="responsive" />
+                                    </Box>
+                                    <JourneyTable
+                                        journeys={terTrains}
+                                        getJourneyInfo={(journey) => getJourneyInfo(journey, fromName, toName)}
+                                        getJourneyDisruptions={getJourneyDisruptions}
+                                        generateTripId={generateTripId}
+                                        onDetailClick={(journey, journeyInfo, journeyDisruptions, tripId) => {
+                                                    // Store journey data in sessionStorage for the Trip page
+                                                        sessionStorage.setItem(`trip_${tripId}`, JSON.stringify({
+                                                            journey,
+                                                info: journeyInfo,
+                                                            disruptions: journeyDisruptions
+                                                        }));
+                                        }}
+                                    />
+                                    <Box sx={{ mb: 2, mt: 2 }}>
+                                        <Ad format="rectangle" size="responsive" />
+                                    </Box>
+                                </>
+                            )}
+
+                            {/* Empty state */}
+                            {!loading && !error && terTrains.length === 0 && (
+                                <EmptyState
+                                    fromName={fromName}
+                                    toName={toName}
+                                    fromId={fromId}
+                                    toId={toId}
+                                />
+                            )}
                         </>
                     )}
-
-                    {!loading && !error && terTrains.length === 0 && (
-                        <EmptyState
-                            fromName={fromName}
-                            toName={toName}
-                            fromId={fromId}
-                            toId={toId}
-                        />
-                    )}
-                </div>
-            </section>
+            </PageLayout>
             <Footer />
         </>
     );

@@ -43,5 +43,4 @@
   animation: spin 1s linear infinite;
 }
 
-// Import statements must come after @use
-@import 'bulma/css/bulma.css';
+// MUI is the foundation - no Bulma import

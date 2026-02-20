@@ -1,8 +1,9 @@
 import React from 'react';
-import type { Link } from '@/client/models/link';
+import { Paper, Typography, Box, Chip, Link } from '@mui/material';
+import type { Link as LinkType } from '@/client/models/link';
 
 interface CoverageLinksProps {
-    links: Link[];
+    links: LinkType[];
     title?: string;
 }
 
@@ -10,24 +11,27 @@ const CoverageLinks: React.FC<CoverageLinksProps> = ({ links, title = 'Liens dis
     if (!links || links.length === 0) return null;
 
     return (
-        <div className='box mb-5'>
-            <h3 className='title is-5 mb-4'>{title}</h3>
-            <div className='tags'>
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Typography variant="h6" sx={{ mb: 2 }}>{title}</Typography>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                 {links.map((link, index) => (
-                    <a
+                    <Link
                         key={index}
                         href={link.href}
-                        target='_blank'
-                        rel='noopener noreferrer'
-                        className='tag is-link is-medium'
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        sx={{ textDecoration: 'none' }}
                     >
-                        {link.type || link.rel || 'Lien'} {link.templated && '(templated)'}
-                    </a>
+                        <Chip
+                            label={`${link.type || link.rel || 'Lien'}${link.templated ? ' (templated)' : ''}`}
+                            component="span"
+                            clickable
+                        />
+                    </Link>
                 ))}
-            </div>
-        </div>
+            </Box>
+        </Paper>
     );
 };
 
 export default CoverageLinks;
-

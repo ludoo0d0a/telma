@@ -1,6 +1,8 @@
 import React from 'react';
+import { Box, Typography, Button, Grid } from '@mui/material';
 import { PageHeader } from '@/components/skytrip';
 import { Clock, Ban, Wrench, HeartPulse, DoorClosed, MessageSquareWarning } from 'lucide-react';
+import PageLayout from '@/components/shared/PageLayout';
 
 const RaiseIssue: React.FC = () => {
     const issues = [
@@ -18,34 +20,35 @@ const RaiseIssue: React.FC = () => {
     };
 
     return (
-        <div className="app-flight">
+        <Box sx={{ minHeight: '100vh' }}>
             <PageHeader
                 title="Raise an Issue"
                 subtitle="Signalez un problème en quelques secondes"
                 showNotification={false}
-                
             />
-
-            <main>
-                <div className="container" style={{ padding: '20px' }}>
-                    <h2 className="title is-2 has-text-centered">Raise an Issue</h2>
-                    <div className="columns is-multiline is-mobile is-centered">
-                        {issues.map((issue, index) => (
-                            <div className="column is-half-mobile is-one-third-tablet" key={index}>
-                                <button
-                                    className="button is-large is-fullwidth is-flex is-flex-direction-column"
-                                    onClick={() => handleIssueClick(issue.text)}
-                                    style={{ height: '150px' }}
-                                >
-                                    <span className="icon is-large">{issue.icon}</span>
-                                    <span>{issue.text}</span>
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </main>
-        </div>
+            <PageLayout>
+                <Typography variant="h4" align="center" gutterBottom>Raise an Issue</Typography>
+                <Grid container spacing={2} justifyContent="center">
+                    {issues.map((issue, index) => (
+                        <Grid item key={index} xs={6} sm={4}>
+                            <Button
+                                variant="outlined"
+                                fullWidth
+                                onClick={() => handleIssueClick(issue.text)}
+                                sx={{
+                                    height: 150,
+                                    flexDirection: 'column',
+                                    gap: 1,
+                                }}
+                            >
+                                {issue.icon}
+                                <span>{issue.text}</span>
+                            </Button>
+                        </Grid>
+                    ))}
+                </Grid>
+            </PageLayout>
+        </Box>
     );
 };
 

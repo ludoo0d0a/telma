@@ -1,14 +1,14 @@
 import React from 'react';
+import { Chip } from '@mui/material';
 
 /**
  * Get a status badge component based on the status string
  */
 export const getStatusBadge = (status: string | undefined): React.ReactNode => {
     if (status === 'running') {
-        return <span className='tag is-success'>En cours</span>;
+        return <Chip label="En cours" color="success" size="small" />;
     } else if (status === 'closed') {
-        return <span className='tag is-danger'>Fermé</span>;
+        return <Chip label="Fermé" color="error" size="small" />;
     }
-    return <span className='tag is-light'>{status || 'N/A'}</span>;
+    return <Chip label={status || 'N/A'} variant="outlined" size="small" />;
 };
-

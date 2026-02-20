@@ -1,4 +1,5 @@
 import React from 'react';
+import { Paper, Typography, Box, Button } from '@mui/material';
 import { ArrowLeft } from 'lucide-react';
 import type { Context } from '@/client/models/context';
 import type { Link } from '@/client/models/link';
@@ -21,94 +22,70 @@ interface CoverageDetailProps {
 
 const CoverageDetail: React.FC<CoverageDetailProps> = ({ selectedCoverage, onBack }) => {
     return (
-        <div className='box'>
-            <div className='level mb-5'>
-                <div className='level-left'>
-                    <div className='level-item'>
-                        <button
-                            className='button is-light'
-                            onClick={onBack}
-                        >
-                            <span className='icon'><ArrowLeft size={20} /></span>
-                            <span>Retour à la liste</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div className='level mb-5'>
-                <div className='level-left'>
-                    <div className='level-item'>
-                        <h2 className='title is-3'>Détails: {selectedCoverage.id}</h2>
-                    </div>
-                </div>
+        <Paper sx={{ p: 2 }}>
+            <Button variant="outlined" onClick={onBack} startIcon={<ArrowLeft size={20} />} sx={{ mb: 2 }}>
+                Retour à la liste
+            </Button>
+
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 2, mb: 2 }}>
+                <Typography variant="h5">Détails: {selectedCoverage.id}</Typography>
+                {selectedCoverage.status && getStatusBadge(selectedCoverage.status)}
+            </Box>
+
+            <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                <Typography variant="h6" sx={{ mb: 2 }}>Informations générales</Typography>
+                {selectedCoverage.id && (
+                    <Typography><strong>ID:</strong> <code>{selectedCoverage.id}</code></Typography>
+                )}
+                {selectedCoverage.start_production_date && (
+                    <Typography><strong>Date de début de production:</strong> {formatDateString(selectedCoverage.start_production_date)}</Typography>
+                )}
+                {selectedCoverage.end_production_date && (
+                    <Typography><strong>Date de fin de production:</strong> {formatDateString(selectedCoverage.end_production_date)}</Typography>
+                )}
                 {selectedCoverage.status && (
-                    <div className='level-right'>
-                        <div className='level-item'>
-                            {getStatusBadge(selectedCoverage.status)}
-                        </div>
-                    </div>
+                    <Typography><strong>Statut:</strong> {selectedCoverage.status}</Typography>
                 )}
-            </div>
+            </Paper>
 
-            <div className='content'>
-                <div className='box mb-5'>
-                    <h3 className='title is-5 mb-4'>Informations générales</h3>
-                    <div className='content'>
-                        {selectedCoverage.id && (
-                            <p><strong>ID:</strong> <code>{selectedCoverage.id}</code></p>
-                        )}
-                        {selectedCoverage.start_production_date && (
-                            <p><strong>Date de début de production:</strong> {formatDateString(selectedCoverage.start_production_date)}</p>
-                        )}
-                        {selectedCoverage.end_production_date && (
-                            <p><strong>Date de fin de production:</strong> {formatDateString(selectedCoverage.end_production_date)}</p>
-                        )}
-                        {selectedCoverage.status && (
-                            <p><strong>Statut:</strong> {selectedCoverage.status}</p>
-                        )}
-                    </div>
-                </div>
+            {selectedCoverage.shape && (
+                <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Forme géographique</Typography>
+                    <Box component="pre" sx={{ overflow: 'auto' }}>{selectedCoverage.shape}</Box>
+                </Paper>
+            )}
 
-                {selectedCoverage.shape && (
-                    <div className='box mb-5'>
-                        <h3 className='title is-5 mb-4'>Forme géographique</h3>
-                        <div className='content'>
-                            <pre>{selectedCoverage.shape}</pre>
-                        </div>
-                    </div>
-                )}
+            {selectedCoverage.context && <CoverageContext context={selectedCoverage.context} />}
 
-                {selectedCoverage.context && (
-                    <CoverageContext context={selectedCoverage.context} />
-                )}
+            {selectedCoverage.links && selectedCoverage.links.length > 0 && (
+                <CoverageLinks links={selectedCoverage.links} />
+            )}
 
-                {selectedCoverage.links && selectedCoverage.links.length > 0 && (
-                    <CoverageLinks links={selectedCoverage.links} />
-                )}
-
-                <div className='box'>
-                    <details>
-                        <summary className='title is-6 mb-4' style={{ cursor: 'pointer' }}>Afficher les données JSON brutes</summary>
-                        <div className='content mt-4'>
-                            <pre style={{
-                                background: 'rgba(0, 0, 0, 0.3)',
-                                borderRadius: '10px',
-                                padding: '1.5rem',
-                                overflow: 'auto',
-                                color: '#ccc',
-                                fontFamily: "'Roboto Mono', monospace",
-                                fontSize: '0.9rem',
-                                whiteSpace: 'pre-wrap',
-                                wordWrap: 'break-word'
-                            }}>{JSON.stringify(selectedCoverage, null, 2)}</pre>
-                        </div>
-                    </details>
-                </div>
-            </div>
-        </div>
+            <Paper variant="outlined" sx={{ p: 2, mt: 2 }}>
+                <details>
+                    <summary style={{ cursor: 'pointer', marginBottom: 16 }}>
+                        <Typography variant="subtitle1">Afficher les données JSON brutes</Typography>
+                    </summary>
+                    <Box
+                        component="pre"
+                        sx={{
+                            background: 'rgba(0, 0, 0, 0.3)',
+                            borderRadius: 2,
+                            p: 2,
+                            overflow: 'auto',
+                            color: '#ccc',
+                            fontFamily: "'Roboto Mono', monospace",
+                            fontSize: '0.9rem',
+                            whiteSpace: 'pre-wrap',
+                            wordWrap: 'break-word',
+                        }}
+                    >
+                        {JSON.stringify(selectedCoverage, null, 2)}
+                    </Box>
+                </details>
+            </Paper>
+        </Paper>
     );
 };
 
 export default CoverageDetail;
-

@@ -6,6 +6,7 @@ import type { CommercialMode } from '@/client/models/commercial-mode';
 import CommercialModesLoadingState from '@/components/commercialModes/CommercialModesLoadingState';
 import CommercialModesErrorState from '@/components/commercialModes/CommercialModesErrorState';
 import CommercialModesList from '@/components/commercialModes/CommercialModesList';
+import PageLayout from '@/components/shared/PageLayout';
 
 const CommercialModes: React.FC = () => {
     const [modes, setModes] = useState<CommercialMode[]>([]);
@@ -36,26 +37,22 @@ const CommercialModes: React.FC = () => {
                 title="Modes de transport SNCF"
                 subtitle="Découvrez les modes commerciaux disponibles dans l'API"
                 showNotification={false}
-                
             />
-            <section className='section'>
-                <div className='container'>
-                    {loading && <CommercialModesLoadingState />}
+            <PageLayout>
+                {loading && <CommercialModesLoadingState />}
 
-                    {error && (
-                        <CommercialModesErrorState
-                            error={error}
-                            onDismiss={() => setError(null)}
-                        />
-                    )}
+                {error && (
+                    <CommercialModesErrorState
+                        error={error}
+                        onDismiss={() => setError(null)}
+                    />
+                )}
 
-                    {!loading && !error && <CommercialModesList modes={modes} />}
-                </div>
-            </section>
+                {!loading && !error && <CommercialModesList modes={modes} />}
+            </PageLayout>
             <Footer />
         </>
     );
 };
 
 export default CommercialModes;
-

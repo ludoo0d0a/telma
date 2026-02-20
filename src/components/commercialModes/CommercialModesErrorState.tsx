@@ -1,4 +1,5 @@
 import React from 'react';
+import { Alert } from '@mui/material';
 
 interface CommercialModesErrorStateProps {
     error: string;
@@ -7,13 +8,10 @@ interface CommercialModesErrorStateProps {
 
 const CommercialModesErrorState: React.FC<CommercialModesErrorStateProps> = ({ error, onDismiss }) => {
     return (
-        <div className='notification is-danger'>
-            <button className='delete' onClick={onDismiss}></button>
-            <p className='title is-5'>Erreur</p>
-            <p>{error}</p>
-        </div>
+        <Alert severity="error" onClose={onDismiss} sx={{ mb: 2 }}>
+            {error}
+        </Alert>
     );
 };
 
 export default CommercialModesErrorState;
-

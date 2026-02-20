@@ -1,8 +1,9 @@
 import React from 'react';
+import { Box, Typography, Paper, Grid } from '@mui/material';
 import { PageHeader } from '@/components/skytrip';
+import PageLayout from '@/components/shared/PageLayout';
 
 const Dashboard: React.FC = () => {
-    // Placeholder for favorite stations
     const favoriteStations = [
         { name: 'Gare de Lyon', city: 'Paris' },
         { name: 'Gare du Nord', city: 'Paris' },
@@ -10,31 +11,27 @@ const Dashboard: React.FC = () => {
     ];
 
     return (
-        <div className="app-flight">
+        <Box sx={{ minHeight: '100vh' }}>
             <PageHeader
                 title="Dashboard"
                 subtitle="Accédez rapidement aux principales fonctionnalités"
                 showNotification={false}
-                
             />
-
-            <main>
-                <div className="container" style={{ padding: '20px' }}>
-                    <h2 className="title is-2">Your Dashboard</h2>
-                    <h3 className="title is-4">Favorite Stations</h3>
-                    <div className="columns is-multiline">
-                        {favoriteStations.map((station, index) => (
-                            <div className="column is-one-third" key={index}>
-                                <div className="box">
-                                    <p className="title is-5">{station.name}</p>
-                                    <p className="subtitle is-6">{station.city}</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </main>
-        </div>
+            <PageLayout>
+                <Typography variant="h4" gutterBottom>Your Dashboard</Typography>
+                <Typography variant="h6" sx={{ mb: 2 }}>Favorite Stations</Typography>
+                <Grid container spacing={2}>
+                    {favoriteStations.map((station, index) => (
+                        <Grid item key={index} xs={12} sm={6} md={4}>
+                            <Paper sx={{ p: 2 }}>
+                                <Typography variant="h6">{station.name}</Typography>
+                                <Typography color="text.secondary">{station.city}</Typography>
+                            </Paper>
+                        </Grid>
+                    ))}
+                </Grid>
+            </PageLayout>
+        </Box>
     );
 };
 

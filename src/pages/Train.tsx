@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Box, Paper, Typography } from '@mui/material';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
 import TrainWaypointsMap from '@/components/TrainWaypointsMap';
@@ -14,6 +15,7 @@ import TrainHeader from '@/components/train/TrainHeader';
 import TrainInfoCard from '@/components/train/TrainInfoCard';
 import TrainStopTimesTable from '@/components/train/TrainStopTimesTable';
 import TrainAdditionalInfo from '@/components/train/TrainAdditionalInfo';
+import PageLayout from '@/components/shared/PageLayout';
 import type { ExtendedVehicleJourney, Waypoint } from '@/components/train/types';
 
 const Train: React.FC = () => {
@@ -28,19 +30,13 @@ const Train: React.FC = () => {
             setLoading(false);
             return;
         }
-
         try {
-            if (isRefresh) {
-                setRefreshing(true);
-            } else {
-                setLoading(true);
-            }
+            if (isRefresh) setRefreshing(true);
+            else setLoading(true);
             setError(null);
-            // Decode the ID
             const decodedId = decodeVehicleJourneyId(id);
             const response = await getVehicleJourney(decodedId, 'sncf');
             const data = response.data;
-            
             if (data.vehicle_journeys && data.vehicle_journeys.length > 0) {
                 setTrainData(data.vehicle_journeys[0] as ExtendedVehicleJourney);
             } else {
@@ -51,11 +47,8 @@ const Train: React.FC = () => {
             setError('Erreur lors de la récupération des détails du train: ' + errorMessage);
             console.error(err);
         } finally {
-            if (isRefresh) {
-                setRefreshing(false);
-            } else {
-                setLoading(false);
-            }
+            if (isRefresh) setRefreshing(false);
+            else setLoading(false);
         }
     };
 
@@ -63,9 +56,7 @@ const Train: React.FC = () => {
         fetchTrainDetails();
     }, [id]);
 
-    const handleRefresh = (): void => {
-        fetchTrainDetails(true);
-    };
+    const handleRefresh = (): void => fetchTrainDetails(true);
 
     const headerTitle = id ? 'Détails du train' : 'Recherche de train';
     const TrainPageHeader = (
@@ -73,11 +64,9 @@ const Train: React.FC = () => {
             title={headerTitle}
             subtitle="Consultez un train précis ou lancez une recherche"
             showNotification={false}
-            
         />
     );
 
-    // Show search interface when no ID is provided
     if (!id) {
         return (
             <>
@@ -101,11 +90,7 @@ const Train: React.FC = () => {
         return (
             <>
                 {TrainPageHeader}
-                <TrainErrorState 
-                    error={error}
-                    onRefresh={handleRefresh}
-                    refreshing={refreshing}
-                />
+                <TrainErrorState error={error} onRefresh={handleRefresh} refreshing={refreshing} />
             </>
         );
     }
@@ -114,10 +99,7 @@ const Train: React.FC = () => {
     const stopTimes = trainData.stop_times || [];
     const commercialMode = displayInfo.commercial_mode || '';
     const network = displayInfo.network || '';
-    
-    // Extract train number using the utility function
     const trainNumber = extractTrainNumber(trainData, id);
-    
     const direction = displayInfo.direction || '';
 
     const waypoints: Waypoint[] = (stopTimes || [])
@@ -127,10 +109,8 @@ const Train: React.FC = () => {
             const coord = (stopPoint as { coord?: { lat?: number; lon?: number } }).coord || stopArea?.coord;
             const lat = coord?.lat;
             const lon = coord?.lon;
-
             if (typeof lat !== 'number' || typeof lon !== 'number') return null;
             if (!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-
             return {
                 lat,
                 lon,
@@ -140,58 +120,45 @@ const Train: React.FC = () => {
             };
         })
         .filter((w): w is Waypoint => w !== null)
-        // drop consecutive duplicates (happens with some datasets)
         .filter((w, idx, arr) => idx === 0 || w.lat !== arr[idx - 1].lat || w.lon !== arr[idx - 1].lon);
 
     return (
         <>
             {TrainPageHeader}
-            <section className='section'>
-                <div className='container'>
-                    <div className='box'>
-                        <TrainHeader 
-                            trainNumber={trainNumber}
-                            onRefresh={handleRefresh}
-                            refreshing={refreshing}
-                        />
+            <PageLayout>
+                <Paper sx={{ p: 2 }}>
+                    <TrainHeader trainNumber={trainNumber} onRefresh={handleRefresh} refreshing={refreshing} />
 
-                        {/* Advertisement */}
-                        <Ad format="horizontal" size="responsive" className="mb-5" />
+                    <Box sx={{ mb: 2 }}>
+                        <Ad format="horizontal" size="responsive" />
+                    </Box>
 
-                        {/* Train Header Info */}
-                        <TrainInfoCard 
-                            trainNumber={trainNumber}
-                            commercialMode={commercialMode}
-                            network={network}
-                            direction={direction}
-                        />
+                    <TrainInfoCard
+                        trainNumber={trainNumber}
+                        commercialMode={commercialMode}
+                        network={network}
+                        direction={direction}
+                    />
 
-                        {/* Map / Waypoints */}
-                        {waypoints.length > 0 && (
-                            <div className='box'>
-                                <h3 className='title is-4 mb-4'>Parcours</h3>
-                                <TrainWaypointsMap waypoints={waypoints} />
-                                <p className='help mt-3'>
-                                    Waypoints basés sur les coordonnées (<code>lat/lon</code>) des arrêts du train.
-                                </p>
-                            </div>
-                        )}
+                    {waypoints.length > 0 && (
+                        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }}>Parcours</Typography>
+                            <TrainWaypointsMap waypoints={waypoints} />
+                            <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                Waypoints basés sur les coordonnées (lat/lon) des arrêts du train.
+                            </Typography>
+                        </Paper>
+                    )}
 
-                        {/* Advertisement */}
-                        <Ad format="rectangle" size="responsive" className="mb-5" />
+                    <Box sx={{ mb: 2 }}>
+                        <Ad format="rectangle" size="responsive" />
+                    </Box>
 
-                        {/* Stop Times Table */}
-                        <TrainStopTimesTable stopTimes={stopTimes} />
+                    <TrainStopTimesTable stopTimes={stopTimes} />
 
-                        {/* Additional Information */}
-                        <TrainAdditionalInfo 
-                            trainData={trainData}
-                            displayInfo={displayInfo}
-                            stopTimes={stopTimes}
-                        />
-                    </div>
-                </div>
-            </section>
+                    <TrainAdditionalInfo trainData={trainData} displayInfo={displayInfo} stopTimes={stopTimes} />
+                </Paper>
+            </PageLayout>
             <Footer />
         </>
     );

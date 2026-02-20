@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Paper, Typography, Chip } from '@mui/material';
 import { getTransportIcon } from '@/services/transportService';
 
 interface TrainInfoCardProps {
@@ -8,42 +9,44 @@ interface TrainInfoCardProps {
     direction: string;
 }
 
-const TrainInfoCard: React.FC<TrainInfoCardProps> = ({ 
-    trainNumber, 
-    commercialMode, 
-    network, 
-    direction 
+const TrainInfoCard: React.FC<TrainInfoCardProps> = ({
+    trainNumber,
+    commercialMode,
+    network,
+    direction,
 }) => {
     const transportInfo = getTransportIcon(commercialMode, network);
+    const Icon = transportInfo.icon;
+
+    const chipColor = transportInfo.tagColor === 'is-danger' ? 'error' :
+        transportInfo.tagColor === 'is-warning' ? 'warning' :
+        transportInfo.tagColor === 'is-info' ? 'info' :
+        transportInfo.tagColor === 'is-success' ? 'success' :
+        transportInfo.tagColor === 'is-primary' ? 'primary' : 'default';
 
     return (
-        <div className='box has-background-light mb-5'>
-            <div className='columns is-vcentered'>
-                <div className='column is-narrow'>
-                    <span className={`icon is-large ${transportInfo.color}`}>
-                        <transportInfo.icon size={48} />
-                    </span>
-                </div>
-                <div className='column'>
-                    <h2 className='title is-3 mb-2'>{trainNumber}</h2>
-                    <div className='tags'>
-                        <span className={`tag ${transportInfo.tagColor} is-medium`}>
-                            {transportInfo.label}
-                        </span>
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, flexWrap: 'wrap' }}>
+                <Box sx={{ color: 'primary.main' }}>
+                    <Icon size={48} />
+                </Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="h5" sx={{ mb: 1 }}>{trainNumber}</Typography>
+                    <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mb: direction ? 1 : 0 }}>
+                        <Chip label={transportInfo.label} color={chipColor} size="small" />
                         {network && network !== commercialMode && (
-                            <span className='tag is-dark is-medium'>{network}</span>
+                            <Chip label={network} variant="outlined" size="small" />
                         )}
-                    </div>
+                    </Box>
                     {direction && (
-                        <p className='mt-2'>
+                        <Typography variant="body2">
                             <strong>Direction:</strong> {direction}
-                        </p>
+                        </Typography>
                     )}
-                </div>
-            </div>
-        </div>
+                </Box>
+            </Box>
+        </Paper>
     );
 };
 
 export default TrainInfoCard;
-

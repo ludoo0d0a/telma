@@ -1,15 +1,13 @@
 import React from 'react';
+import { Paper, Typography, CircularProgress } from '@mui/material';
 
 const CommercialModesLoadingState: React.FC = () => {
     return (
-        <div className='box has-text-centered'>
-            <div className='loader-wrapper'>
-                <div className='loader is-loading'></div>
-            </div>
-            <p className='mt-4 subtitle is-5'>Chargement des modes de transport...</p>
-        </div>
+        <Paper sx={{ p: 4, textAlign: 'center' }}>
+            <CircularProgress />
+            <Typography sx={{ mt: 2 }}>Chargement des modes de transport...</Typography>
+        </Paper>
     );
 };
 
 export default CommercialModesLoadingState;
-

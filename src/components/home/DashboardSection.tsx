@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Typography, Grid } from '@mui/material';
 import DashboardCard from './DashboardCard';
 
 interface DashboardCardData {
@@ -21,27 +22,22 @@ const DashboardSection: React.FC<DashboardSectionProps> = ({
     title,
     icon: Icon,
     cards,
-    columnsClass = 'is-one-third-tablet is-half-mobile',
-    columnsWrapperClassName = ''
 }) => {
     return (
-        <div className='skytrip-search-card mb-6'>
-            <h2 className='title is-3 mb-4'>
-                <span className='icon mr-2'>
-                    <Icon size={24} />
-                </span>
+        <Box sx={{ mb: 3 }}>
+            <Typography variant="h5" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Icon size={24} />
                 {title}
-            </h2>
-            <div className={`columns is-multiline ${columnsWrapperClassName}`.trim()}>
+            </Typography>
+            <Grid container spacing={2}>
                 {cards.map((card) => (
-                    <div key={card.path} className={`column ${columnsClass}`}>
+                    <Grid item key={card.path} xs={12} sm={6} md={4}>
                         <DashboardCard {...card} />
-                    </div>
+                    </Grid>
                 ))}
-            </div>
-        </div>
+            </Grid>
+        </Box>
     );
 };
 
 export default DashboardSection;
-

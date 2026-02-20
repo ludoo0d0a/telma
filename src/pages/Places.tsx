@@ -1,7 +1,21 @@
 import React, { useState } from 'react';
+import {
+    Box,
+    Paper,
+    TextField,
+    Button,
+    Alert,
+    Tabs,
+    Tab,
+    Typography,
+    Grid,
+    CircularProgress,
+} from '@mui/material';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
 import Ad from '@/components/Ad';
+import QueryOverview from '@/components/shared/QueryOverview';
+import PageLayout from '@/components/shared/PageLayout';
 import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
 import type { Place } from '@/client/models/place';
 import { Search, MapPin, Loader2 } from 'lucide-react';
@@ -12,7 +26,8 @@ const Places: React.FC = () => {
     const [places, setPlaces] = useState<Place[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
-    const [searchType, setSearchType] = useState<'text' | 'nearby'>('text'); // 'text' or 'nearby'
+    const [searchType, setSearchType] = useState<'text' | 'nearby'>('text');
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     const handleTextSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -24,12 +39,15 @@ const Places: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
+            setShowResults(false);
             const data = await searchPlaces(searchQuery);
             setPlaces(data.places || []);
+            setShowResults(true);
         } catch (err) {
             setError('Erreur lors de la recherche');
             console.error(err);
             setPlaces([]);
+            setShowResults(false);
         } finally {
             setLoading(false);
         }
@@ -45,12 +63,15 @@ const Places: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
+            setShowResults(false);
             const data = await getPlacesNearby(coordQuery);
             setPlaces(data.stop_areas || []);
+            setShowResults(true);
         } catch (err) {
             setError('Erreur lors de la recherche');
             console.error(err);
             setPlaces([]);
+            setShowResults(false);
         } finally {
             setLoading(false);
         }
@@ -62,162 +83,177 @@ const Places: React.FC = () => {
                 title="Recherche de lieux"
                 subtitle="Trouvez les gares et arrêts à proximité ou par mot-clé"
                 showNotification={false}
-                
             />
-            <section className='section'>
-                <div className='container'>
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-5" />
+            <PageLayout fullHeight={!showResults}>
+                {!showResults && (
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <Box sx={{ mb: 2 }}>
+                            <Ad format="horizontal" size="responsive" />
+                        </Box>
 
-                    <div className='box mb-5'>
-                        <h3 className='title is-5 mb-4'>Type de recherche</h3>
-                        <div className='tabs is-boxed mb-4'>
-                            <ul>
-                                <li className={searchType === 'text' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setSearchType('text');
-                                        setPlaces([]);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><Search size={16} /></span>
-                                        <span>Recherche par texte</span>
-                                    </a>
-                                </li>
-                                <li className={searchType === 'nearby' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setSearchType('nearby');
-                                        setPlaces([]);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><MapPin size={16} /></span>
-                                        <span>Recherche par coordonnées</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+                        <Paper sx={{ p: 2, mb: 2, flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Type de recherche
+                            </Typography>
+                            <Tabs
+                                value={searchType}
+                                onChange={(_, v: 'text' | 'nearby') => {
+                                    setSearchType(v);
+                                    setPlaces([]);
+                                    setError(null);
+                                    setShowResults(false);
+                                }}
+                                variant="fullWidth"
+                                sx={{ mb: 2 }}
+                            >
+                                <Tab
+                                    value="text"
+                                    icon={<Search size={16} />}
+                                    iconPosition="start"
+                                    label="Recherche par texte"
+                                />
+                                <Tab
+                                    value="nearby"
+                                    icon={<MapPin size={16} />}
+                                    iconPosition="start"
+                                    label="Recherche par coordonnées"
+                                />
+                            </Tabs>
 
-                        {searchType === 'text' ? (
-                            <form onSubmit={handleTextSearch}>
-                                <div className='field'>
-                                    <label className='label' htmlFor='search'>Rechercher un lieu</label>
-                                    <div className='control'>
-                                        <input
-                                            id='search'
-                                            className='input'
-                                            type='text'
-                                            value={searchQuery}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchQuery(e.target.value)}
-                                            placeholder='Ex: Paris, Gare du Nord...'
-                                            disabled={loading}
-                                        />
-                                    </div>
-                                </div>
-                                <div className='field'>
-                                    <div className='control'>
-                                        <button type='submit' className='button is-primary' disabled={loading}>
-                                            <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
-                                            <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        ) : (
-                            <form onSubmit={handleNearbySearch}>
-                                <div className='field'>
-                                    <label className='label' htmlFor='coord'>Coordonnées (format: lon;lat)</label>
-                                    <div className='control'>
-                                        <input
-                                            id='coord'
-                                            className='input'
-                                            type='text'
-                                            value={coordQuery}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setCoordQuery(e.target.value)}
-                                            placeholder='Ex: 2.3522;48.8566'
-                                            disabled={loading}
-                                        />
-                                    </div>
-                                    <p className='help'>Format: longitude;latitude (ex: 2.3522;48.8566 pour Paris)</p>
-                                </div>
-                                <div className='field'>
-                                    <div className='control'>
-                                        <button type='submit' className='button is-primary' disabled={loading}>
-                                            <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}</span>
-                                            <span>{loading ? 'Recherche...' : 'Rechercher'}</span>
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                            {searchType === 'text' ? (
+                                <form onSubmit={handleTextSearch}>
+                                    <TextField
+                                        fullWidth
+                                        label="Rechercher un lieu"
+                                        id="search"
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        placeholder="Ex: Paris, Gare du Nord..."
+                                        disabled={loading}
+                                        sx={{ mb: 2 }}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        disabled={loading}
+                                        fullWidth
+                                        startIcon={loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                                    >
+                                        {loading ? 'Recherche...' : 'Rechercher'}
+                                    </Button>
+                                </form>
+                            ) : (
+                                <form onSubmit={handleNearbySearch}>
+                                    <TextField
+                                        fullWidth
+                                        label="Coordonnées (format: lon;lat)"
+                                        id="coord"
+                                        value={coordQuery}
+                                        onChange={(e) => setCoordQuery(e.target.value)}
+                                        placeholder="Ex: 2.3522;48.8566"
+                                        helperText="Format: longitude;latitude (ex: 2.3522;48.8566 pour Paris)"
+                                        disabled={loading}
+                                        sx={{ mb: 2 }}
+                                    />
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        disabled={loading}
+                                        fullWidth
+                                        startIcon={loading ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                                    >
+                                        {loading ? 'Recherche...' : 'Rechercher'}
+                                    </Button>
+                                </form>
+                            )}
+                        </Paper>
+
+                        {error && !loading && (
+                            <Alert severity="error" onClose={() => setError(null)} sx={{ mt: 2 }}>
+                                {error}
+                            </Alert>
                         )}
-                    </div>
+                    </Box>
+                )}
 
-                    {loading && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des lieux...</p>
-                        </div>
-                    )}
+                {showResults && (
+                    <>
+                        <QueryOverview
+                            query={searchType === 'text' ? searchQuery : coordQuery}
+                            queryLabel={searchType === 'text' ? 'Recherche par texte' : 'Recherche par coordonnées'}
+                            onClick={() => setShowResults(false)}
+                        />
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                        </div>
-                    )}
+                        {loading && (
+                            <Paper sx={{ p: 4, textAlign: 'center' }}>
+                                <CircularProgress />
+                                <Typography sx={{ mt: 2 }}>Chargement des lieux...</Typography>
+                            </Paper>
+                        )}
 
-                    {!loading && places.length > 0 && (
-                        <>
-                            {/* Advertisement */}
-                            <Ad format="auto" size="responsive" className="mb-5" />
-                            
-                            <div className='box'>
-                                <h2 className='title is-4 mb-5'>
-                                    Résultats <span className='tag is-primary is-medium'>{places.length}</span>
-                                </h2>
-                            <div className='columns is-multiline'>
-                                {places.map((place, index) => (
-                                    <div key={place.id || index} className='column is-half is-half-mobile'>
-                                        <div className='box'>
-                                            <h3 className='title is-5 mb-3'>{place.name || 'Sans nom'}</h3>
-                                            <div className='content'>
-                                                <p><strong>Type:</strong> {place.embedded_type || 'N/A'}</p>
-                                                {place.id && (
-                                                    <p><strong>ID:</strong> <code>{place.id}</code></p>
-                                                )}
-                                                {place.administrative_regions && place.administrative_regions.length > 0 && (
-                                                    <p><strong>Région:</strong> {place.administrative_regions[0].name}</p>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                        
-                        {/* Advertisement */}
-                        <Ad format="rectangle" size="responsive" className="mb-5" />
-                        </>
-                    )}
+                        {error && !loading && (
+                            <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                                {error}
+                            </Alert>
+                        )}
 
-                    {!loading && places.length === 0 && !error && searchQuery && (
-                        <div className='box has-text-centered'>
-                            <div className='content'>
-                                <span className='icon is-large has-text-warning mb-4' style={{fontSize: '4rem'}}>📍</span>
-                                <h2 className='title is-4'>Aucun résultat trouvé</h2>
-                                <p className='subtitle is-6 has-text-grey'>
+                        {!loading && places.length > 0 && (
+                            <>
+                                <Box sx={{ mb: 2 }}>
+                                    <Ad format="auto" size="responsive" />
+                                </Box>
+
+                                <Paper sx={{ p: 2 }}>
+                                    <Typography variant="h5" sx={{ mb: 2 }}>
+                                        Résultats <Box component="span" sx={{ color: 'primary.main' }}>{places.length}</Box>
+                                    </Typography>
+                                    <Grid container spacing={2}>
+                                        {places.map((place, index) => (
+                                            <Grid item key={place.id || index} xs={12} sm={6}>
+                                                <Paper variant="outlined" sx={{ p: 2 }}>
+                                                    <Typography variant="h6" sx={{ mb: 1 }}>
+                                                        {place.name || 'Sans nom'}
+                                                    </Typography>
+                                                    <Typography variant="body2">
+                                                        <strong>Type:</strong> {place.embedded_type || 'N/A'}
+                                                    </Typography>
+                                                    {place.id && (
+                                                        <Typography variant="body2">
+                                                            <strong>ID:</strong> <code>{place.id}</code>
+                                                        </Typography>
+                                                    )}
+                                                    {place.administrative_regions && place.administrative_regions.length > 0 && (
+                                                        <Typography variant="body2">
+                                                            <strong>Région:</strong> {place.administrative_regions[0].name}
+                                                        </Typography>
+                                                    )}
+                                                </Paper>
+                                            </Grid>
+                                        ))}
+                                    </Grid>
+                                </Paper>
+
+                                <Box sx={{ mb: 2, mt: 2 }}>
+                                    <Ad format="rectangle" size="responsive" />
+                                </Box>
+                            </>
+                        )}
+
+                        {!loading && places.length === 0 && !error && (searchQuery || coordQuery) && (
+                            <Paper sx={{ p: 4, textAlign: 'center' }}>
+                                <Typography sx={{ fontSize: '4rem', mb: 2 }}>📍</Typography>
+                                <Typography variant="h5">Aucun résultat trouvé</Typography>
+                                <Typography color="text.secondary">
                                     Aucun lieu ne correspond à votre recherche.
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </section>
+                                </Typography>
+                            </Paper>
+                        )}
+                    </>
+                )}
+            </PageLayout>
             <Footer />
         </>
     );
 };
 
 export default Places;
-

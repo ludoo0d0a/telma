@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Paper, Typography, Grid, Chip, Link } from '@mui/material';
 import type { Coverage, CoverageResponse } from '@/client/models';
 import CoverageCard from './CoverageCard';
 import CoverageLinks from './CoverageLinks';
@@ -11,47 +12,42 @@ interface CoverageListProps {
 
 const CoverageList: React.FC<CoverageListProps> = ({ coverages, coverageResponse, onCoverageClick }) => {
     return (
-        <div className='box'>
-            <h2 className='title is-4 mb-5'>
-                Zones de couverture <span className='tag is-primary is-medium'>{coverages.length}</span>
-            </h2>
+        <Paper sx={{ p: 2 }}>
+            <Typography variant="h5" sx={{ mb: 2 }}>
+                Zones de couverture <Chip label={coverages.length} color="primary" size="small" sx={{ ml: 1 }} />
+            </Typography>
             {coverages.length === 0 ? (
-                <div className='has-text-centered'>
-                    <p className='subtitle is-5'>Aucune zone de couverture trouvée</p>
-                </div>
+                <Typography color="text.secondary" align="center" sx={{ py: 4 }}>
+                    Aucune zone de couverture trouvée
+                </Typography>
             ) : (
-                <div className='columns is-multiline'>
+                <Grid container spacing={2}>
                     {coverages.map((coverage) => (
-                        <CoverageCard 
-                            key={coverage.id} 
-                            coverage={coverage} 
-                            onClick={onCoverageClick}
-                        />
+                        <CoverageCard key={coverage.id} coverage={coverage} onClick={onCoverageClick} />
                     ))}
-                </div>
+                </Grid>
             )}
 
             {coverageResponse?.links && coverageResponse.links.length > 0 && (
-                <div className='mt-5'>
-                    <h3 className='title is-5 mb-3'>Liens disponibles</h3>
-                    <div className='tags'>
+                <Box sx={{ mt: 3 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Liens disponibles</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
                         {coverageResponse.links.map((link, index) => (
-                            <a
+                            <Link
                                 key={index}
                                 href={link.href}
-                                target='_blank'
-                                rel='noopener noreferrer'
-                                className='tag is-link is-medium'
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                sx={{ textDecoration: 'none' }}
                             >
-                                {link.type || link.rel || 'Lien'}
-                            </a>
+                                <Chip label={link.type || link.rel || 'Lien'} component="span" clickable />
+                            </Link>
                         ))}
-                    </div>
-                </div>
+                    </Box>
+                </Box>
             )}
-        </div>
+        </Paper>
     );
 };
 
 export default CoverageList;
-

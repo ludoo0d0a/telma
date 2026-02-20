@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, Box, Typography } from '@mui/material';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
 import { cleanLocationName } from '@/services/locationService';
 import { parseUTCDate } from '@/utils/dateUtils';
 import { Loader2, AlertTriangle, MapPin, Train, Ruler } from 'lucide-react';
-import {DEFAULT_RADIUS_NEARBY, DEFAULT_RADIUS_NEARBY_LARGE} from "@/pages/LocationDetection";
-import {StopAreasResponse} from "@/client";
+import { DEFAULT_RADIUS_NEARBY, DEFAULT_RADIUS_NEARBY_LARGE } from '@/pages/LocationDetection';
+import { StopAreasResponse } from '@/client';
 
 interface CurrentLocationInfo {
     station?: {
@@ -21,17 +22,47 @@ interface CurrentLocationInfo {
     error: string | null;
 }
 
+const LocationCard: React.FC<{
+    icon: React.ReactNode;
+    title: string;
+    subtitle: string;
+    onClick: () => void;
+    bgcolor?: string;
+    iconColor?: string;
+}> = ({ icon, title, subtitle, onClick, bgcolor = 'background.paper', iconColor = 'primary.main' }) => (
+    <Card
+        onClick={onClick}
+        sx={{
+            cursor: 'pointer',
+            transition: 'all 0.3s ease',
+            '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 },
+            bgcolor,
+        }}
+    >
+        <CardContent>
+            <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                <Box sx={{ color: iconColor, flexShrink: 0 }}>{icon}</Box>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="h6">{title}</Typography>
+                    <Typography variant="body2" color="text.secondary">
+                        {subtitle}
+                    </Typography>
+                </Box>
+            </Box>
+        </CardContent>
+    </Card>
+);
+
 const CurrentLocationWidget: React.FC = () => {
     const [locationInfo, setLocationInfo] = useState<CurrentLocationInfo>({
         loading: false,
-        error: null
+        error: null,
     });
     const navigate = useNavigate();
     const hasDetectedRef = useRef<boolean>(false);
 
-    // Calculate distance between two coordinates (Haversine formula)
     const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-        const R = 6371000; // Earth radius in meters
+        const R = 6371000;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -41,7 +72,6 @@ const CurrentLocationWidget: React.FC = () => {
         return R * c;
     };
 
-    // Find train at location (simplified version)
     const findTrainAtLocation = async (
         userLat: number,
         userLon: number,
@@ -53,16 +83,15 @@ const CurrentLocationWidget: React.FC = () => {
 
             const [departuresResponse, arrivalsResponse] = await Promise.all([
                 getDepartures(stopAreaId, nowStr, 'sncf', { count: 5, depth: 2 }),
-                getArrivals(stopAreaId, nowStr, 'sncf', { count: 5, depth: 2 })
+                getArrivals(stopAreaId, nowStr, 'sncf', { count: 5, depth: 2 }),
             ]);
 
             const allTrains = [
                 ...(departuresResponse.departures || []),
-                ...(arrivalsResponse.arrivals || [])
+                ...(arrivalsResponse.arrivals || []),
             ];
 
-            // Find the closest train by checking stop times
-            for (const train of allTrains.slice(0, 3)) { // Check first 3 trains
+            for (const train of allTrains.slice(0, 3)) {
                 const vehicleJourneyLink = train.links?.find(link =>
                     link.type === 'vehicle_journey' || link.id?.includes('vehicle_journey')
                 );
@@ -79,7 +108,6 @@ const CurrentLocationWidget: React.FC = () => {
 
                     const stopTimes = vehicleJourney.stop_times as Array<any>;
 
-                    // Check if train is at a stop near user location
                     for (const stopTime of stopTimes) {
                         const stopPoint = stopTime.stop_point;
                         const coord = stopPoint?.coord || stopPoint?.stop_area?.coord;
@@ -95,46 +123,37 @@ const CurrentLocationWidget: React.FC = () => {
                             const stopDateTime = parseUTCDate(timeStr);
                             const timeDiff = Math.abs(now.getTime() - stopDateTime.getTime());
 
-                            // Train should be at this stop if distance < 100m and time < 5 minutes
                             if (distance < 100 && timeDiff < 5 * 60 * 1000) {
-                                // VehicleJourney doesn't have display_informations, construct it from available properties
                                 const displayInfo = train.display_informations || {
                                     headsign: vehicleJourney.headsign || '',
                                     trip_short_name: vehicleJourney.name || '',
                                     network: (vehicleJourney.journey_pattern as any)?.route?.line?.network?.name || 'SNCF',
-                                    direction: vehicleJourney.headsign || ''
+                                    direction: vehicleJourney.headsign || '',
                                 };
                                 return {
                                     number: displayInfo?.headsign || displayInfo?.trip_short_name || 'N/A',
-                                    destination: displayInfo?.direction || 'Inconnu'
+                                    destination: displayInfo?.direction || 'Inconnu',
                                 };
                             }
                         }
                     }
-                } catch (err) {
+                } catch {
                     continue;
                 }
             }
 
             return null;
-        } catch (err) {
-            console.error('Error finding train:', err);
+        } catch {
             return null;
         }
     };
 
     const detectCurrentLocation = useCallback(async () => {
-        // Prevent multiple calls
-        if (hasDetectedRef.current) {
-            return;
-        }
+        if (hasDetectedRef.current) return;
         hasDetectedRef.current = true;
 
         if (!navigator.geolocation) {
-            setLocationInfo({
-                loading: false,
-                error: 'Géolocalisation non supportée'
-            });
+            setLocationInfo({ loading: false, error: 'Géolocalisation non supportée' });
             return;
         }
 
@@ -142,28 +161,23 @@ const CurrentLocationWidget: React.FC = () => {
 
         try {
             const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-                navigator.geolocation.getCurrentPosition(
-                    resolve,
-                    reject,
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 10000,
-                        maximumAge: 60000 // Cache for 1 minute
-                    }
-                );
+                navigator.geolocation.getCurrentPosition(resolve, reject, {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000,
+                });
             });
 
             const { latitude, longitude } = position.coords;
-
-            // Find nearby stations
             const coordStr = `${longitude};${latitude}`;
-            let response:StopAreasResponse ;
+            let response: StopAreasResponse;
+
             try {
                 response = await getPlacesNearby(coordStr, 'sncf', {
                     type: ['stop_area', 'stop_point'],
                     count: 5,
                     distance: DEFAULT_RADIUS_NEARBY,
-                    depth: 2
+                    depth: 2,
                 });
             } catch (apiError: any) {
                 if (apiError?.response?.status === 404) {
@@ -172,34 +186,24 @@ const CurrentLocationWidget: React.FC = () => {
                             type: ['stop_area', 'stop_point'],
                             count: 5,
                             distance: DEFAULT_RADIUS_NEARBY_LARGE,
-                            depth: 2
+                            depth: 2,
                         });
-                    } catch (fallbackError) {
-                        setLocationInfo({
-                            loading: false,
-                            error: 'Zone non couverte'
-                        });
+                    } catch {
+                        setLocationInfo({ loading: false, error: 'Zone non couverte' });
                         return;
                     }
                 } else {
-                    setLocationInfo({
-                        loading: false,
-                        error: 'Erreur de recherche'
-                    });
+                    setLocationInfo({ loading: false, error: 'Erreur de recherche' });
                     return;
                 }
             }
 
             const stations = response.stop_areas || [];
             if (stations.length === 0) {
-                setLocationInfo({
-                    loading: false,
-                    error: null
-                });
+                setLocationInfo({ loading: false, error: null });
                 return;
             }
 
-            // Find closest station
             let closestStation: any = null;
             let minDistance = Infinity;
 
@@ -215,16 +219,10 @@ const CurrentLocationWidget: React.FC = () => {
             }
 
             if (!closestStation) {
-                setLocationInfo({
-                    loading: false,
-                    error: null,
-                    station: undefined,
-                    train: undefined
-                });
+                setLocationInfo({ loading: false, error: null, station: undefined, train: undefined });
                 return;
             }
 
-            // If the closest station is more than 200m away, we're not inside, so don't check for trains
             if (minDistance > 200) {
                 setLocationInfo({
                     station: {
@@ -233,11 +231,11 @@ const CurrentLocationWidget: React.FC = () => {
                             closestStation.stop_point?.name ||
                             closestStation.name
                         ) || 'Gare inconnue',
-                        distance: Math.round(minDistance)
+                        distance: Math.round(minDistance),
                     },
                     train: undefined,
                     loading: false,
-                    error: null
+                    error: null,
                 });
                 return;
             }
@@ -249,142 +247,108 @@ const CurrentLocationWidget: React.FC = () => {
                 closestStation.name
             ) || 'Gare inconnue';
 
-            // Try to find train
-            const train = await findTrainAtLocation(
-                latitude,
-                longitude,
-                stationId
-            );
+            const train = await findTrainAtLocation(latitude, longitude, stationId);
 
             setLocationInfo({
                 station: {
                     name: stationName,
-                    distance: Math.round(minDistance)
+                    distance: Math.round(minDistance),
                 },
                 train: train || undefined,
                 loading: false,
-                error: null
+                error: null,
             });
         } catch (err: any) {
-            console.error('Error detecting location:', err);
             setLocationInfo({
                 loading: false,
-                error: err?.message || 'Erreur de détection'
+                error: err?.message || 'Erreur de détection',
             });
         }
     }, []);
 
-    // Initial detection on mount - only once
     useEffect(() => {
         detectCurrentLocation();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency array ensures this runs only once on mount
+    }, []);
 
-    const handleClick = () => {
-        navigate('/location-detection');
-    };
+    const handleClick = () => navigate('/location-detection');
 
     if (locationInfo.loading) {
         return (
-            <div className='card dashboard-card current-location-widget' onClick={handleClick}>
-                <div className='card-content'>
-                    <div className='media'>
-                        <div className='media-left'>
-                            <span className='icon is-large has-text-primary'>
-                                <Loader2 size={32} className="animate-spin" />
-                            </span>
-                        </div>
-                        <div className='media-content'>
-                            <p className='title is-5'>Détection en cours...</p>
-                            <p className='subtitle is-6 has-text-secondary'>Localisation de votre position</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <LocationCard
+                icon={<Loader2 size={32} className="animate-spin" />}
+                title="Détection en cours..."
+                subtitle="Localisation de votre position"
+                onClick={handleClick}
+                iconColor="primary.main"
+            />
         );
     }
 
     if (locationInfo.error) {
         return (
-            <div className='card dashboard-card current-location-widget' onClick={handleClick}>
-                <div className='card-content'>
-                    <div className='media'>
-                        <div className='media-left'>
-                            <span className='icon is-large has-text-warning'>
-                                <AlertTriangle size={32} />
-                            </span>
-                        </div>
-                        <div className='media-content'>
-                            <p className='title is-5'>Position non détectée</p>
-                            <p className='subtitle is-6 has-text-secondary'>Cliquez pour détecter votre position</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <LocationCard
+                icon={<AlertTriangle size={32} />}
+                title="Position non détectée"
+                subtitle="Cliquez pour détecter votre position"
+                onClick={handleClick}
+                iconColor="warning.main"
+            />
         );
     }
 
     if (!locationInfo.station) {
         return (
-            <div className='card dashboard-card current-location-widget' onClick={handleClick}>
-                <div className='card-content'>
-                    <div className='media'>
-                        <div className='media-left'>
-                            <span className='icon is-large has-text-grey'>
-                                <MapPin size={32} />
-                            </span>
-                        </div>
-                        <div className='media-content'>
-                            <p className='title is-5'>Aucune gare détectée</p>
-                            <p className='subtitle is-6 has-text-secondary'>Cliquez pour détecter votre position</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <LocationCard
+                icon={<MapPin size={32} />}
+                title="Aucune gare détectée"
+                subtitle="Cliquez pour détecter votre position"
+                onClick={handleClick}
+                iconColor="text.secondary"
+            />
         );
     }
 
     return (
-        <div className='card dashboard-card current-location-widget has-background-info' onClick={handleClick}>
-            <div className='card-content'>
-                <div className='media'>
-                    <div className='media-left'>
-                        <span className='icon is-large has-text-white'>
-                            {locationInfo.train ? (
-                                <Train size={32} />
-                            ) : (
-                                <MapPin size={32} />
-                            )}
-                        </span>
-                    </div>
-                    <div className='media-content'>
+        <Card
+            onClick={handleClick}
+            sx={{
+                cursor: 'pointer',
+                bgcolor: 'info.main',
+                color: 'white',
+                transition: 'all 0.3s ease',
+                '&:hover': { transform: 'translateY(-2px)', boxShadow: 3 },
+            }}
+        >
+            <CardContent>
+                <Box sx={{ display: 'flex', alignItems: 'flex-start', gap: 2 }}>
+                    <Box sx={{ flexShrink: 0 }}>
+                        {locationInfo.train ? <Train size={32} /> : <MapPin size={32} />}
+                    </Box>
+                    <Box sx={{ flex: 1, minWidth: 0 }}>
                         {locationInfo.train ? (
                             <>
-                                <p className='title is-5 has-text-white'>
+                                <Typography variant="h6">
                                     Train {locationInfo.train.number}
-                                </p>
-                                <p className='subtitle is-6 has-text-white'>
-                                    <span className='icon is-small'><MapPin size={16} /></span>
+                                </Typography>
+                                <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                                    <MapPin size={16} />
                                     {locationInfo.station.name} • Destination: {locationInfo.train.destination}
-                                </p>
+                                </Typography>
                             </>
                         ) : (
                             <>
-                                <p className='title is-5 has-text-white'>
-                                    {locationInfo.station.name}
-                                </p>
-                                <p className='subtitle is-6 has-text-white'>
-                                    <span className='icon is-small'><Ruler size={16} /></span>
+                                <Typography variant="h6">{locationInfo.station.name}</Typography>
+                                <Typography variant="body2" sx={{ display: 'flex', alignItems: 'center', gap: 0.5, mt: 0.5 }}>
+                                    <Ruler size={16} />
                                     À {locationInfo.station.distance}m • Cliquez pour plus d'infos
-                                </p>
+                                </Typography>
                             </>
                         )}
-                    </div>
-                </div>
-            </div>
-        </div>
+                    </Box>
+                </Box>
+            </CardContent>
+        </Card>
     );
 };
 
 export default CurrentLocationWidget;
-

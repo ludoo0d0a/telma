@@ -1,20 +1,39 @@
 import React, { useState } from 'react';
+import {
+    Box,
+    Paper,
+    TextField,
+    Button,
+    Alert,
+    Tabs,
+    Tab,
+    Typography,
+    CircularProgress,
+} from '@mui/material';
 import { Route, TrafficCone, Settings, Loader2, Download } from 'lucide-react';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
+import QueryOverview from '@/components/shared/QueryOverview';
+import PageLayout from '@/components/shared/PageLayout';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '@/services/navitiaApi';
-import type { 
+import type {
     CoverageCoverageLineReportsGet200Response,
     CoverageCoverageTrafficReportsGet200Response,
-    CoverageCoverageEquipmentReportsGet200Response
+    CoverageCoverageEquipmentReportsGet200Response,
 } from '@/client/models';
 
 const Reports: React.FC = () => {
-    const [reportType, setReportType] = useState<'line' | 'traffic' | 'equipment'>('traffic'); // 'line', 'traffic', 'equipment'
+    const [reportType, setReportType] = useState<'line' | 'traffic' | 'equipment'>('traffic');
     const [filter, setFilter] = useState<string>('');
-    const [reports, setReports] = useState<CoverageCoverageLineReportsGet200Response | CoverageCoverageTrafficReportsGet200Response | CoverageCoverageEquipmentReportsGet200Response | null>(null);
+    const [reports, setReports] = useState<
+        | CoverageCoverageLineReportsGet200Response
+        | CoverageCoverageTrafficReportsGet200Response
+        | CoverageCoverageEquipmentReportsGet200Response
+        | null
+    >(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const [showResults, setShowResults] = useState<boolean>(false);
 
     const handleSearch = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
         e.preventDefault();
@@ -26,6 +45,7 @@ const Reports: React.FC = () => {
         try {
             setLoading(true);
             setError(null);
+            setShowResults(false);
             let response;
             switch (reportType) {
                 case 'line':
@@ -42,13 +62,35 @@ const Reports: React.FC = () => {
             }
 
             setReports(response);
+            setShowResults(true);
         } catch (err) {
             setError('Erreur lors de la récupération des rapports');
             console.error(err);
             setReports(null);
+            setShowResults(false);
         } finally {
             setLoading(false);
         }
+    };
+
+    const getReportTypeLabel = (): string => {
+        switch (reportType) {
+            case 'line':
+                return 'Rapports de ligne';
+            case 'traffic':
+                return 'Rapports de trafic';
+            case 'equipment':
+                return "Rapports d'équipement";
+            default:
+                return 'Rapports';
+        }
+    };
+
+    const getQueryDisplay = (): string => {
+        if (reportType === 'traffic') {
+            return 'Tous les rapports de trafic';
+        }
+        return filter || 'Aucun filtre';
     };
 
     return (
@@ -57,121 +99,113 @@ const Reports: React.FC = () => {
                 title="Rapports et informations"
                 subtitle="Téléchargez les rapports de ligne, trafic ou équipements"
                 showNotification={false}
-                
             />
-            <section className='section'>
-                <div className='container'>
-                    <div className='box mb-5'>
-                        <h3 className='title is-5 mb-4'>Type de rapport</h3>
-                        <div className='tabs is-boxed mb-4'>
-                            <ul>
-                                <li className={reportType === 'line' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setReportType('line');
-                                        setReports(null);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><Route size={16} /></span>
-                                        <span>Rapports de ligne</span>
-                                    </a>
-                                </li>
-                                <li className={reportType === 'traffic' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setReportType('traffic');
-                                        setReports(null);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><TrafficCone size={16} /></span>
-                                        <span>Rapports de trafic</span>
-                                    </a>
-                                </li>
-                                <li className={reportType === 'equipment' ? 'is-active' : ''}>
-                                    <a onClick={() => {
-                                        setReportType('equipment');
-                                        setReports(null);
-                                        setError(null);
-                                    }}>
-                                        <span className='icon is-small'><Settings size={16} /></span>
-                                        <span>Rapports d'équipement</span>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
+            <PageLayout fullHeight={!showResults}>
+                {!showResults && (
+                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                        <Paper sx={{ p: 2, mb: 2, flex: 1 }}>
+                            <Typography variant="h6" sx={{ mb: 2 }}>
+                                Type de rapport
+                            </Typography>
+                            <Tabs
+                                value={reportType}
+                                onChange={(_, v: 'line' | 'traffic' | 'equipment') => {
+                                    setReportType(v);
+                                    setReports(null);
+                                    setError(null);
+                                    setShowResults(false);
+                                }}
+                                variant="fullWidth"
+                                sx={{ mb: 2 }}
+                            >
+                                <Tab value="line" icon={<Route size={16} />} iconPosition="start" label="Rapports de ligne" />
+                                <Tab value="traffic" icon={<TrafficCone size={16} />} iconPosition="start" label="Rapports de trafic" />
+                                <Tab value="equipment" icon={<Settings size={16} />} iconPosition="start" label="Rapports d'équipement" />
+                            </Tabs>
 
-                        <form onSubmit={handleSearch}>
-                            {(reportType === 'line' || reportType === 'equipment') && (
-                                <div className='field'>
-                                    <label className='label' htmlFor='filter'>
-                                        Filtre {reportType === 'equipment' ? '(optionnel)' : '(requis)'}
-                                    </label>
-                                    <div className='control'>
-                                        <input
-                                            id='filter'
-                                            className='input'
-                                            type='text'
-                                            value={filter}
-                                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value)}
-                                            placeholder='Ex: line.id=line:SNCF:1'
-                                            disabled={loading}
-                                        />
-                                    </div>
-                                </div>
-                            )}
+                            <form onSubmit={handleSearch}>
+                                {(reportType === 'line' || reportType === 'equipment') && (
+                                    <TextField
+                                        fullWidth
+                                        label={`Filtre ${reportType === 'equipment' ? '(optionnel)' : '(requis)'}`}
+                                        id="filter"
+                                        value={filter}
+                                        onChange={(e) => setFilter(e.target.value)}
+                                        placeholder="Ex: line.id=line:SNCF:1"
+                                        disabled={loading}
+                                        sx={{ mb: 2 }}
+                                    />
+                                )}
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    disabled={loading}
+                                    fullWidth
+                                    startIcon={loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                                >
+                                    {loading ? 'Chargement...' : 'Récupérer les rapports'}
+                                </Button>
+                            </form>
+                        </Paper>
 
-                            <div className='field'>
-                                <div className='control'>
-                                    <button type='submit' className='button is-primary' disabled={loading}>
-                                        <span className='icon'>{loading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}</span>
-                                        <span>{loading ? 'Chargement...' : 'Récupérer les rapports'}</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
+                        {error && !loading && (
+                            <Alert severity="error" onClose={() => setError(null)} sx={{ mt: 2 }}>
+                                {error}
+                            </Alert>
+                        )}
+                    </Box>
+                )}
 
-                    {loading && (
-                        <div className='box has-text-centered'>
-                            <div className='loader-wrapper'>
-                                <div className='loader is-loading'></div>
-                            </div>
-                            <p className='mt-4 subtitle is-5'>Chargement des rapports...</p>
-                        </div>
-                    )}
+                {showResults && (
+                    <>
+                        <QueryOverview
+                            query={getQueryDisplay()}
+                            queryLabel={getReportTypeLabel()}
+                            onClick={() => setShowResults(false)}
+                        />
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            <p className='title is-5'>Erreur</p>
-                            <p>{error}</p>
-                        </div>
-                    )}
+                        {loading && (
+                            <Paper sx={{ p: 4, textAlign: 'center' }}>
+                                <CircularProgress />
+                                <Typography sx={{ mt: 2 }}>Chargement des rapports...</Typography>
+                            </Paper>
+                        )}
 
-                    {!loading && reports && (
-                        <div className='box'>
-                            <h2 className='title is-4 mb-5'>Résultats</h2>
-                            <div className='content'>
-                                <div className='table-container'>
-                                    <pre style={{
+                        {error && !loading && (
+                            <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                                {error}
+                            </Alert>
+                        )}
+
+                        {!loading && reports && (
+                            <Paper sx={{ p: 2 }}>
+                                <Typography variant="h5" sx={{ mb: 2 }}>
+                                    Résultats
+                                </Typography>
+                                <Box
+                                    component="pre"
+                                    sx={{
                                         background: 'rgba(0, 0, 0, 0.3)',
-                                        borderRadius: '10px',
-                                        padding: '1.5rem',
+                                        borderRadius: 2,
+                                        p: 2,
                                         overflow: 'auto',
                                         color: '#ccc',
                                         fontFamily: "'Roboto Mono', monospace",
                                         fontSize: '0.9rem',
                                         whiteSpace: 'pre-wrap',
-                                        wordWrap: 'break-word'
-                                    }}>{JSON.stringify(reports, null, 2)}</pre>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </section>
+                                        wordWrap: 'break-word',
+                                    }}
+                                >
+                                    {JSON.stringify(reports, null, 2)}
+                                </Box>
+                            </Paper>
+                        )}
+                    </>
+                )}
+            </PageLayout>
             <Footer />
         </>
     );
 };
 
 export default Reports;
-

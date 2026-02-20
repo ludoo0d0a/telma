@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { Box, Paper, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Alert } from '@mui/material';
 import Footer from '@/components/Footer';
+import PageLayout from '@/components/shared/PageLayout';
 import { PageHeader } from '@/components/skytrip';
 import GeoJSONMap from '@/components/GeoJSONMap';
 import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
@@ -504,16 +506,12 @@ const Trip: React.FC = () => {
         return (
             <>
                 {TripHeader}
-                <section className='section'>
-                    <div className='container'>
-                        <div className='box has-text-centered'>
-                            <span className='icon is-large'>
-                                <Loader2 size={48} className="animate-spin" />
-                            </span>
-                            <p className='mt-4'>Chargement des détails du trajet...</p>
-                        </div>
-                    </div>
-                </section>
+                <PageLayout>
+                    <Paper sx={{ p: 4, textAlign: 'center' }}>
+                        <Loader2 size={48} className="animate-spin" />
+                        <Typography sx={{ mt: 2 }}>Chargement des détails du trajet...</Typography>
+                    </Paper>
+                </PageLayout>
                 <Footer />
             </>
         );
@@ -532,46 +530,26 @@ const Trip: React.FC = () => {
             return (
                 <>
                     {TripHeader}
-                    <section className='section'>
-                        <div className='container'>
-                            <div className='box has-text-centered mb-5'>
-                                <span className='icon is-large has-text-info'>
-                                    <Route size={48} />
-                                </span>
-                                <p className='mt-4'>Sélectionnez un exemple de trajet ci-dessous</p>
-                            </div>
-                            
-                            {/* Samples Section */}
-                            <div className='mt-6'>
-                                <h3 className='title is-4 mb-4'>Exemples</h3>
-                                <div className='columns is-multiline'>
-                                    {sampleTripIds.map((sample) => (
-                                        <div key={sample.id} className='column is-half'>
-                                            <Link 
-                                                to={`/trip/${encodeTripId(sample.id)}`}
-                                                className='box is-clickable'
-                                                style={{ textDecoration: 'none' }}
-                                            >
-                                                <div className='is-flex is-align-items-center'>
-                                                    <span className='icon is-large has-text-primary mr-3'>
-                                                        <Route size={32} />
-                                                    </span>
-                                                    <div>
-                                                        <p className='title is-5 mb-1'>
-                                                            {sample.label}
-                                                        </p>
-                                                        <p className='subtitle is-6 has-text-grey'>
-                                                            Cliquez pour voir les détails
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </Link>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+                    <PageLayout>
+                        <Paper sx={{ p: 4, textAlign: 'center', mb: 2 }}>
+                            <Route size={48} color="var(--primary)" />
+                            <Typography sx={{ mt: 2 }}>Sélectionnez un exemple de trajet ci-dessous</Typography>
+                        </Paper>
+                        <Typography variant="h6" sx={{ mb: 2 }}>Exemples</Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                            {sampleTripIds.map((sample) => (
+                                <Link key={sample.id} to={`/trip/${encodeTripId(sample.id)}`} style={{ textDecoration: 'none', flex: '1 1 200px', maxWidth: 400 }}>
+                                    <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, '&:hover': { bgcolor: 'action.hover' } }}>
+                                        <Route size={32} color="var(--primary)" />
+                                        <Box>
+                                            <Typography variant="h6">{sample.label}</Typography>
+                                            <Typography variant="body2" color="text.secondary">Cliquez pour voir les détails</Typography>
+                                        </Box>
+                                    </Paper>
+                                </Link>
+                            ))}
+                        </Box>
+                    </PageLayout>
                     <Footer />
                 </>
             );
@@ -580,30 +558,20 @@ const Trip: React.FC = () => {
         return (
             <>
                 {TripHeader}
-                <section className='section'>
-                    <div className='container'>
-                        <div className='box has-text-centered'>
-                            <span className='icon is-large has-text-danger'>
-                                <AlertTriangle size={48} />
-                            </span>
-                            <p className='mt-4 has-text-danger'>{error || 'Trajet non trouvé'}</p>
-                            <div className='buttons is-centered mt-4'>
-                                <button onClick={() => navigate(-1)} className='button is-primary'>
-                                    Retour
-                                </button>
-                                {vehicleJourneyId && (
-                                    <Link 
-                                        to={`/train/${encodeVehicleJourneyId(vehicleJourneyId)}`}
-                                        className='button is-link'
-                                    >
-                                        <span className='icon'><TrainIcon size={20} /></span>
-                                        <span>Voir les détails du train</span>
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                <PageLayout>
+                    <Paper sx={{ p: 4, textAlign: 'center' }}>
+                        <AlertTriangle size={48} color="var(--primary)" />
+                        <Typography color="error" sx={{ mt: 2 }}>{error || 'Trajet non trouvé'}</Typography>
+                        <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center', mt: 2 }}>
+                            <Button variant="contained" onClick={() => navigate(-1)}>Retour</Button>
+                            {vehicleJourneyId && (
+                                <Button component={Link} to={`/train/${encodeVehicleJourneyId(vehicleJourneyId)}`} startIcon={<TrainIcon size={20} />}>
+                                    Voir les détails du train
+                                </Button>
+                            )}
+                        </Box>
+                    </Paper>
+                </PageLayout>
                 <Footer />
             </>
         );
@@ -661,192 +629,150 @@ const Trip: React.FC = () => {
         }
     };
 
+    const TransportIcon = transportInfo.icon;
+    const chipColor = transportInfo.tagColor === 'is-danger' ? 'error' : transportInfo.tagColor === 'is-warning' ? 'warning' : transportInfo.tagColor === 'is-info' ? 'info' : transportInfo.tagColor === 'is-success' ? 'success' : transportInfo.tagColor === 'is-primary' ? 'primary' : 'default';
+
     return (
         <>
             {TripHeader}
-            <section className='section'>
-                <div className='container'>
-                    <div className='level mb-5'>
-                        <div className='level-left'>
-                        </div>
-                        <div className='level-right'>
-                            <div className='level-item'>
-                                <button 
-                                    className='button is-light' 
-                                    onClick={() => {
-                                        loadTripData(true);
-                                    }}
-                                    disabled={loading}
-                                >
-                                    <span className='icon'>
-                                        {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
-                                    </span>
-                                    <span>Actualiser</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <PageLayout>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                    <Button
+                        variant="outlined"
+                        onClick={() => loadTripData(true)}
+                        disabled={loading}
+                        startIcon={loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
+                    >
+                        Actualiser
+                    </Button>
+                </Box>
 
-                    {/* Train Information */}
-                    <div className='box mb-5'>
-                        <h2 className='title is-4 mb-4'>Informations du train</h2>
-                        <div className='columns'>
-                            <div className='column'>
-                                <div className='is-flex is-align-items-center mb-3'>
-                                    <span className={`icon ${transportInfo.color} mr-3`} style={{ fontSize: '2rem' }}>
-                                        <transportInfo.icon size={32} />
-                                    </span>
-                                    <div>
-                                        <h3 className='title is-5 mb-1'>
-                                            {info.trainNumber}
-                                        </h3>
-                                        <span className={`tag ${transportInfo.tagColor} is-medium`}>
-                                            {transportInfo.label}
-                                        </span>
-                                        {info.network && info.network !== info.commercialMode && (
-                                            <span className='tag is-dark ml-2'>{info.network}</span>
-                                        )}
-                                    </div>
-                                </div>
+                <Paper sx={{ p: 2, mb: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Informations du train</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 3 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <TransportIcon size={32} />
+                            <Box>
+                                <Typography variant="h6">{info.trainNumber}</Typography>
+                                <Box sx={{ display: 'flex', gap: 1, mt: 0.5 }}>
+                                    <Chip label={transportInfo.label} color={chipColor} size="small" />
+                                    {info.network && info.network !== info.commercialMode && (
+                                        <Chip label={info.network} variant="outlined" size="small" />
+                                    )}
+                                </Box>
                                 {info.vehicleJourneyId && (() => {
-                                    // Ensure we have a string ID, not an object
                                     let trainId = info.vehicleJourneyId;
                                     if (typeof trainId === 'object' && trainId !== null) {
                                         trainId = (trainId as { id?: string; href?: string }).id || (trainId as { id?: string; href?: string }).href || null;
                                     }
                                     return trainId ? (
-                                        <Link 
-                                            to={`/train/${encodeVehicleJourneyId(trainId)}`}
-                                            className='button is-small is-link'
-                                        >
-                                            <span className='icon'><TrainIcon size={20} /></span>
-                                            <span>Voir les détails du train</span>
-                                        </Link>
+                                        <Button component={Link} to={`/train/${encodeVehicleJourneyId(trainId)}`} size="small" startIcon={<TrainIcon size={20} />} sx={{ mt: 1 }}>
+                                            Voir les détails du train
+                                        </Button>
                                     ) : null;
                                 })()}
-                            </div>
-                            <div className='column'>
-                                <div className='content'>
-                                    <p><strong>Gare de départ:</strong> {info.departureStation}</p>
-                                    <p><strong>Gare d'arrivée:</strong> {info.arrivalStation}</p>
-                                    <p><strong>Date:</strong> {depDate ? formatDate(depDate) : '-'}</p>
-                                    <p><strong>Durée totale:</strong> {formatDuration(info.duration)}</p>
-                                    {info.wagonCount && (
-                                        <p><strong>Nombre de wagons:</strong> {info.wagonCount}</p>
+                            </Box>
+                        </Box>
+                        <Box>
+                            <Typography><strong>Gare de départ:</strong> {info.departureStation}</Typography>
+                            <Typography><strong>Gare d'arrivée:</strong> {info.arrivalStation}</Typography>
+                            <Typography><strong>Date:</strong> {depDate ? formatDate(depDate) : '-'}</Typography>
+                            <Typography><strong>Durée totale:</strong> {formatDuration(info.duration)}</Typography>
+                            {info.wagonCount && <Typography><strong>Nombre de wagons:</strong> {info.wagonCount}</Typography>}
+                        </Box>
+                    </Box>
+                </Paper>
+
+                {(sectionsWithGeoJSON.length > 0 || journeyMarkers.length > 0) && (
+                    <Paper sx={{ p: 2, mb: 2 }}>
+                        <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <Map size={20} />
+                            Carte de l'itinéraire
+                        </Typography>
+                        <GeoJSONMap
+                            geojsonData={sectionsWithGeoJSON.length > 0 ? sectionsWithGeoJSON : undefined}
+                            markers={journeyMarkers || []}
+                            height={400}
+                        />
+                    </Paper>
+                )}
+
+                {disruptions && disruptions.length > 0 && (
+                    <Paper sx={{ p: 2, mb: 2 }}>
+                        <Typography variant="h6" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <AlertTriangle size={20} />
+                            Perturbations ({disruptions.length})
+                        </Typography>
+                        {disruptions.map((disruption, index) => {
+                            let severityText = 'unknown';
+                            if (typeof disruption.severity === 'string') {
+                                severityText = disruption.severity;
+                            } else if (disruption.severity && typeof disruption.severity === 'object') {
+                                severityText = (disruption.severity as { name?: string; label?: string }).name ||
+                                    (disruption.severity as { name?: string; label?: string }).label || 'Perturbation';
+                            }
+                            const severityLevel = severityText.toLowerCase();
+                            let alertSeverity: 'error' | 'warning' | 'info' = 'warning';
+                            let IconComponent = AlertTriangle;
+                            if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
+                                alertSeverity = 'error';
+                                IconComponent = Ban;
+                            } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
+                                alertSeverity = 'info';
+                                IconComponent = Info;
+                            } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
+                                IconComponent = Clock;
+                            }
+                            return (
+                                <Alert key={index} severity={alertSeverity} icon={<IconComponent size={20} />} sx={{ mb: 2 }}>
+                                    <Typography fontWeight={600}>{severityText !== 'unknown' ? severityText : 'Perturbation'}</Typography>
+                                    {disruption.messages && Array.isArray(disruption.messages) && disruption.messages.length > 0 && (
+                                        <Box sx={{ mt: 1 }}>
+                                            {disruption.messages.map((msg, msgIndex) => (
+                                                <Typography key={msgIndex} sx={{ mb: 1 }}>
+                                                    {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
+                                                </Typography>
+                                            ))}
+                                        </Box>
                                     )}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Journey Map */}
-                    {(sectionsWithGeoJSON.length > 0 || journeyMarkers.length > 0) && (
-                        <div className='box mb-5'>
-                            <h2 className='title is-4 mb-4'>
-                                <span className='icon mr-2'>
-                                    <Map size={20} />
-                                </span>
-                                Carte de l'itinéraire
-                            </h2>
-                            <GeoJSONMap 
-                                geojsonData={sectionsWithGeoJSON.length > 0 ? sectionsWithGeoJSON : undefined}
-                                markers={journeyMarkers || []}
-                                height={400}
-                            />
-                        </div>
-                    )}
-
-                    {/* Disruptions */}
-                    {disruptions && disruptions.length > 0 && (
-                        <div className='box mb-5'>
-                            <h2 className='title is-4 mb-4'>
-                                <span className='icon has-text-warning mr-2'>
-                                    <AlertTriangle size={20} />
-                                </span>
-                                Perturbations ({disruptions.length})
-                            </h2>
-                            {disruptions.map((disruption, index) => {
-                                let severityText = 'unknown';
-                                if (typeof disruption.severity === 'string') {
-                                    severityText = disruption.severity;
-                                } else if (disruption.severity && typeof disruption.severity === 'object') {
-                                    severityText = (disruption.severity as { name?: string; label?: string }).name || 
-                                                  (disruption.severity as { name?: string; label?: string }).label || 
-                                                  'Perturbation';
-                                }
-                                
-                                const severityLevel = severityText.toLowerCase();
-                                let notificationClass = 'is-warning';
-                                let IconComponent = AlertTriangle;
-                                if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
-                                    notificationClass = 'is-danger';
-                                    IconComponent = Ban;
-                                } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
-                                    notificationClass = 'is-info';
-                                    IconComponent = Info;
-                                } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
-                                    notificationClass = 'is-warning';
-                                    IconComponent = Clock;
-                                }
-                                
-                                return (
-                                    <div key={index} className={`notification ${notificationClass} mb-3`}>
-                                        <div className='is-flex is-align-items-center mb-2'>
-                                            <span className='icon mr-2'>
-                                                <IconComponent size={20} />
-                                            </span>
-                                            <strong>{severityText !== 'unknown' ? severityText : 'Perturbation'}</strong>
-                                        </div>
-                                        {disruption.messages && Array.isArray(disruption.messages) && disruption.messages.length > 0 && (
-                                            <div className='content mb-2'>
-                                                {disruption.messages.map((msg, msgIndex) => (
-                                                    <p key={msgIndex} className='mb-2'>
-                                                        {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
-                                                    </p>
+                                    {(!disruption.messages || disruption.messages.length === 0) && disruption.message && (
+                                        <Typography sx={{ mt: 1 }}>{disruption.message}</Typography>
+                                    )}
+                                    {disruption.application_periods && disruption.application_periods.length > 0 && (
+                                        <Box sx={{ mt: 1 }}>
+                                            <Typography fontWeight={600}>Période d'application:</Typography>
+                                            <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                                                {disruption.application_periods.map((period, periodIndex) => (
+                                                    <li key={periodIndex}>
+                                                        Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : '-'}
+                                                        {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : '-'}
+                                                    </li>
                                                 ))}
-                                            </div>
-                                        )}
-                                        {(!disruption.messages || disruption.messages.length === 0) && disruption.message && (
-                                            <p className='mb-2'>{disruption.message}</p>
-                                        )}
-                                        {disruption.application_periods && disruption.application_periods.length > 0 && (
-                                            <div className='content is-small mt-2'>
-                                                <p className='has-text-weight-semibold'>Période d'application:</p>
-                                                <ul>
-                                                    {disruption.application_periods.map((period, periodIndex) => (
-                                                        <li key={periodIndex}>
-                                                            Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : '-'} 
-                                                            {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : '-'}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    )}
+                                            </Box>
+                                        </Box>
+                                    )}
+                                </Alert>
+                            );
+                        })}
+                    </Paper>
+                )}
 
-                    {/* All Stops */}
-                    <div className='box'>
-                        <h2 className='title is-4 mb-4'>
-                            Arrêts et horaires
-                        </h2>
-                        {allStops.length === 0 ? (
-                            <p className='has-text-grey'>Aucun arrêt disponible pour ce trajet.</p>
-                        ) : (
-                            <div className='table-container'>
-                                <table className='table is-fullwidth is-striped is-hoverable'>
-                                    <thead>
-                                        <tr>
-                                            <th>Gare</th>
-                                            <th>Voie/Quai</th>
-                                            <th>Horaire</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {allStops.map((stop, index) => {
+                <Paper sx={{ p: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Arrêts et horaires</Typography>
+                    {allStops.length === 0 ? (
+                        <Typography color="text.secondary">Aucun arrêt disponible pour ce trajet.</Typography>
+                    ) : (
+                        <TableContainer>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell><strong>Gare</strong></TableCell>
+                                        <TableCell><strong>Voie/Quai</strong></TableCell>
+                                        <TableCell><strong>Horaire</strong></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {allStops.map((stop, index) => {
                                         const stopName = cleanLocationName(
                                             stop.stop_point?.name || 
                                             stop.stop_area?.name || 
@@ -894,64 +820,48 @@ const Trip: React.FC = () => {
                                         }
                                         
                                         return (
-                                            <tr key={index}>
-                                                <td>
+                                            <TableRow key={index}>
+                                                <TableCell>
                                                     <strong>{stopName}</strong>
-                                                    {stop.isFirst && (
-                                                        <span className='tag is-success is-small ml-2'>Départ</span>
-                                                    )}
-                                                    {stop.isLast && (
-                                                        <span className='tag is-danger is-small ml-2'>Arrivée</span>
-                                                    )}
-                                                </td>
-                                                <td>{platform}</td>
-                                                <td>
+                                                    {stop.isFirst && <Chip label="Départ" color="success" size="small" sx={{ ml: 1 }} />}
+                                                    {stop.isLast && <Chip label="Arrivée" color="error" size="small" sx={{ ml: 1 }} />}
+                                                </TableCell>
+                                                <TableCell>{platform}</TableCell>
+                                                <TableCell>
                                                     {parsedBaseTime ? (
-                                                        <div>
-                                                            <div className='is-flex is-align-items-center'>
-                                                                <span className='is-size-5 has-text-weight-semibold'>
-                                                                    {formatTime(parsedBaseTime)}
-                                                                </span>
+                                                        <Box>
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                                <Typography fontWeight={600}>{formatTime(parsedBaseTime)}</Typography>
                                                                 {hasDelay && parsedRealTime && (
                                                                     <>
-                                                                        <span className='mx-2 has-text-grey'>→</span>
-                                                                        <span className='is-size-5 has-text-danger has-text-weight-semibold'>
-                                                                            {formatTime(parsedRealTime)}
-                                                                        </span>
+                                                                        <Typography component="span" color="text.secondary">→</Typography>
+                                                                        <Typography component="span" fontWeight={600} color="error.main">{formatTime(parsedRealTime)}</Typography>
                                                                     </>
                                                                 )}
-                                                            </div>
+                                                            </Box>
                                                             {delay && (
-                                                                <div className='mt-1'>
+                                                                <Box sx={{ mt: 0.5 }}>
                                                                     {hasDelay ? (
-                                                                        <span className='tag is-danger is-small'>
-                                                                            <span className='icon mr-1'>
-                                                                                <Clock size={16} />
-                                                                            </span>
-                                                                            {delay}
-                                                                        </span>
+                                                                        <Chip icon={<Clock size={16} />} label={delay} color="error" size="small" />
                                                                     ) : (
-                                                                        <span className='tag is-success is-small'>
-                                                                            {delay}
-                                                                        </span>
+                                                                        <Chip label={delay} color="success" size="small" />
                                                                     )}
-                                                                </div>
+                                                                </Box>
                                                             )}
-                                                        </div>
+                                                        </Box>
                                                     ) : (
-                                                        <span className='has-text-grey'>-</span>
+                                                        <Typography color="text.secondary">-</Typography>
                                                     )}
-                                                </td>
-                                            </tr>
+                                                </TableCell>
+                                            </TableRow>
                                         );
                                     })}
-                                    </tbody>
-                                </table>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            </section>
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </Paper>
+            </PageLayout>
             <Footer />
         </>
     );

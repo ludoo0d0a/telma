@@ -1,5 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { IconButton } from '@mui/material';
 import { useSidebar } from '@/contexts/SidebarContext';
 import { X, Home, Route, Clock, MapPin, Crosshair, Star, Train, BarChart3, Map, Circle, Bus, Book, Info, LayoutDashboard, BarChart2, MessageSquareWarning } from 'lucide-react';
 
@@ -17,11 +18,9 @@ const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       <aside className={`sidebar ${isOpen ? 'is-open' : ''}`}>
         <div className="sidebar-header">
           <h3>More</h3>
-          <button className="button is-ghost" onClick={onClose}>
-              <span className="icon">
-                  <X size={20} />
-              </span>
-          </button>
+          <IconButton onClick={onClose} size="small" sx={{ color: 'inherit' }} aria-label="Fermer">
+            <X size={20} />
+          </IconButton>
         </div>
         <div className="sidebar-content">
           <ul className="sidebar-links">

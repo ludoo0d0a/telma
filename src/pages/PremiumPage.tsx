@@ -1,19 +1,16 @@
-
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 
 const PremiumPage: React.FC = () => {
   return (
-    <div className="premium-page-container">
-      <h2>Welcome to the Premium Content!</h2>
-      <p>This is an exclusive feature available only to our subscribed users. Thank you for your support!</p>
-      {/* Add your premium content here */}
-      <style>{`
-        .premium-page-container {
-          padding: 2rem;
-          text-align: center;
-        }
-      `}</style>
-    </div>
+    <Box sx={{ p: 4, textAlign: 'center' }}>
+      <Typography variant="h4" gutterBottom>
+        Welcome to the Premium Content!
+      </Typography>
+      <Typography>
+        This is an exclusive feature available only to our subscribed users. Thank you for your support!
+      </Typography>
+    </Box>
   );
 };
 

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import { Box, Typography } from '@mui/material';
 import { Info } from 'lucide-react';
 
 interface AdProps {
@@ -83,28 +84,25 @@ const Ad: React.FC<AdProps> = ({
         return null;
     }
 
-    // Show placeholder if no publisher ID is configured
     if (!publisherId || publisherId.trim() === '') {
         return (
-            <div
-                className={`ad-container ad-placeholder ${className}`}
-                style={style}
+            <Box
+                className={`ad-container ad-placeholder ${className}`.trim()}
+                sx={{ ...style, p: 1, textAlign: 'center' }}
             >
-                <div className="ad-placeholder-content">
-                    <p className="has-text-grey is-size-7">
-                        <Info size={16} className="mr-2" />
-                        Ad space - Configure VITE_GOOGLE_ADSENSE_ID in .env file
-                    </p>
-                </div>
-            </div>
+                <Typography variant="caption" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 1 }}>
+                    <Info size={16} />
+                    Ad space - Configure VITE_GOOGLE_ADSENSE_ID in .env file
+                </Typography>
+            </Box>
         );
     }
 
     return (
-        <div
+        <Box
             ref={adRef}
-            className={`ad-container ${className}`}
-            style={style}
+            className={`ad-container ${className}`.trim()}
+            sx={style}
         >
             <ins
                 className="adsbygoogle"
@@ -115,7 +113,7 @@ const Ad: React.FC<AdProps> = ({
                 data-full-width-responsive={size === 'responsive' ? 'true' : 'false'}
                 data-adtest={enableTestMode ? 'on' : undefined}
             />
-        </div>
+        </Box>
     );
 };
 

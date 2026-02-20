@@ -1,24 +1,20 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 import { Crosshair } from 'lucide-react';
 import CurrentLocationWidget from '@/components/CurrentLocationWidget';
 
 const CurrentLocationSection: React.FC = () => {
     return (
-        <div className='skytrip-search-card mb-6'>
-            <h2 className='title is-3 mb-4'>
-                <span className='icon mr-2'>
-                    <Crosshair size={24} />
-                </span>
+        <Box sx={{ mb: 3 }}>
+            <Typography variant="h5" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Crosshair size={24} />
                 Votre Position Actuelle
-            </h2>
-            <div className='columns'>
-                <div className='column is-full'>
-                    <CurrentLocationWidget />
-                </div>
-            </div>
-        </div>
+            </Typography>
+            <Box>
+                <CurrentLocationWidget />
+            </Box>
+        </Box>
     );
 };
 
 export default CurrentLocationSection;
-

@@ -1,11 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Box, Paper, Typography, TextField, InputAdornment } from '@mui/material';
 import { Loader2, Search, Train as TrainIcon } from 'lucide-react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Ad from '@/components/Ad';
 import { autocompletePT } from '@/services/navitiaApi';
 import { encodeVehicleJourneyId, parseVehicleJourneyId } from '@/utils/uriUtils';
 import { getTransportIcon } from '@/services/transportService';
 import type { ExtendedVehicleJourney } from './types';
+import PageLayout from '@/components/shared/PageLayout';
+import { Link as RouterLink } from 'react-router-dom';
 
 const TrainSearch: React.FC = () => {
     const navigate = useNavigate();
@@ -16,18 +19,14 @@ const TrainSearch: React.FC = () => {
     const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent): void => {
             if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
                 setIsSearchOpen(false);
             }
         };
-
         document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
+        return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
     const searchTrains = async (query: string): Promise<void> => {
@@ -36,17 +35,12 @@ const TrainSearch: React.FC = () => {
             setIsSearchOpen(false);
             return;
         }
-
         setSearchLoading(true);
         try {
             const data = await autocompletePT(query, 'sncf', 20);
-            // Filter to only show vehicle_journeys and extract the vehicle_journey object
-            // Note: The API actually returns pt_objects, but TypeScript types say places
             const ptObjects = ((data as unknown as { pt_objects?: Array<{ embedded_type?: string; vehicle_journey?: unknown }> }).pt_objects || []);
             const vehicleJourneys = ptObjects
-                .filter((obj) => 
-                    (obj.embedded_type as string) === 'vehicle_journey' && obj.vehicle_journey
-                )
+                .filter((obj) => (obj.embedded_type as string) === 'vehicle_journey' && obj.vehicle_journey)
                 .map((obj) => obj.vehicle_journey as ExtendedVehicleJourney);
             setSuggestions(vehicleJourneys);
             setIsSearchOpen(vehicleJourneys.length > 0);
@@ -62,163 +56,116 @@ const TrainSearch: React.FC = () => {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const value = e.target.value;
         setSearchQuery(value);
-        
-        // Clear previous timeout
-        if (searchTimeoutRef.current) {
-            clearTimeout(searchTimeoutRef.current);
-        }
-        
-        // Debounce search
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
         searchTimeoutRef.current = setTimeout(() => {
-            if (value.length >= 2) {
-                searchTrains(value);
-            } else {
-                setSuggestions([]);
-                setIsSearchOpen(false);
-            }
+            if (value.length >= 2) searchTrains(value);
+            else { setSuggestions([]); setIsSearchOpen(false); }
         }, 300);
     };
 
     const handleSelectTrain = (train: ExtendedVehicleJourney): void => {
-        if (train.id) {
-            navigate(`/train/${encodeVehicleJourneyId(train.id)}`);
-        }
+        if (train.id) navigate(`/train/${encodeVehicleJourneyId(train.id)}`);
     };
 
     return (
-        <section className='section'>
-            <div className='container'>
-                <div className='box'>
-                    <h1 className='title is-2 mb-5'>Rechercher un train</h1>
-                    <p className='subtitle is-5 mb-5'>
-                        Recherchez un train par son numéro ou son type (TGV, TER, etc.)
-                    </p>
-                    
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-5" />
+        <PageLayout>
+            <Paper sx={{ p: 2 }}>
+                <Typography variant="h4" sx={{ mb: 1 }}>Rechercher un train</Typography>
+                <Typography color="text.secondary" sx={{ mb: 2 }}>
+                    Recherchez un train par son numéro ou son type (TGV, TER, etc.)
+                </Typography>
 
-                    <div className='field' ref={wrapperRef}>
-                        <label className='label'>Numéro ou type de train</label>
-                        <div className='control has-icons-right'>
-                            <input
-                                className='input is-large'
-                                type='text'
-                                value={searchQuery}
-                                onChange={handleSearchChange}
-                                onFocus={() => {
-                                    if (suggestions.length > 0) {
-                                        setIsSearchOpen(true);
-                                    }
-                                }}
-                                placeholder='Ex: 1234, TGV, TER...'
-                            />
-                            {searchLoading && (
-                                <span className='icon is-right'>
-                                    <Loader2 size={20} className="animate-spin" />
-                                </span>
-                            )}
-                            {!searchLoading && searchQuery && (
-                                <span className='icon is-right'>
-                                    <Search size={20} />
-                                </span>
-                            )}
-                        </div>
-                        {isSearchOpen && suggestions.length > 0 && (
-                            <div className='dropdown is-active' style={{ width: '100%', position: 'relative' }}>
-                                <div className='dropdown-menu' style={{ width: '100%' }}>
-                                    <div className='dropdown-content' style={{ maxHeight: '400px', overflowY: 'auto' }}>
-                                        {suggestions.map((train, index) => {
-                                            const displayInfo = train.display_informations || {};
-                                            const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || train.id || '';
-                                            const commercialMode = displayInfo.commercial_mode || '';
-                                            const network = displayInfo.network || '';
-                                            const direction = displayInfo.direction || '';
-                                            const transportInfo = getTransportIcon(commercialMode, network);
-                                            
-                                            return (
-                                                <a
-                                                    key={train.id || index}
-                                                    className='dropdown-item'
-                                                    onClick={() => handleSelectTrain(train)}
-                                                    style={{ cursor: 'pointer' }}
-                                                >
-                                                    <div className='is-flex is-align-items-center'>
-                                                        <span className={`icon ${transportInfo.color} mr-3`}>
-                                                            <transportInfo.icon size={16} />
-                                                        </span>
-                                                        <div style={{ flex: 1 }}>
-                                                            <div className='is-flex is-align-items-center'>
-                                                                <strong className='mr-2'>{trainNumber}</strong>
-                                                                <span className={`tag ${transportInfo.tagColor} is-dark is-small`}>
-                                                                    {transportInfo.label}
-                                                                </span>
-                                                            </div>
-                                                            {direction && (
-                                                                <small className='has-text-grey'>{direction}</small>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                        {searchQuery.length >= 2 && !searchLoading && suggestions.length === 0 && (
-                            <p className='help has-text-grey mt-2'>Aucun train trouvé</p>
-                        )}
-                    </div>
+                <Box sx={{ mb: 2 }}>
+                    <Ad format="horizontal" size="responsive" />
+                </Box>
 
-                    {/* Samples Section */}
-                    <div className='mt-6'>
-                        <h3 className='title is-4 mb-4'>Exemples</h3>
-                        <div className='columns is-multiline'>
-                            {[
-                                'vehicle_journey:SNCF:2025-12-18:88776:1187:Train',
-                                'vehicle_journey:SNCF:2025-12-18:88778:1187:Train'
-                            ].map((sampleId) => {
-                                const parsed = parseVehicleJourneyId(sampleId);
-                                if (!parsed) return null;
-                                
+                <Box ref={wrapperRef} sx={{ position: 'relative' }}>
+                    <TextField
+                        fullWidth
+                        label="Numéro ou type de train"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        onFocus={() => suggestions.length > 0 && setIsSearchOpen(true)}
+                        placeholder="Ex: 1234, TGV, TER..."
+                        size="medium"
+                        InputProps={{
+                            endAdornment: (
+                                <InputAdornment position="end">
+                                    {searchLoading ? <Loader2 size={20} className="animate-spin" /> : searchQuery ? <Search size={20} /> : null}
+                                </InputAdornment>
+                            ),
+                        }}
+                    />
+                    {isSearchOpen && suggestions.length > 0 && (
+                        <Paper sx={{ position: 'absolute', zIndex: 10, width: '100%', maxHeight: 400, overflow: 'auto', mt: 0.5 }}>
+                            {suggestions.map((train, index) => {
+                                const displayInfo = train.display_informations || {};
+                                const trainNumber = displayInfo.headsign || displayInfo.trip_short_name || train.id || '';
+                                const transportInfo = getTransportIcon(displayInfo.commercial_mode || '', displayInfo.network || '');
+                                const Icon = transportInfo.icon;
                                 return (
-                                    <div key={sampleId} className='column is-half'>
-                                        <Link 
-                                            to={`/train/${encodeVehicleJourneyId(sampleId)}`}
-                                            className='box is-clickable'
-                                            style={{ textDecoration: 'none' }}
-                                        >
-                                            <div className='is-flex is-align-items-center'>
-                                                <span className='icon is-large has-text-primary mr-3'>
-                                                    <TrainIcon size={32} />
-                                                </span>
-                                                <div>
-                                                    <p className='title is-5 mb-1'>
-                                                        Train {parsed.trainNumber}
-                                                    </p>
-                                                    <p className='subtitle is-6 mb-1'>
-                                                        <span className='tag is-dark mr-2'>{parsed.vehicleType}</span>
-                                                        <span className='has-text-grey'>{parsed.date}</span>
-                                                    </p>
-                                                    <p className='help'>
-                                                        ID: {parsed.id2}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </Link>
-                                    </div>
+                                    <Box
+                                        key={train.id || index}
+                                        onClick={() => handleSelectTrain(train)}
+                                        sx={{ p: 2, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' }, borderBottom: '1px solid', borderColor: 'divider' }}
+                                    >
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                                            <Icon size={16} />
+                                            <Box sx={{ flex: 1 }}>
+                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <Typography component="span" fontWeight={600}>{trainNumber}</Typography>
+                                                    <Typography component="span" variant="caption" sx={{ bgcolor: 'grey.200', px: 1, borderRadius: 1 }}>{transportInfo.label}</Typography>
+                                                </Box>
+                                                {displayInfo.direction && (
+                                                    <Typography variant="caption" color="text.secondary">{displayInfo.direction}</Typography>
+                                                )}
+                                            </Box>
+                                        </Box>
+                                    </Box>
                                 );
                             })}
-                        </div>
-                        <p className='help mt-2 has-text-grey'>
-                            Cliquez sur un exemple pour voir les détails du train
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </section>
+                        </Paper>
+                    )}
+                    {searchQuery.length >= 2 && !searchLoading && suggestions.length === 0 && (
+                        <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>Aucun train trouvé</Typography>
+                    )}
+                </Box>
+
+                <Box sx={{ mt: 3 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>Exemples</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2 }}>
+                        {['vehicle_journey:SNCF:2025-12-18:88776:1187:Train', 'vehicle_journey:SNCF:2025-12-18:88778:1187:Train'].map((sampleId) => {
+                            const parsed = parseVehicleJourneyId(sampleId);
+                            if (!parsed) return null;
+                            return (
+                                <Link
+                                    key={sampleId}
+                                    component={RouterLink}
+                                    to={`/train/${encodeVehicleJourneyId(sampleId)}`}
+                                    underline="none"
+                                    sx={{ flex: '1 1 200px', maxWidth: 400 }}
+                                >
+                                    <Paper sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 2, '&:hover': { bgcolor: 'action.hover' } }}>
+                                        <TrainIcon size={32} color="var(--primary)" />
+                                        <Box>
+                                            <Typography variant="h6">Train {parsed.trainNumber}</Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {parsed.vehicleType} • {parsed.date}
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary">ID: {parsed.id2}</Typography>
+                                        </Box>
+                                    </Paper>
+                                </Link>
+                            );
+                        })}
+                    </Box>
+                    <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                        Cliquez sur un exemple pour voir les détails du train
+                    </Typography>
+                </Box>
+            </Paper>
+        </PageLayout>
     );
 };
 
 export default TrainSearch;
-

@@ -3,8 +3,18 @@ import { Link } from 'react-router-dom';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl } from 'react-map-gl/maplibre';
 import type { MapRef, ViewState } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import {
+    Box,
+    Paper,
+    Button,
+    Alert,
+    Typography,
+    Grid,
+    Stack,
+} from '@mui/material';
 import Footer from '@/components/Footer';
 import { PageHeader } from '@/components/skytrip';
+import PageLayout from '@/components/shared/PageLayout';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
 import { encodeVehicleJourneyId } from '@/utils/uriUtils';
@@ -642,419 +652,422 @@ const LocationDetection: React.FC = () => {
                 title="Détection de localisation"
                 subtitle="Identifiez votre position, la gare la plus proche et le train en cours"
                 showNotification={false}
-                
             />
-            <section className='section'>
-                <div className='container'>
-                    <div className='box mb-5'>
-                        <h3 className='title is-5 mb-4'>Détecter votre position</h3>
-                        <p className='mb-4'>
-                            Cette page détecte votre position exacte et tente de déterminer :
-                        </p>
-                        <ul className='mb-4'>
-                            <li>Si vous êtes dans une gare</li>
-                            <li>Sur quel quai vous vous trouvez</li>
-                            <li>Dans quel train vous êtes actuellement</li>
-                        </ul>
+            <PageLayout>
+                <Paper sx={{ p: 2, mb: 2 }}>
+                    <Typography variant="h6" sx={{ mb: 2 }}>
+                        Détecter votre position
+                    </Typography>
+                    <Typography sx={{ mb: 2 }}>
+                        Cette page détecte votre position exacte et tente de déterminer :
+                    </Typography>
+                    <Box component="ul" sx={{ mb: 2, pl: 2 }}>
+                        <li>Si vous êtes dans une gare</li>
+                        <li>Sur quel quai vous vous trouvez</li>
+                        <li>Dans quel train vous êtes actuellement</li>
+                    </Box>
 
-                        <div className='buttons'>
-                            <button
-                                className='button is-primary'
-                                onClick={handleDetectLocation}
-                                disabled={loading || watchingLocation}
+                    <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} flexWrap="wrap">
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleDetectLocation}
+                            disabled={loading || watchingLocation}
+                            startIcon={<MapPin size={20} />}
+                        >
+                            Détecter maintenant
+                        </Button>
+                        {!watchingLocation ? (
+                            <Button
+                                variant="contained"
+                                color="info"
+                                onClick={handleStartWatching}
+                                disabled={loading}
+                                startIcon={<RefreshCw size={20} />}
                             >
-                                <span className='icon'><MapPin size={20} /></span>
-                                <span>Détecter maintenant</span>
-                            </button>
-                            {!watchingLocation ? (
-                                <button
-                                    className='button is-info'
-                                    onClick={handleStartWatching}
-                                    disabled={loading}
-                                >
-                                    <span className='icon'><RefreshCw size={20} /></span>
-                                    <span>Surveiller en continu</span>
-                                </button>
-                            ) : (
-                                <button
-                                    className='button is-danger'
-                                    onClick={handleStopWatching}
-                                >
-                                    <span className='icon'><Square size={20} /></span>
-                                    <span>Arrêter la surveillance</span>
-                                </button>
-                            )}
-                        </div>
-                    </div>
+                                Surveiller en continu
+                            </Button>
+                        ) : (
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={handleStopWatching}
+                                startIcon={<Square size={20} />}
+                            >
+                                Arrêter la surveillance
+                            </Button>
+                        )}
+                    </Stack>
+                </Paper>
 
-                    {error && (
-                        <div className='notification is-danger'>
-                            <button className='delete' onClick={() => setError(null)}></button>
-                            {error}
-                        </div>
-                    )}
+                {error && (
+                    <Alert severity="error" onClose={() => setError(null)} sx={{ mb: 2 }}>
+                        {error}
+                    </Alert>
+                )}
 
-                    {loading && !detectionResult && (
-                        <div className='box has-text-centered'>
-                            <span className='icon is-large'>
-                                <Loader2 size={48} className="animate-spin" />
-                            </span>
-                            <p className='mt-4'>Détection en cours...</p>
-                        </div>
-                    )}
+                {loading && !detectionResult && (
+                    <Paper sx={{ p: 4, textAlign: 'center' }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
+                            <Loader2 size={48} className="animate-spin" />
+                            <Typography>Détection en cours...</Typography>
+                        </Box>
+                    </Paper>
+                )}
 
-                    {detectionResult && (
-                        <div className='box'>
-                            <h3 className='title is-4 mb-4'>Résultats de la détection</h3>
+                {detectionResult && (
+                    <Paper sx={{ p: 2, mb: 2 }}>
+                        <Typography variant="h5" sx={{ mb: 2 }}>
+                            Résultats de la détection
+                        </Typography>
 
-                            {detectionResult.userLocation && (
-                                <div className='mb-4'>
-                                    <p><strong>Votre position :</strong></p>
-                                    <p>
-                                        Latitude: {detectionResult.userLocation.lat.toFixed(6)},
-                                        Longitude: {detectionResult.userLocation.lon.toFixed(6)}
-                                    </p>
-                                    <p>Précision: ±{Math.round(detectionResult.userLocation.accuracy)}m</p>
-                                </div>
-                            )}
+                        {detectionResult.userLocation && (
+                            <Box sx={{ mb: 2 }}>
+                                <Typography><strong>Votre position :</strong></Typography>
+                                <Typography>
+                                    Latitude: {detectionResult.userLocation.lat.toFixed(6)},
+                                    Longitude: {detectionResult.userLocation.lon.toFixed(6)}
+                                </Typography>
+                                <Typography>Précision: ±{Math.round(detectionResult.userLocation.accuracy)}m</Typography>
+                            </Box>
+                        )}
 
-                            {detectionResult.isInStation ? (
-                                <>
-                                    {detectionResult.station && (
-                                        <div className='mb-4'>
-                                            <p className='has-text-success'>
-                                                <span className='icon'><CheckCircle2 size={20} /></span>
-                                                <strong>Vous êtes dans une gare !</strong>
-                                            </p>
-                                            <p><strong>Gare :</strong> {detectionResult.station.name}</p>
-                                            <p>Distance: {detectionResult.station.distance}m</p>
-                                        </div>
-                                    )}
+                        {detectionResult.isInStation ? (
+                            <>
+                                {detectionResult.station && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography color="success.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <CheckCircle2 size={20} />
+                                            <strong>Vous êtes dans une gare !</strong>
+                                        </Typography>
+                                        <Typography><strong>Gare :</strong> {detectionResult.station.name}</Typography>
+                                        <Typography>Distance: {detectionResult.station.distance}m</Typography>
+                                    </Box>
+                                )}
 
-                                    {detectionResult.platform && (
-                                        <div className='mb-4'>
-                                            <p><strong>Quai détecté :</strong></p>
-                                            <p>{detectionResult.platform.name}</p>
-                                        </div>
-                                    )}
+                                {detectionResult.platform && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography><strong>Quai détecté :</strong></Typography>
+                                        <Typography>{detectionResult.platform.name}</Typography>
+                                    </Box>
+                                )}
 
-                                    {detectionResult.detectedTrain ? (
-                                        <div className='mb-4'>
-                                            <p className='has-text-info'>
-                                                <span className='icon'><Train size={20} /></span>
-                                                <strong>Train détecté !</strong>
-                                            </p>
-                                            <div className='box' style={{ backgroundColor: '#f5f5f5' }}>
-                                                <p><strong>Numéro de train :</strong> {detectionResult.detectedTrain.trainNumber}</p>
-                                                <p><strong>Destination :</strong> {detectionResult.detectedTrain.destination}</p>
-                                                <p><strong>Réseau :</strong> {detectionResult.detectedTrain.network}</p>
-                                                <p><strong>Arrêt actuel :</strong> {detectionResult.detectedTrain.currentStop}</p>
-                                                <p><strong>Prochain arrêt :</strong> {detectionResult.detectedTrain.nextStop}</p>
-                                                <p><strong>Confiance :</strong> {detectionResult.detectedTrain.confidence}%</p>
-                                                <div className='buttons mt-4'>
-                                                    <Link
-                                                        to={`/train/${encodeVehicleJourneyId(detectionResult.detectedTrain.vehicleJourneyId)}`}
-                                                        className='button is-primary'
-                                                    >
-                                                        <span className='icon'><Info size={20} /></span>
-                                                        <span>Voir les détails du train</span>
-                                                    </Link>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className='mb-4'>
-                                            <p className='has-text-warning'>
-                                                <span className='icon'><AlertTriangle size={20} /></span>
-                                                Aucun train détecté à votre position actuelle.
-                                            </p>
-                                            <p className='is-size-7 mt-2'>
-                                                Cela peut signifier que vous êtes sur un quai sans train,
-                                                ou que le train n'a pas encore été détecté. Essayez de vous déplacer
-                                                ou attendez quelques instants.
-                                            </p>
-                                        </div>
-                                    )}
-                                </>
-                            ) : (
-                                <>
-                                    <div className='mb-4'>
-                                        <p className='has-text-warning'>
-                                            <span className='icon'><AlertTriangle size={16} /></span>
-                                            Vous ne semblez pas être dans une gare.
-                                        </p>
-                                        <p className='is-size-7 mt-2'>
-                                            Aucune gare trouvée à moins de 200m de votre position.
-                                            Vous pouvez sélectionner une gare dans la liste ci-dessous pour continuer.
-                                        </p>
-                                    </div>
+                                {detectionResult.detectedTrain ? (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography color="info.main" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                            <Train size={20} />
+                                            <strong>Train détecté !</strong>
+                                        </Typography>
+                                        <Paper variant="outlined" sx={{ p: 2, backgroundColor: 'action.hover', mb: 2 }}>
+                                            <Typography><strong>Numéro de train :</strong> {detectionResult.detectedTrain.trainNumber}</Typography>
+                                            <Typography><strong>Destination :</strong> {detectionResult.detectedTrain.destination}</Typography>
+                                            <Typography><strong>Réseau :</strong> {detectionResult.detectedTrain.network}</Typography>
+                                            <Typography><strong>Arrêt actuel :</strong> {detectionResult.detectedTrain.currentStop}</Typography>
+                                            <Typography><strong>Prochain arrêt :</strong> {detectionResult.detectedTrain.nextStop}</Typography>
+                                            <Typography><strong>Confiance :</strong> {detectionResult.detectedTrain.confidence}%</Typography>
+                                            <Box sx={{ mt: 2 }}>
+                                                <Button
+                                                    component={Link}
+                                                    to={`/train/${encodeVehicleJourneyId(detectionResult.detectedTrain.vehicleJourneyId)}`}
+                                                    variant="contained"
+                                                    color="primary"
+                                                    startIcon={<Info size={20} />}
+                                                >
+                                                    Voir les détails du train
+                                                </Button>
+                                            </Box>
+                                        </Paper>
+                                    </Box>
+                                ) : (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography color="warning.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                            <AlertTriangle size={20} />
+                                            Aucun train détecté à votre position actuelle.
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                            Cela peut signifier que vous êtes sur un quai sans train,
+                                            ou que le train n'a pas encore été détecté. Essayez de vous déplacer
+                                            ou attendez quelques instants.
+                                        </Typography>
+                                    </Box>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <Box sx={{ mb: 2 }}>
+                                    <Typography color="warning.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                        <AlertTriangle size={16} />
+                                        Vous ne semblez pas être dans une gare.
+                                    </Typography>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                        Aucune gare trouvée à moins de 200m de votre position.
+                                        Vous pouvez sélectionner une gare dans la liste ci-dessous pour continuer.
+                                    </Typography>
+                                </Box>
 
-                                    {detectionResult.nearbyStations && detectionResult.nearbyStations.length > 0 && (
-                                        <div className='mb-4'>
-                                            <h4 className='title is-5 mb-3'>Gares à proximité</h4>
-                                            <p className='is-size-7 mb-3 has-text-grey'>
-                                                Sélectionnez une gare pour la définir comme gare actuelle et détecter les trains :
-                                            </p>
-                                            <div className='columns is-multiline'>
-                                                {detectionResult.nearbyStations
-                                                    .sort((a, b) => a.distance - b.distance)
-                                                    .map((station, idx) => (
-                                                        <div key={`station-${station.id}-${idx}`} className='column is-half-tablet is-one-third-desktop'>
-                                                            <div
-                                                                className={`box station-card ${selectedStation?.id === station.id ? 'has-background-info-light' : ''}`}
-                                                                style={{
-                                                                    cursor: 'pointer',
-                                                                    transition: 'all 0.2s',
-                                                                    border: selectedStation?.id === station.id ? '2px solid #3273dc' : '1px solid #dbdbdb'
-                                                                }}
-                                                                onClick={() => handleSelectStation({
-                                                                    id: station.id,
-                                                                    name: station.name,
-                                                                    distance: station.distance,
-                                                                    coord: station.coord
-                                                                })}
-                                                                onMouseEnter={(e) => {
-                                                                    if (selectedStation?.id !== station.id) {
-                                                                        e.currentTarget.style.backgroundColor = '#f5f5f5';
-                                                                    }
-                                                                }}
-                                                                onMouseLeave={(e) => {
-                                                                    if (selectedStation?.id !== station.id) {
-                                                                        e.currentTarget.style.backgroundColor = '';
-                                                                    }
-                                                                }}
-                                                            >
-                                                                <div className='level mb-2'>
-                                                                    <div className='level-left'>
-                                                                        <div className='level-item'>
-                                                                            <span className='icon has-text-primary'>
-                                                                                <Train size={16} />
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className='level-item'>
-                                                                            <strong>{station.name}</strong>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                                <p className='is-size-7 has-text-grey'>
-                                                                    <span className='icon is-small'><MapPin size={16} /></span>
-                                                                    Distance: {station.distance}m
-                                                                </p>
-                                                                {selectedStation?.id === station.id && (
-                                                                    <p className='has-text-info is-size-7 mt-2'>
-                                                                        <span className='icon'><CheckCircle2 size={20} /></span>
-                                                                        Gare sélectionnée
-                                                                    </p>
-                                                                )}
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                            </div>
-                                            {detectingTrainForStation && (
-                                                <div className='box has-text-centered'>
-                                                    <span className='icon is-large'>
-                                                        <Loader2 size={32} className="animate-spin" />
-                                                    </span>
-                                                    <p className='mt-3'>Détection des trains en cours...</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    )}
+                                {detectionResult.nearbyStations && detectionResult.nearbyStations.length > 0 && (
+                                    <Box sx={{ mb: 2 }}>
+                                        <Typography variant="h6" sx={{ mb: 1 }}>
+                                            Gares à proximité
+                                        </Typography>
+                                        <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                                            Sélectionnez une gare pour la définir comme gare actuelle et détecter les trains :
+                                        </Typography>
+                                        <Grid container spacing={2}>
+                                            {detectionResult.nearbyStations
+                                                .sort((a, b) => a.distance - b.distance)
+                                                .map((station, idx) => (
+                                                    <Grid item xs={12} sm={6} md={4} key={`station-${station.id}-${idx}`}>
+                                                        <Paper
+                                                            variant="outlined"
+                                                            sx={{
+                                                                p: 2,
+                                                                cursor: 'pointer',
+                                                                transition: 'all 0.2s',
+                                                                border: selectedStation?.id === station.id ? 2 : 1,
+                                                                borderColor: selectedStation?.id === station.id ? 'primary.main' : 'divider',
+                                                                backgroundColor: selectedStation?.id === station.id ? 'primary.light' : 'background.paper',
+                                                                '&:hover': {
+                                                                    backgroundColor: selectedStation?.id === station.id ? 'primary.light' : 'action.hover',
+                                                                },
+                                                            }}
+                                                            onClick={() => handleSelectStation({
+                                                                id: station.id,
+                                                                name: station.name,
+                                                                distance: station.distance,
+                                                                coord: station.coord
+                                                            })}
+                                                        >
+                                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                                <Train size={16} color="var(--primary)" />
+                                                                <Typography fontWeight="bold">{station.name}</Typography>
+                                                            </Box>
+                                                            <Typography variant="body2" color="text.secondary" sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                <MapPin size={16} />
+                                                                Distance: {station.distance}m
+                                                            </Typography>
+                                                            {selectedStation?.id === station.id && (
+                                                                <Typography color="info.main" variant="body2" sx={{ mt: 1, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                                    <CheckCircle2 size={20} />
+                                                                    Gare sélectionnée
+                                                                </Typography>
+                                                            )}
+                                                        </Paper>
+                                                    </Grid>
+                                                ))}
+                                        </Grid>
+                                        {detectingTrainForStation && (
+                                            <Paper variant="outlined" sx={{ p: 3, mt: 2, textAlign: 'center' }}>
+                                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                                                    <Loader2 size={32} className="animate-spin" />
+                                                    <Typography>Détection des trains en cours...</Typography>
+                                                </Box>
+                                            </Paper>
+                                        )}
+                                    </Box>
+                                )}
 
-                                    {selectedStation && detectionResult.isInStation && (
-                                        <>
-                                            {detectionResult.detectedTrain ? (
-                                                <div className='mb-4'>
-                                                    <p className='has-text-info'>
-                                                        <span className='icon'><Train size={20} /></span>
-                                                        <strong>Train détecté !</strong>
-                                                    </p>
-                                                    <div className='box' style={{ backgroundColor: '#f5f5f5' }}>
-                                                        <p><strong>Numéro de train :</strong> {detectionResult.detectedTrain.trainNumber}</p>
-                                                        <p><strong>Destination :</strong> {detectionResult.detectedTrain.destination}</p>
-                                                        <p><strong>Réseau :</strong> {detectionResult.detectedTrain.network}</p>
-                                                        <p><strong>Arrêt actuel :</strong> {detectionResult.detectedTrain.currentStop}</p>
-                                                        <p><strong>Prochain arrêt :</strong> {detectionResult.detectedTrain.nextStop}</p>
-                                                        <p><strong>Confiance :</strong> {detectionResult.detectedTrain.confidence}%</p>
-                                                        <div className='buttons mt-4'>
-                                                            <Link
-                                                                to={`/train/${encodeVehicleJourneyId(detectionResult.detectedTrain.vehicleJourneyId)}`}
-                                                                className='button is-primary'
-                                                            >
-                                                                <span className='icon'><Info size={20} /></span>
-                                                                <span>Voir les détails du train</span>
-                                                            </Link>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className='mb-4'>
-                                                    <p className='has-text-warning'>
-                                                        <span className='icon'><AlertTriangle size={20} /></span>
-                                                        Aucun train détecté à la gare sélectionnée.
-                                                    </p>
-                                                    <p className='is-size-7 mt-2'>
-                                                        Cela peut signifier qu'il n'y a pas de train actuellement à cette gare,
-                                                        ou que le train n'a pas encore été détecté.
-                                                    </p>
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-                                </>
-                            )}
-                        </div>
-                    )}
+                                {selectedStation && detectionResult.isInStation && (
+                                    <>
+                                        {detectionResult.detectedTrain ? (
+                                            <Box sx={{ mb: 2 }}>
+                                                <Typography color="info.main" sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
+                                                    <Train size={20} />
+                                                    <strong>Train détecté !</strong>
+                                                </Typography>
+                                                <Paper variant="outlined" sx={{ p: 2, backgroundColor: 'action.hover' }}>
+                                                    <Typography><strong>Numéro de train :</strong> {detectionResult.detectedTrain.trainNumber}</Typography>
+                                                    <Typography><strong>Destination :</strong> {detectionResult.detectedTrain.destination}</Typography>
+                                                    <Typography><strong>Réseau :</strong> {detectionResult.detectedTrain.network}</Typography>
+                                                    <Typography><strong>Arrêt actuel :</strong> {detectionResult.detectedTrain.currentStop}</Typography>
+                                                    <Typography><strong>Prochain arrêt :</strong> {detectionResult.detectedTrain.nextStop}</Typography>
+                                                    <Typography><strong>Confiance :</strong> {detectionResult.detectedTrain.confidence}%</Typography>
+                                                    <Box sx={{ mt: 2 }}>
+                                                        <Button
+                                                            component={Link}
+                                                            to={`/train/${encodeVehicleJourneyId(detectionResult.detectedTrain.vehicleJourneyId)}`}
+                                                            variant="contained"
+                                                            color="primary"
+                                                            startIcon={<Info size={20} />}
+                                                        >
+                                                            Voir les détails du train
+                                                        </Button>
+                                                    </Box>
+                                                </Paper>
+                                            </Box>
+                                        ) : (
+                                            <Box sx={{ mb: 2 }}>
+                                                <Typography color="warning.main" sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                    <AlertTriangle size={20} />
+                                                    Aucun train détecté à la gare sélectionnée.
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                                    Cela peut signifier qu'il n'y a pas de train actuellement à cette gare,
+                                                    ou que le train n'a pas encore été détecté.
+                                                </Typography>
+                                            </Box>
+                                        )}
+                                    </>
+                                )}
+                            </>
+                        )}
+                    </Paper>
+                )}
 
-                    {/* Map showing user location and nearby stations */}
-                    {detectionResult && detectionResult.userLocation && (
-                        <div className='box mt-5'>
-                            <h3 className='title is-5 mb-4'>Carte des gares à proximité</h3>
-                            <div className="map-container" data-map-loaded={isMapLoaded} style={{ height: 500, width: '100%', borderRadius: 6, overflow: 'hidden' }}>
-                                <Map
-                                    ref={mapRef}
-                                    {...viewState}
-                                    onMove={evt => setViewState(evt.viewState)}
-                                    onLoad={() => setIsMapLoaded(true)}
-                                    style={{ width: '100%', height: '100%' }}
-                                    mapStyle={{
-                                        version: 8,
-                                        sources: {
-                                            'osm-tiles': {
-                                                type: 'raster',
-                                                tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
-                                                tileSize: 256,
-                                                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                            }
-                                        },
-                                        layers: [{
-                                            id: 'osm-tiles-layer',
+                {/* Map showing user location and nearby stations */}
+                {detectionResult && detectionResult.userLocation && (
+                    <Paper sx={{ p: 2, mt: 2 }}>
+                        <Typography variant="h6" sx={{ mb: 2 }}>
+                            Carte des gares à proximité
+                        </Typography>
+                        <Box
+                            data-map-loaded={isMapLoaded}
+                            sx={{ height: 500, width: '100%', borderRadius: 1, overflow: 'hidden' }}
+                        >
+                            <Map
+                                ref={mapRef}
+                                {...viewState}
+                                onMove={evt => setViewState(evt.viewState)}
+                                onLoad={() => setIsMapLoaded(true)}
+                                style={{ width: '100%', height: '100%' }}
+                                mapStyle={{
+                                    version: 8,
+                                    sources: {
+                                        'osm-tiles': {
                                             type: 'raster',
-                                            source: 'osm-tiles',
-                                            minzoom: 0,
-                                            maxzoom: 19
-                                        }]
-                                    }}
-                                    attributionControl={{compact: true}}
-                                >
-                                    <NavigationControl position="top-right" />
-                                    <GeolocateControl position="top-right" />
+                                            tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+                                            tileSize: 256,
+                                            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                        }
+                                    },
+                                    layers: [{
+                                        id: 'osm-tiles-layer',
+                                        type: 'raster',
+                                        source: 'osm-tiles',
+                                        minzoom: 0,
+                                        maxzoom: 19
+                                    }]
+                                }}
+                                attributionControl={{compact: true}}
+                            >
+                                <NavigationControl position="top-right" />
+                                <GeolocateControl position="top-right" />
 
-                                    {/* User location marker */}
-                                    <Marker
-                                        longitude={detectionResult.userLocation.lon}
-                                        latitude={detectionResult.userLocation.lat}
-                                        anchor="center"
+                                {/* User location marker */}
+                                <Marker
+                                    longitude={detectionResult.userLocation.lon}
+                                    latitude={detectionResult.userLocation.lat}
+                                    anchor="center"
+                                >
+                                    <div
+                                        style={{
+                                            backgroundColor: '#00d1b2',
+                                            width: 24,
+                                            height: 24,
+                                            borderRadius: '50%',
+                                            border: '3px solid white',
+                                            boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            cursor: 'default'
+                                        }}
                                     >
                                         <div
                                             style={{
-                                                backgroundColor: '#00d1b2',
-                                                width: 24,
-                                                height: 24,
+                                                width: 12,
+                                                height: 12,
                                                 borderRadius: '50%',
-                                                border: '3px solid white',
-                                                boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                cursor: 'default'
+                                                backgroundColor: 'white'
                                             }}
+                                        />
+                                    </div>
+                                </Marker>
+
+                                {/* Nearby stations markers */}
+                                {detectionResult.nearbyStations?.map((station, idx) => {
+                                    const isClosest = detectionResult.station?.id === station.id;
+                                    return (
+                                        <Marker
+                                            key={`station-${station.id}-${idx}`}
+                                            longitude={station.coord.lon}
+                                            latitude={station.coord.lat}
+                                            anchor="bottom"
+                                            onClick={() => setSelectedStationIndex(idx)}
                                         >
                                             <div
                                                 style={{
-                                                    width: 12,
-                                                    height: 12,
+                                                    backgroundColor: isClosest ? '#ff3860' : '#3273dc',
+                                                    width: isClosest ? 36 : 32,
+                                                    height: isClosest ? 36 : 32,
                                                     borderRadius: '50%',
-                                                    backgroundColor: 'white'
+                                                    border: '3px solid white',
+                                                    cursor: 'pointer',
+                                                    boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'center'
                                                 }}
-                                            />
-                                        </div>
-                                    </Marker>
-
-                                    {/* Nearby stations markers */}
-                                    {detectionResult.nearbyStations?.map((station, idx) => {
-                                        const isClosest = detectionResult.station?.id === station.id;
-                                        return (
-                                            <Marker
-                                                key={`station-${station.id}-${idx}`}
-                                                longitude={station.coord.lon}
-                                                latitude={station.coord.lat}
-                                                anchor="bottom"
-                                                onClick={() => setSelectedStationIndex(idx)}
                                             >
-                                                <div
-                                                    style={{
-                                                        backgroundColor: isClosest ? '#ff3860' : '#3273dc',
-                                                        width: isClosest ? 36 : 32,
-                                                        height: isClosest ? 36 : 32,
-                                                        borderRadius: '50%',
-                                                        border: '3px solid white',
-                                                        cursor: 'pointer',
-                                                        boxShadow: '0 2px 8px rgba(0,0,0,0.3)',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    }}
+                                                <svg
+                                                    width={isClosest ? 20 : 18}
+                                                    height={isClosest ? 20 : 18}
+                                                    viewBox="0 0 24 24"
+                                                    fill="white"
+                                                    xmlns="http://www.w3.org/2000/svg"
                                                 >
-                                                    <svg
-                                                        width={isClosest ? 20 : 18}
-                                                        height={isClosest ? 20 : 18}
-                                                        viewBox="0 0 24 24"
-                                                        fill="white"
-                                                        xmlns="http://www.w3.org/2000/svg"
-                                                    >
-                                                        <path d="M12 2c-4 0-8 .5-8 4v9.5c0 .95.38 1.81 1 2.44L3 22h3l.5-2h11l.5 2h3l-2-4.06c.62-.63 1-1.49 1-2.44V6c0-3.5-3.58-4-8-4zM5.5 16c-.83 0-1.5-.67-1.5-1.5S4.67 13 5.5 13s1.5.67 1.5 1.5S6.33 16 5.5 16zm13 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5H4V6h16v5z"/>
-                                                    </svg>
-                                                </div>
-                                            </Marker>
-                                        );
-                                    })}
-
-                                    {/* Popup for selected station */}
-                                    {selectedStationIndex !== null && detectionResult.nearbyStations?.[selectedStationIndex] && (
-                                        <Popup
-                                            longitude={detectionResult.nearbyStations[selectedStationIndex].coord.lon}
-                                            latitude={detectionResult.nearbyStations[selectedStationIndex].coord.lat}
-                                            anchor="bottom"
-                                            onClose={() => setSelectedStationIndex(null)}
-                                            closeButton={true}
-                                            closeOnClick={false}
-                                        >
-                                            <div>
-                                                <strong>{detectionResult.nearbyStations[selectedStationIndex].name}</strong>
-                                                <div className='is-size-7 mt-1'>
-                                                    Distance: {detectionResult.nearbyStations[selectedStationIndex].distance}m
-                                                </div>
-                                                {detectionResult.station?.id === detectionResult.nearbyStations[selectedStationIndex].id && (
-                                                    <div className='has-text-success is-size-7 mt-1'>
-                                                        <CheckCircle2 size={16} /> Gare détectée
-                                                    </div>
-                                                )}
+                                                    <path d="M12 2c-4 0-8 .5-8 4v9.5c0 .95.38 1.81 1 2.44L3 22h3l.5-2h11l.5 2h3l-2-4.06c.62-.63 1-1.49 1-2.44V6c0-3.5-3.58-4-8-4zM5.5 16c-.83 0-1.5-.67-1.5-1.5S4.67 13 5.5 13s1.5.67 1.5 1.5S6.33 16 5.5 16zm13 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-5H4V6h16v5z"/>
+                                                </svg>
                                             </div>
-                                        </Popup>
-                                    )}
-                                </Map>
-                            </div>
-                            <div className='mt-3'>
-                                <p className='is-size-7 has-text-grey'>
-                                    <span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#00d1b2', border: '2px solid white', marginRight: 6, verticalAlign: 'middle' }}></span>
-                                    Votre position
-                                    {' '}
-                                    <span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ff3860', border: '2px solid white', marginRight: 6, marginLeft: 12, verticalAlign: 'middle' }}></span>
-                                    Gare détectée
-                                    {' '}
-                                    <span style={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#3273dc', border: '2px solid white', marginRight: 6, marginLeft: 12, verticalAlign: 'middle' }}></span>
-                                    Autres gares
-                                </p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </section>
+                                        </Marker>
+                                    );
+                                })}
+
+                                {/* Popup for selected station */}
+                                {selectedStationIndex !== null && detectionResult.nearbyStations?.[selectedStationIndex] && (
+                                    <Popup
+                                        longitude={detectionResult.nearbyStations[selectedStationIndex].coord.lon}
+                                        latitude={detectionResult.nearbyStations[selectedStationIndex].coord.lat}
+                                        anchor="bottom"
+                                        onClose={() => setSelectedStationIndex(null)}
+                                        closeButton={true}
+                                        closeOnClick={false}
+                                    >
+                                        <Box>
+                                            <Typography fontWeight="bold">
+                                                {detectionResult.nearbyStations[selectedStationIndex].name}
+                                            </Typography>
+                                            <Typography variant="body2" sx={{ mt: 0.5 }}>
+                                                Distance: {detectionResult.nearbyStations[selectedStationIndex].distance}m
+                                            </Typography>
+                                            {detectionResult.station?.id === detectionResult.nearbyStations[selectedStationIndex].id && (
+                                                <Typography variant="body2" color="success.main" sx={{ mt: 0.5, display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                    <CheckCircle2 size={16} /> Gare détectée
+                                                </Typography>
+                                            )}
+                                        </Box>
+                                    </Popup>
+                                )}
+                            </Map>
+                        </Box>
+                        <Box sx={{ mt: 2 }}>
+                            <Typography variant="body2" color="text.secondary">
+                                <Box component="span" sx={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#00d1b2', border: '2px solid white', mr: 0.75, verticalAlign: 'middle' }} />
+                                Votre position
+                                {' '}
+                                <Box component="span" sx={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#ff3860', border: '2px solid white', mr: 0.75, ml: 1.5, verticalAlign: 'middle' }} />
+                                Gare détectée
+                                {' '}
+                                <Box component="span" sx={{ display: 'inline-block', width: 12, height: 12, borderRadius: '50%', backgroundColor: '#3273dc', border: '2px solid white', mr: 0.75, ml: 1.5, verticalAlign: 'middle' }} />
+                                Autres gares
+                            </Typography>
+                        </Box>
+                    </Paper>
+                )}
+            </PageLayout>
             <Footer />
         </>
     );
 };
 
 export default LocationDetection;
-

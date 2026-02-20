@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box } from '@mui/material';
 import Footer from '@/components/Footer';
 import Ad from '@/components/Ad';
 import AuthenticationSection from '@/components/home/AuthenticationSection';
@@ -140,7 +141,7 @@ const Home: React.FC = () => {
     ];
 
     return (
-        <div className="app-flight">
+        <Box sx={{ minHeight: '100vh' }}>
             <PageHeader
                 title="Dashboard"
                 subtitle="Accédez rapidement aux principales fonctionnalités"
@@ -148,58 +149,34 @@ const Home: React.FC = () => {
 
             />
 
-            <main>
-
+            <Box component="main" sx={{ px: 2, py: 2, pb: 10 }}>
                     {/* Authentication Section */}
                     {/*<AuthenticationSection />*/}
 
                     {/* Current Location Widget */}
                     <CurrentLocationSection />
 
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" adSlot='5391792359'/>
+                    <Box sx={{ mb: 3 }}>
+                        <Ad format="horizontal" size="responsive" adSlot='5391792359'/>
+                    </Box>
 
-                    {/* Main Pages Section */}
-                    <DashboardSection
-                        title="Pages Principales"
-                        icon={LayoutGrid}
-                        cards={mainPages}
-                        columnsWrapperClassName="is-mobile"
-                    />
+                    <DashboardSection title="Pages Principales" icon={LayoutGrid} cards={mainPages} />
 
-                    {/* Advertisement */}
-                    <Ad format="horizontal" size="responsive" className="mb-6" adSlot='2674307283'/>
+                    <Box sx={{ mb: 3 }}>
+                        <Ad format="horizontal" size="responsive" adSlot='2674307283'/>
+                    </Box>
 
-                    {/* Sample Routes Section */}
-                    <DashboardSection
-                        title="Exemples de Trajets"
-                        icon={Route}
-                        cards={sampleRoutes}
-                        columnsWrapperClassName="is-mobile"
-                    />
+                    <DashboardSection title="Exemples de Trajets" icon={Route} cards={sampleRoutes} />
 
-                    {/* Sample Trips Section */}
-                    <DashboardSection
-                        title="Exemples de Trajets Détaillés"
-                        icon={List}
-                        cards={sampleTrips}
-                        columnsWrapperClassName="is-mobile"
-                    />
+                    <DashboardSection title="Exemples de Trajets Détaillés" icon={List} cards={sampleTrips} />
 
-                    {/* API Documentation Section */}
-                    <DashboardSection
-                        title="Documentation"
-                        icon={Code}
-                        cards={apiDocs}
-                        columnsWrapperClassName="is-mobile"
-                    />
+                    <DashboardSection title="Documentation" icon={Code} cards={apiDocs} />
 
-                    {/* Advertisement */}
-                    <Ad format="auto" size="responsive" className="mb-6" adSlot='4669737629'/>
-
-            </main>
-            {/*<Footer />*/}
-        </div>
+                    <Box sx={{ mb: 3 }}>
+                        <Ad format="auto" size="responsive" adSlot='4669737629'/>
+                    </Box>
+            </Box>
+        </Box>
     );
 };
 

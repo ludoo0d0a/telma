@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { TextField, InputAdornment, IconButton, Paper, Box, Typography, Chip } from '@mui/material';
 import { Loader2, CheckCircle2, Navigation, Star } from 'lucide-react';
 import { searchPlaces, getPlacesNearby } from '@/services/navitiaApi';
 import { getFavorites, addFavorite, removeFavorite, isFavorite, sortFavoritesFirst } from '@/services/favoritesService';
@@ -263,83 +263,77 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
     };
 
     return (
-        <div className='field' ref={wrapperRef}>
-            <label className='label'>{label}</label>
-            <div className='field has-addons'>
-                <div className='control is-expanded has-icons-right'>
-                    <input
-                        className='input'
-                        type='text'
-                        value={inputValue}
-                        onChange={handleInputChange}
-                        onFocus={handleInputFocus}
-                        placeholder={placeholder}
-                        disabled={disabled || geolocating}
-                    />
-                    {loading && !geolocating && (
-                        <span className='icon is-right'>
-                            <Loader2 size={20} className="animate-spin" />
-                        </span>
-                    )}
-                    {!loading && !geolocating && selectedStation && (
-                        <span className='icon is-right has-text-success'>
-                            <CheckCircle2 size={20} />
-                        </span>
-                    )}
-                </div>
-                <div className='control'>
-                    <button
-                        type='button'
-                        className={`button ${geolocating ? 'is-loading' : ''}`}
-                        onClick={handleGetCurrentLocation}
-                        disabled={disabled || geolocating || loading}
-                        title='Utiliser ma position actuelle'
-                    >
-                        <span className='icon'>
-                            <Navigation size={20} />
-                        </span>
-                    </button>
-                </div>
-            </div>
-            {geolocationError && (
-                <p className='help is-danger'>{geolocationError}</p>
-            )}
+        <Box ref={wrapperRef} sx={{ position: 'relative' }}>
+            <TextField
+                fullWidth
+                label={label}
+                value={inputValue}
+                onChange={handleInputChange}
+                onFocus={handleInputFocus}
+                placeholder={placeholder}
+                disabled={disabled || geolocating}
+                error={!!geolocationError}
+                helperText={geolocationError}
+                InputProps={{
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            {loading && !geolocating && <Loader2 size={20} className="animate-spin" />}
+                            {!loading && !geolocating && selectedStation && <CheckCircle2 size={20} color="success" />}
+                            <IconButton
+                                onClick={handleGetCurrentLocation}
+                                disabled={disabled || geolocating || loading}
+                                title="Utiliser ma position actuelle"
+                                edge="end"
+                            >
+                                <Navigation size={20} />
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                }}
+            />
             {isOpen && suggestions.length > 0 && (
-                <div className='dropdown is-active' style={{ width: '100%', position: 'relative' }}>
-                    <div className='dropdown-menu' style={{ width: '100%' }}>
-                        <div className='dropdown-content' style={{ maxHeight: '200px', overflowY: 'auto' }}>
-                            {suggestions.map((station, index) => {
-                                const isFav = station.id ? favoriteIds.has(station.id) : false;
-                                return (
-                                    <a
-                                        key={station.id || index}
-                                        className='dropdown-item'
-                                        onClick={() => handleSelectStation(station)}
-                                        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
-                                    >
-                                        <div>
-                                            <strong>{cleanLocationName(station.name)}</strong>
-                                            {station.embedded_type && (
-                                                <span className='tag is-dark is-small ml-2'>
-                                                    {station.embedded_type === 'stop_area' ? 'Gare' : 'Point d\'arrêt'}
-                                                </span>
-                                            )}
-                                        </div>
-                                        <span
-                                            className='icon'
-                                            onClick={(e) => handleToggleFavorite(e, station)}
-                                            style={{ cursor: 'pointer', marginLeft: 'auto' }}
-                                        >
-                                            <Star size={16} className={isFav ? 'has-text-warning' : 'has-text-grey'} />
-                                        </span>
-                                    </a>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
+                <Paper sx={{ position: 'absolute', zIndex: 10, width: '100%', maxHeight: 200, overflow: 'auto', mt: 0.5 }}>
+                    {suggestions.map((station, index) => {
+                        const isFav = station.id ? favoriteIds.has(station.id) : false;
+                        return (
+                            <Box
+                                key={station.id || index}
+                                onClick={() => handleSelectStation(station)}
+                                sx={{
+                                    p: 2,
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    '&:hover': { bgcolor: 'action.hover' },
+                                    borderBottom: '1px solid',
+                                    borderColor: 'divider',
+                                }}
+                            >
+                                <Box>
+                                    <Typography fontWeight={600}>{cleanLocationName(station.name)}</Typography>
+                                    {station.embedded_type && (
+                                        <Chip
+                                            label={station.embedded_type === 'stop_area' ? 'Gare' : "Point d'arrêt"}
+                                            size="small"
+                                            variant="outlined"
+                                            sx={{ ml: 1 }}
+                                        />
+                                    )}
+                                </Box>
+                                <Box
+                                    component="span"
+                                    onClick={(e) => handleToggleFavorite(e, station)}
+                                    sx={{ cursor: 'pointer', color: isFav ? 'warning.main' : 'text.secondary' }}
+                                >
+                                    <Star size={16} />
+                                </Box>
+                            </Box>
+                        );
+                    })}
+                </Paper>
             )}
-        </div>
+        </Box>
     );
 };
 

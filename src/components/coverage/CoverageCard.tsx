@@ -1,4 +1,5 @@
 import React from 'react';
+import { Box, Grid, Paper, Typography } from '@mui/material';
 import type { Coverage } from '@/client/models';
 import { formatDateString } from '@/utils/dateUtils';
 import { getStatusBadge } from './coverageUtils';
@@ -10,28 +11,26 @@ interface CoverageCardProps {
 
 const CoverageCard: React.FC<CoverageCardProps> = ({ coverage, onClick }) => {
     return (
-        <div className='column is-half-tablet is-one-third-desktop'>
-            <div 
-                className='box is-clickable' 
-                onClick={() => onClick(coverage.id)} 
-                style={{ cursor: 'pointer' }}
+        <Grid item xs={12} sm={6} md={4}>
+            <Paper
+                onClick={() => onClick(coverage.id)}
+                sx={{
+                    p: 2,
+                    cursor: 'pointer',
+                    '&:hover': { bgcolor: 'action.hover' },
+                }}
             >
-                <h3 className='title is-5 mb-3'>{coverage.id}</h3>
-                <div className='content'>
-                    <div className='mb-3'>
-                        {getStatusBadge(coverage.status)}
-                    </div>
-                    {coverage.start_production_date && (
-                        <p><strong>Début:</strong> {formatDateString(coverage.start_production_date)}</p>
-                    )}
-                    {coverage.end_production_date && (
-                        <p><strong>Fin:</strong> {formatDateString(coverage.end_production_date)}</p>
-                    )}
-                </div>
-            </div>
-        </div>
+                <Typography variant="h6" sx={{ mb: 1 }}>{coverage.id}</Typography>
+                <Box sx={{ mb: 1 }}>{getStatusBadge(coverage.status)}</Box>
+                {coverage.start_production_date && (
+                    <Typography variant="body2"><strong>Début:</strong> {formatDateString(coverage.start_production_date)}</Typography>
+                )}
+                {coverage.end_production_date && (
+                    <Typography variant="body2"><strong>Fin:</strong> {formatDateString(coverage.end_production_date)}</Typography>
+                )}
+            </Paper>
+        </Grid>
     );
 };
 
 export default CoverageCard;
-
