@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Paper, Typography, TextField, Button, Grid } from '@mui/material';
+import { Box, Paper, Typography, TextField, Button } from '@mui/material';
 import { Search, ArrowLeftRight, RefreshCw } from 'lucide-react';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import type { Place } from '@/client/models/place';
@@ -71,19 +71,17 @@ const ItinerarySearchForm: React.FC<ItinerarySearchFormProps> = ({
                     </Button>
                 )}
             </Box>
-            <Grid container spacing={2} alignItems="flex-end">
-                <Grid item xs={12} sm={5}>
-                    <LocationAutocomplete
-                        label="Gare de départ"
-                        value={fromName}
-                        onValueChange={onFromValueChange}
-                        onChange={onFromChange}
-                        defaultSearchTerm={fromName || 'Metz'}
-                        onStationFound={onFromStationFound}
-                        disabled={loading}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={2}>
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, width: '100%' }}>
+                <LocationAutocomplete
+                    label="Gare de départ"
+                    value={fromName}
+                    onValueChange={onFromValueChange}
+                    onChange={onFromChange}
+                    defaultSearchTerm={fromName || 'Metz'}
+                    onStationFound={onFromStationFound}
+                    disabled={loading}
+                />
+                <Box sx={{ display: 'flex', justifyContent: 'center', py: 0.5 }}>
                     <Button
                         variant="outlined"
                         onClick={onInvertItinerary}
@@ -93,53 +91,50 @@ const ItinerarySearchForm: React.FC<ItinerarySearchFormProps> = ({
                     >
                         <ArrowLeftRight size={20} />
                     </Button>
-                </Grid>
-                <Grid item xs={12} sm={5}>
-                    <LocationAutocomplete
-                        label="Gare d'arrivée"
-                        value={toName}
-                        onValueChange={onToValueChange}
-                        onChange={onToChange}
-                        defaultSearchTerm={toName || 'Thionville'}
-                        onStationFound={onToStationFound}
-                        disabled={loading}
-                    />
-                </Grid>
-            </Grid>
-            <Grid container spacing={2} alignItems="flex-end" sx={{ mt: 2 }}>
-                <Grid item xs={6} sm={3}>
-                    <TextField
-                        label="Date"
-                        type="date"
-                        value={filterDate}
-                        onChange={(e) => onFilterDateChange(e.target.value)}
-                        disabled={loading}
-                        size="small"
-                        InputLabelProps={{ shrink: true }}
-                    />
-                </Grid>
-                <Grid item xs={6} sm={3}>
-                    <TextField
-                        label="Heure"
-                        type="time"
-                        value={filterTime}
-                        onChange={(e) => onFilterTimeChange(e.target.value)}
-                        disabled={loading}
-                        size="small"
-                        InputLabelProps={{ shrink: true }}
-                    />
-                </Grid>
-                <Grid item xs={12} sm={4}>
-                    <Button
-                        variant="contained"
-                        onClick={onSearch}
-                        disabled={loading || !fromId || !toId}
-                        startIcon={<Search size={16} />}
-                    >
-                        Rechercher
-                    </Button>
-                </Grid>
-            </Grid>
+                </Box>
+                <LocationAutocomplete
+                    label="Gare d'arrivée"
+                    value={toName}
+                    onValueChange={onToValueChange}
+                    onChange={onToChange}
+                    defaultSearchTerm={toName || 'Thionville'}
+                    onStationFound={onToStationFound}
+                    disabled={loading}
+                />
+            </Box>
+            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2, alignItems: 'flex-end', mt: 2, width: '100%' }}>
+                <TextField
+                    label="Date"
+                    type="date"
+                    value={filterDate}
+                    onChange={(e) => onFilterDateChange(e.target.value)}
+                    disabled={loading}
+                    size="small"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ flex: { xs: '1 1 100%', sm: '1 1 140px' }, minWidth: 0 }}
+                />
+                <TextField
+                    label="Heure"
+                    type="time"
+                    value={filterTime}
+                    onChange={(e) => onFilterTimeChange(e.target.value)}
+                    disabled={loading}
+                    size="small"
+                    fullWidth
+                    InputLabelProps={{ shrink: true }}
+                    sx={{ flex: { xs: '1 1 100%', sm: '1 1 100px' }, minWidth: 0 }}
+                />
+                <Button
+                    variant="contained"
+                    onClick={onSearch}
+                    disabled={loading || !fromId || !toId}
+                    startIcon={<Search size={16} />}
+                    sx={{ flex: { xs: '1 1 100%', sm: '1 1 auto' } }}
+                >
+                    Rechercher
+                </Button>
+            </Box>
         </Paper>
     );
 };
