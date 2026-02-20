@@ -593,24 +593,15 @@ const Trajet: React.FC = () => {
         <>
             <PageLayout fullHeight={!showResults}>
                 {!showResults && (
-                    <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
-                            <Button
-                                variant="contained"
-                                onClick={handleRefresh}
-                                disabled={loading}
-                                startIcon={loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
-                            >
-                                Actualiser
-                            </Button>
-                        </Box>
-
-                        <Box sx={{ mb: 2 }}>
-                            <Ad format="horizontal" size="responsive" />
-                        </Box>
-
-                        <Box sx={{ flex: 1 }}>
-                            <ItinerarySearchForm
+                    <Box
+                        sx={{
+                            flex: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            minHeight: { xs: 'calc(100vh - 180px)', sm: 'calc(100vh - 200px)' },
+                        }}
+                    >
+                        <ItinerarySearchForm
                                     fromName={fromName}
                                     toName={toName}
                                     fromId={fromId}
@@ -640,7 +631,12 @@ const Trajet: React.FC = () => {
                                     onFilterTimeChange={setFilterTime}
                                     onSearch={handleSearch}
                                     onInvertItinerary={handleInvertItinerary}
+                                    onRefresh={handleRefresh}
+                                    refreshing={loading}
                                 />
+
+                        <Box sx={{ mt: 2 }}>
+                            <Ad format="horizontal" size="responsive" />
                         </Box>
 
                         {error && !loading && (
