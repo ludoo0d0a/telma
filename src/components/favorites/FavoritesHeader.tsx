@@ -1,20 +1,14 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 import { Star } from 'lucide-react';
 
 const FavoritesHeader: React.FC = () => {
     return (
-        <div className='level mb-5'>
-            <div className='level-left'>
-                <div className='level-item'>
-                    <h1 className='title is-2'>
-                        <span className='icon has-text-warning mr-3'><Star size={24} /></span>
-                        Favoris
-                    </h1>
-                </div>
-            </div>
-        </div>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+            <Star size={24} color="var(--primary, #f97316)" style={{ marginRight: 12 }} />
+            <Typography variant="h4">Favoris</Typography>
+        </Box>
     );
 };
 
 export default FavoritesHeader;
-

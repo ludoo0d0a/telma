@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { TableCell, TableRow, Chip, Button, Box, Typography } from '@mui/material';
 import { AlertTriangle, Info, Train as TrainIcon } from 'lucide-react';
 import type { JourneyItem } from '@/client/models/journey-item';
 import type { JourneyInfo } from '@/services/journeyService';
@@ -7,6 +8,15 @@ import type { Disruption } from '@/client/models/disruption';
 import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
 import { getDelay, getMaxDelay } from '@/services/delayService';
 import { encodeVehicleJourneyId } from '@/utils/uriUtils';
+
+const tagClassToChipColor = (tagClass: string): 'error' | 'success' | 'warning' | 'info' | 'default' | 'primary' => {
+    if (tagClass === 'is-danger') return 'error';
+    if (tagClass === 'is-success') return 'success';
+    if (tagClass === 'is-warning') return 'warning';
+    if (tagClass === 'is-info') return 'info';
+    if (tagClass === 'is-primary') return 'primary';
+    return 'default';
+};
 
 interface JourneyTableRowProps {
     journey: JourneyItem;
@@ -36,19 +46,20 @@ const JourneyTableRow: React.FC<JourneyTableRowProps> = ({
         journeyInfo.realArrivalTime
     );
 
+    const TransportIcon = journeyInfo.transportIcon;
+
     return (
-        <tr>
-            <td>
-                <span className='tag is-dark has-text-weight-semibold'>{formatDate(depDate, 'short')}</span>
-            </td>
-            <td>
-                <div>
-                    <div className='is-flex is-align-items-center mb-2'>
-                        <span className={`icon ${journeyInfo.transportColor} mr-2`}>
-                            <journeyInfo.transportIcon size={20} />
-                        </span>
+        <TableRow hover>
+            <TableCell>
+                <Chip label={formatDate(depDate, 'short')} size="small" color="default" sx={{ fontWeight: 600 }} />
+            </TableCell>
+            <TableCell>
+                <Box>
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                        <Box component="span" sx={{ mr: 1, color: 'primary.main', display: 'inline-flex' }}>
+                            <TransportIcon size={20} />
+                        </Box>
                         {journeyInfo.vehicleJourneyId ? (() => {
-                            // Ensure we have a string ID, not an object
                             let trainId = journeyInfo.vehicleJourneyId;
                             if (typeof trainId === 'object' && trainId !== null) {
                                 trainId = (trainId as { id?: string; href?: string }).id || (trainId as { id?: string; href?: string }).href || null;
@@ -56,80 +67,82 @@ const JourneyTableRow: React.FC<JourneyTableRowProps> = ({
                             return trainId ? (
                                 <Link
                                     to={`/train/${encodeVehicleJourneyId(trainId)}`}
-                                    className='has-text-primary has-text-weight-bold'
+                                    style={{ color: 'inherit', fontWeight: 600, textDecoration: 'none' }}
                                 >
                                     {journeyInfo.trainNumber}
                                 </Link>
                             ) : (
-                                <strong className='has-text-primary'>{journeyInfo.trainNumber}</strong>
+                                <Typography component="span" fontWeight={600} color="primary.main">{journeyInfo.trainNumber}</Typography>
                             );
                         })() : (
-                            <strong className='has-text-primary'>{journeyInfo.trainNumber}</strong>
+                            <Typography component="span" fontWeight={600} color="primary.main">{journeyInfo.trainNumber}</Typography>
                         )}
-                    </div>
-                    <span className={`tag ${journeyInfo.transportTagColor} is-dark`}>
-                        {journeyInfo.transportLabel}
-                    </span>
+                    </Box>
+                    <Chip label={journeyInfo.transportLabel} size="small" sx={{ mr: 0.5 }} />
                     {journeyInfo.network && journeyInfo.network !== journeyInfo.commercialMode && (
                         <>
                             <br />
-                            <small className='has-text-grey'>{journeyInfo.network}</small>
+                            <Typography component="small" variant="caption" color="text.secondary">{journeyInfo.network}</Typography>
                         </>
                     )}
-                </div>
-            </td>
-            <td>
-                <div>
-                    <strong className='has-text-info'>{journeyInfo.departureStation}</strong>
+                </Box>
+            </TableCell>
+            <TableCell>
+                <Box>
+                    <Typography fontWeight={600} color="info.main">{journeyInfo.departureStation}</Typography>
                     <br />
-                    <span className='is-size-5'>{formatTime(parseUTCDate(journeyInfo.baseDepartureTime))}</span>
+                    <Typography component="span">{formatTime(parseUTCDate(journeyInfo.baseDepartureTime))}</Typography>
                     {depDelay && depDelay !== 'À l\'heure' && (
                         <>
                             <br />
-                            <span className='has-text-danger'>{formatTime(parseUTCDate(journeyInfo.realDepartureTime))}</span>
+                            <Typography component="span" color="error.main">{formatTime(parseUTCDate(journeyInfo.realDepartureTime))}</Typography>
                         </>
                     )}
                     {depDelay && (
                         <>
                             <br />
-                            <span className={`tag is-small ${depDelay !== 'À l\'heure' ? 'is-danger' : 'is-success'}`}>
-                                {depDelay}
-                            </span>
+                            <Chip
+                                label={depDelay}
+                                size="small"
+                                color={depDelay !== 'À l\'heure' ? 'error' : 'success'}
+                            />
                         </>
                     )}
-                </div>
-            </td>
-            <td>
-                <div>
-                    <strong className='has-text-info'>{journeyInfo.arrivalStation}</strong>
+                </Box>
+            </TableCell>
+            <TableCell>
+                <Box>
+                    <Typography fontWeight={600} color="info.main">{journeyInfo.arrivalStation}</Typography>
                     <br />
-                    <span className='is-size-5'>{formatTime(parseUTCDate(journeyInfo.baseArrivalTime))}</span>
+                    <Typography component="span">{formatTime(parseUTCDate(journeyInfo.baseArrivalTime))}</Typography>
                     {arrDelay && arrDelay !== 'À l\'heure' && (
                         <>
                             <br />
-                            <span className='has-text-danger'>{formatTime(parseUTCDate(journeyInfo.realArrivalTime))}</span>
+                            <Typography component="span" color="error.main">{formatTime(parseUTCDate(journeyInfo.realArrivalTime))}</Typography>
                         </>
                     )}
                     {arrDelay && (
                         <>
                             <br />
-                            <span className={`tag is-small ${arrDelay !== 'À l\'heure' ? 'is-danger' : 'is-success'}`}>
-                                {arrDelay}
-                            </span>
+                            <Chip
+                                label={arrDelay}
+                                size="small"
+                                color={arrDelay !== 'À l\'heure' ? 'error' : 'success'}
+                            />
                         </>
                     )}
-                </div>
-            </td>
-            <td>
+                </Box>
+            </TableCell>
+            <TableCell>
                 {maxDelay && maxDelay !== 'À l\'heure' ? (
-                    <span className='tag is-danger'>{maxDelay}</span>
+                    <Chip label={maxDelay} size="small" color="error" />
                 ) : (
-                    <span className='tag is-success'>À l'heure</span>
+                    <Chip label="À l'heure" size="small" color="success" />
                 )}
-            </td>
-            <td>
+            </TableCell>
+            <TableCell>
                 {journeyDisruptions.length > 0 ? (
-                    <div className='tags'>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                         {journeyDisruptions.map((disruption, disIndex) => {
                             let severityText = 'unknown';
                             if (typeof disruption.severity === 'string') {
@@ -139,7 +152,6 @@ const JourneyTableRow: React.FC<JourneyTableRowProps> = ({
                                               (disruption.severity as { name?: string; label?: string }).label ||
                                               'Perturbation';
                             }
-
                             const severityLevel = severityText.toLowerCase();
                             let tagClass = 'is-warning';
                             if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
@@ -149,57 +161,55 @@ const JourneyTableRow: React.FC<JourneyTableRowProps> = ({
                             } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
                                 tagClass = 'is-warning';
                             }
-
                             const message = disruption.messages && disruption.messages.length > 0
                                 ? disruption.messages[0].text || (disruption.messages[0] as { message?: string }).message
                                 : disruption.message || severityText;
-
                             return (
-                                <span
+                                <Chip
                                     key={disIndex}
-                                    className={`tag ${tagClass} is-small`}
+                                    size="small"
+                                    color={tagClassToChipColor(tagClass)}
+                                    icon={<AlertTriangle size={14} />}
+                                    label={message.length > 30 ? message.substring(0, 30) + '...' : message}
                                     title={message}
-                                >
-                                    <span className='icon mr-1'>
-                                        <AlertTriangle size={20} />
-                                    </span>
-                                    {message.length > 30 ? message.substring(0, 30) + '...' : message}
-                                </span>
+                                />
                             );
                         })}
-                    </div>
+                    </Box>
                 ) : (
-                    <span className='has-text-grey' style={{fontStyle: 'italic'}}>-</span>
+                    <Typography component="span" color="text.secondary" fontStyle="italic">-</Typography>
                 )}
-            </td>
-            <td>
-                <span className='tag is-dark has-text-weight-semibold'>{Math.floor(journeyInfo.duration / 60)}min</span>
-            </td>
-            <td>
+            </TableCell>
+            <TableCell>
+                <Chip label={`${Math.floor(journeyInfo.duration / 60)}min`} size="small" sx={{ fontWeight: 600 }} />
+            </TableCell>
+            <TableCell>
                 {journeyInfo.wagonCount ? (
-                    <span className='tag is-info is-dark'>
-                        <span className='icon mr-1'><TrainIcon size={16} /></span>
-                        {journeyInfo.wagonCount}
-                    </span>
+                    <Chip
+                        size="small"
+                        icon={<TrainIcon size={14} />}
+                        label={journeyInfo.wagonCount}
+                        color="info"
+                    />
                 ) : (
-                    <span className='has-text-grey' style={{fontStyle: 'italic'}}>N/A</span>
+                    <Typography component="span" color="text.secondary" fontStyle="italic">N/A</Typography>
                 )}
-            </td>
-            <td>
-                <Link
+            </TableCell>
+            <TableCell>
+                <Button
+                    component={Link}
                     to={`/trip/${tripId}`}
-                    className='button is-small is-info is-light'
+                    variant="outlined"
+                    size="small"
+                    color="info"
                     onClick={onDetailClick}
-                    title='Voir les détails du trajet'
+                    title="Voir les détails du trajet"
                 >
-                    <span className='icon'>
-                        <Info size={16} />
-                    </span>
-                </Link>
-            </td>
-        </tr>
+                    <Info size={16} />
+                </Button>
+            </TableCell>
+        </TableRow>
     );
 };
 
 export default JourneyTableRow;
-

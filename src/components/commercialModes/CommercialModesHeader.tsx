@@ -1,18 +1,12 @@
 import React from 'react';
+import { Box, Typography } from '@mui/material';
 
 const CommercialModesHeader: React.FC = () => {
     return (
-        <div className='level mb-5'>
-            <div className='level-left'>
-                <div className='level-item'>
-                    <h1 className='title is-2'>
-                        Modes de transport <span>SNCF</span>
-                    </h1>
-                </div>
-            </div>
-        </div>
+        <Box sx={{ mb: 3 }}>
+            <Typography variant="h4">Modes de transport <Typography component="span" color="text.secondary">SNCF</Typography></Typography>
+        </Box>
     );
 };
 
 export default CommercialModesHeader;
-

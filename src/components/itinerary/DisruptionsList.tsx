@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
+import { Paper, Typography, Box, Alert, Collapse } from '@mui/material';
 import { AlertTriangle, ChevronUp, ChevronDown, Ban, Info, Clock } from 'lucide-react';
 import type { Disruption } from '@/client/models/disruption';
 import { cleanLocationName } from '@/services/locationService';
 import type { ImpactApplicationPeriodsInner } from '@/client/models/impact-application-periods-inner';
+
+const severityToAlertSeverity = (notificationClass: string): 'error' | 'warning' | 'info' => {
+    if (notificationClass === 'is-danger') return 'error';
+    if (notificationClass === 'is-info') return 'info';
+    return 'warning';
+};
 
 interface DisruptionsListProps {
     disruptions: Disruption[];
@@ -16,135 +23,117 @@ const DisruptionsList: React.FC<DisruptionsListProps> = ({ disruptions }) => {
     }
 
     return (
-        <div className='box mb-5'>
-            <h3
-                className='title is-5 mb-4 is-clickable'
+        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
+            <Typography
+                variant="h6"
                 onClick={() => setShowDisruptionsSection(!showDisruptionsSection)}
-                style={{ cursor: 'pointer' }}
+                sx={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 1 }}
             >
-                <span className='icon has-text-warning mr-2'>
-                    <AlertTriangle size={20} />
-                </span>
+                <AlertTriangle size={20} color="var(--primary, #f97316)" />
                 Perturbations ({disruptions.length})
-                <span className='icon ml-2'>
-                    {showDisruptionsSection ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                </span>
-            </h3>
-            {showDisruptionsSection && disruptions.map((disruption, index) => {
-                // Handle severity - can be string, object with name, or object with other properties
-                let severityText = 'unknown';
-                if (typeof disruption.severity === 'string') {
-                    severityText = disruption.severity;
-                } else if (disruption.severity && typeof disruption.severity === 'object') {
-                    severityText = (disruption.severity as { name?: string; label?: string }).name ||
-                                  (disruption.severity as { name?: string; label?: string }).label ||
-                                  JSON.stringify(disruption.severity);
-                }
-
-                const severityLevel = severityText.toLowerCase();
-
-                // Determine notification type based on severity
-                let notificationClass = 'is-warning';
-                let IconComponent = AlertTriangle;
-                if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
-                    notificationClass = 'is-danger';
-                    IconComponent = Ban;
-                } else if (severityLevel.includes('information') || severityLevel.includes('info') || severityLevel.includes('information')) {
-                    notificationClass = 'is-info';
-                    IconComponent = Info;
-                } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
-                    notificationClass = 'is-warning';
-                    IconComponent = Clock;
-                }
-
-                return (
-                    <div key={index} className={`notification ${notificationClass} mb-3`}>
-                        <div className='is-flex is-align-items-center mb-2'>
-                            <span className='icon mr-2'>
-                                <IconComponent size={20} />
-                            </span>
-                            <strong>
+                {showDisruptionsSection ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </Typography>
+            <Collapse in={showDisruptionsSection}>
+                {disruptions.map((disruption, index) => {
+                    let severityText = 'unknown';
+                    if (typeof disruption.severity === 'string') {
+                        severityText = disruption.severity;
+                    } else if (disruption.severity && typeof disruption.severity === 'object') {
+                        severityText = (disruption.severity as { name?: string; label?: string }).name ||
+                                      (disruption.severity as { name?: string; label?: string }).label ||
+                                      JSON.stringify(disruption.severity);
+                    }
+                    const severityLevel = severityText.toLowerCase();
+                    let notificationClass = 'is-warning';
+                    let IconComponent = AlertTriangle;
+                    if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
+                        notificationClass = 'is-danger';
+                        IconComponent = Ban;
+                    } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
+                        notificationClass = 'is-info';
+                        IconComponent = Info;
+                    } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
+                        notificationClass = 'is-warning';
+                        IconComponent = Clock;
+                    }
+                    return (
+                        <Alert
+                            key={index}
+                            severity={severityToAlertSeverity(notificationClass)}
+                            icon={<IconComponent size={20} />}
+                            sx={{ mb: 2 }}
+                        >
+                            <Typography fontWeight={600} sx={{ mb: 1 }}>
                                 {severityText !== 'unknown' ? severityText : 'Perturbation'}
-                            </strong>
-                        </div>
-                        {/* Display messages from messages array */}
-                        {disruption.messages && Array.isArray(disruption.messages) && disruption.messages.length > 0 && (
-                            <div className='content mb-2'>
-                                {disruption.messages.map((msg, msgIndex) => (
-                                    <p key={msgIndex} className='mb-2'>
-                                        {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
-                                    </p>
-                                ))}
-                            </div>
-                        )}
-                        {/* Fallback to single message field if messages array doesn't exist */}
-                        {(!disruption.messages || disruption.messages.length === 0) && disruption.message && (
-                            <p className='mb-2'>{disruption.message}</p>
-                        )}
-                        {disruption.impacted_objects && disruption.impacted_objects.length > 0 && (
-                            <div className='content is-small mt-2'>
-                                <p className='has-text-weight-semibold'>Objets impactés:</p>
-                                {disruption.impacted_objects.map((obj, objIndex) => (
-                                    <div key={objIndex} className='mb-3'>
-                                        <p className='has-text-weight-medium mb-1'>
-                                            {obj.pt_object?.name || obj.pt_object?.id || `Objet ${objIndex + 1}`}
-                                        </p>
-                                        {/* Display impacted stops */}
-                                        {obj.impacted_stops && Array.isArray(obj.impacted_stops) && obj.impacted_stops.length > 0 && (
-                                            <div className='ml-3'>
-                                                <p className='has-text-weight-semibold is-size-7 mb-1'>Arrêts impactés:</p>
-                                                <ul className='is-size-7'>
-                                                    {obj.impacted_stops.map((stop, stopIndex) => (
-                                                        <li key={stopIndex}>
-                                                            {cleanLocationName(stop.name || stop.stop_point?.name || stop.stop_area?.name || stop.id || 'Arrêt inconnu')}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                        {/* Display other pt_object properties */}
-                                        {obj.pt_object && (
-                                            <div className='ml-3 is-size-7'>
-                                                {obj.pt_object.name && (
-                                                    <p><strong>Nom:</strong> {obj.pt_object.name}</p>
-                                                )}
-                                                {obj.pt_object.id && (
-                                                    <p><strong>ID:</strong> {obj.pt_object.id}</p>
-                                                )}
-                                                {obj.pt_object.embedded_type && (
-                                                    <p><strong>Type:</strong> {obj.pt_object.embedded_type}</p>
-                                                )}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                        {disruption.application_periods && disruption.application_periods.length > 0 && (
-                            <div className='content is-small mt-2'>
-                                <p className='has-text-weight-semibold'>Période d'application:</p>
-                                <ul>
-                                    {disruption.application_periods.map((period, periodIndex) => (
-                                        <li key={periodIndex}>
-                                            Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : 'N/A'}
-                                            {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : 'N/A'}
-                                        </li>
+                            </Typography>
+                            {disruption.messages && Array.isArray(disruption.messages) && disruption.messages.length > 0 && (
+                                <Box sx={{ mb: 1 }}>
+                                    {disruption.messages.map((msg, msgIndex) => (
+                                        <Typography key={msgIndex} sx={{ mb: 1 }}>
+                                            {msg.text || (msg as { message?: string }).message || JSON.stringify(msg)}
+                                        </Typography>
                                     ))}
-                                </ul>
-                            </div>
-                        )}
-                    </div>
-                );
-            })}
+                                </Box>
+                            )}
+                            {(!disruption.messages || disruption.messages.length === 0) && disruption.message && (
+                                <Typography sx={{ mb: 1 }}>{disruption.message}</Typography>
+                            )}
+                            {disruption.impacted_objects && disruption.impacted_objects.length > 0 && (
+                                <Box sx={{ mt: 2 }}>
+                                    <Typography fontWeight={600}>Objets impactés:</Typography>
+                                    {disruption.impacted_objects.map((obj, objIndex) => (
+                                        <Box key={objIndex} sx={{ mb: 2 }}>
+                                            <Typography fontWeight={500} sx={{ mb: 1 }}>
+                                                {obj.pt_object?.name || obj.pt_object?.id || `Objet ${objIndex + 1}`}
+                                            </Typography>
+                                            {obj.impacted_stops && Array.isArray(obj.impacted_stops) && obj.impacted_stops.length > 0 && (
+                                                <Box sx={{ ml: 2 }}>
+                                                    <Typography variant="caption" fontWeight={600} display="block" sx={{ mb: 0.5 }}>Arrêts impactés:</Typography>
+                                                    <Box component="ul" sx={{ m: 0, pl: 2, fontSize: '0.75rem' }}>
+                                                        {obj.impacted_stops.map((stop, stopIndex) => (
+                                                            <li key={stopIndex}>
+                                                                {cleanLocationName(stop.name || stop.stop_point?.name || stop.stop_area?.name || stop.id || 'Arrêt inconnu')}
+                                                            </li>
+                                                        ))}
+                                                    </Box>
+                                                </Box>
+                                            )}
+                                            {obj.pt_object && (
+                                                <Box sx={{ ml: 2, fontSize: '0.75rem' }}>
+                                                    {obj.pt_object.name && <Typography><strong>Nom:</strong> {obj.pt_object.name}</Typography>}
+                                                    {obj.pt_object.id && <Typography><strong>ID:</strong> {obj.pt_object.id}</Typography>}
+                                                    {obj.pt_object.embedded_type && <Typography><strong>Type:</strong> {obj.pt_object.embedded_type}</Typography>}
+                                                </Box>
+                                            )}
+                                        </Box>
+                                    ))}
+                                </Box>
+                            )}
+                            {disruption.application_periods && disruption.application_periods.length > 0 && (
+                                <Box sx={{ mt: 2 }}>
+                                    <Typography fontWeight={600}>Période d'application:</Typography>
+                                    <Box component="ul" sx={{ m: 0, pl: 2 }}>
+                                        {disruption.application_periods.map((period: ImpactApplicationPeriodsInner, periodIndex: number) => (
+                                            <li key={periodIndex}>
+                                                Du {period.begin ? new Date(period.begin).toLocaleString('fr-FR') : 'N/A'}
+                                                {' '}au {period.end ? new Date(period.end).toLocaleString('fr-FR') : 'N/A'}
+                                            </li>
+                                        ))}
+                                    </Box>
+                                </Box>
+                            )}
+                        </Alert>
+                    );
+                })}
+            </Collapse>
             {!showDisruptionsSection && (
-                <p className='has-text-grey is-italic'>
+                <Typography color="text.secondary" fontStyle="italic" sx={{ mt: 1 }}>
                     Cliquez sur le titre pour afficher les détails des perturbations.
                     Les perturbations sont également affichées dans le tableau ci-dessous.
-                </p>
+                </Typography>
             )}
-        </div>
+        </Paper>
     );
 };
 
 export default DisruptionsList;
-

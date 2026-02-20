@@ -1,5 +1,7 @@
 import React from 'react';
+import { Box, Paper, Typography, Grid } from '@mui/material';
 import { PageHeader } from '@/components/skytrip';
+import PageLayout from '@/components/shared/PageLayout';
 
 const Stats: React.FC = () => {
     return (
@@ -8,36 +10,30 @@ const Stats: React.FC = () => {
                 title="Statistics"
                 subtitle="Visualisez vos indicateurs clés"
                 showNotification={false}
-                
             />
-
-            <main>
-                <div className="flight-results-section">
-                    <div className="container">
-                        <h2 className="title is-2">Statistics</h2>
-                        <div className="columns is-multiline">
-                            <div className="column is-one-third">
-                                <div className="box">
-                                    <p className="title is-4">Total Journeys</p>
-                                    <p className="subtitle is-6">1,234</p>
-                                </div>
-                            </div>
-                            <div className="column is-one-third">
-                                <div className="box">
-                                    <p className="title is-4">Stations Covered</p>
-                                    <p className="subtitle is-6">567</p>
-                                </div>
-                            </div>
-                            <div className="column is-one-third">
-                                <div className="box">
-                                    <p className="title is-4">Active Users</p>
-                                    <p className="subtitle is-6">890</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
+            <PageLayout>
+                <Typography variant="h4" sx={{ mb: 3 }}>Statistics</Typography>
+                <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Paper variant="outlined" sx={{ p: 2 }}>
+                            <Typography variant="h6" color="text.secondary">Total Journeys</Typography>
+                            <Typography variant="h4">1,234</Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Paper variant="outlined" sx={{ p: 2 }}>
+                            <Typography variant="h6" color="text.secondary">Stations Covered</Typography>
+                            <Typography variant="h4">567</Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                        <Paper variant="outlined" sx={{ p: 2 }}>
+                            <Typography variant="h6" color="text.secondary">Active Users</Typography>
+                            <Typography variant="h4">890</Typography>
+                        </Paper>
+                    </Grid>
+                </Grid>
+            </PageLayout>
         </div>
     );
 };

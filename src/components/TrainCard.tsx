@@ -1,6 +1,7 @@
 import React from 'react';
 import { Train, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { Card, CardContent, Box, Typography } from '@mui/material';
 
 interface TrainCardProps {
     city: string;
@@ -8,27 +9,23 @@ interface TrainCardProps {
 
 const TrainCard: React.FC<TrainCardProps> = ({ city }) => {
     return (
-        <Link to={`/city/${city.toLowerCase()}`} className='train-card-wrapper'>
-            <div className='card train-card-item'>
-                <div className='card-content'>
-                    <div className='media'>
-                        <div className='media-left'>
-                            <span className='icon is-medium has-text-primary'>
-                                <Train size={32} />
-                            </span>
-                        </div>
-                        <div className='media-content'>
-                            <p className='title is-5 mb-1'>{city}</p>
-                            <p className='subtitle is-7'>View station schedules</p>
-                        </div>
-                        <div className='media-right'>
-                            <span className='icon has-text-grey-light'>
-                                <ChevronRight size={20} />
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <Link to={`/city/${city.toLowerCase()}`} className='train-card-wrapper' style={{ textDecoration: 'none' }}>
+            <Card variant="outlined" sx={{ '&:hover': { boxShadow: 2 } }}>
+                <CardContent>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                        <Box sx={{ color: 'primary.main', display: 'flex', alignItems: 'center' }}>
+                            <Train size={32} />
+                        </Box>
+                        <Box sx={{ flex: 1, minWidth: 0 }}>
+                            <Typography variant="h6" sx={{ mb: 0.5 }}>{city}</Typography>
+                            <Typography variant="body2" color="text.secondary">View station schedules</Typography>
+                        </Box>
+                        <Box sx={{ color: 'text.secondary' }}>
+                            <ChevronRight size={20} />
+                        </Box>
+                    </Box>
+                </CardContent>
+            </Card>
         </Link>
     );
 };

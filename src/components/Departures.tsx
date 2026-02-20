@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
+import { Box, Chip } from '@mui/material'
 import { getDepartures } from '@/services/navitiaApi'
 import { extractVehicleJourneyId } from '@/services/vehicleJourneyService'
 import { parseUTCDate, getFullMinutes } from '@/utils/dateUtils'
@@ -23,7 +24,7 @@ interface ProcessedDeparture {
 }
 
 interface DisruptionSeverityInfo {
-    tagClass: string;
+    chipColor: 'error' | 'warning' | 'info';
     icon: React.ComponentType<{ size?: number | string; className?: string }>;
     severityText: string;
 }
@@ -123,21 +124,21 @@ const Departures: React.FC = () => {
         }
         
         const severityLevel = severityText.toLowerCase();
-        let tagClass = 'is-warning';
+        let chipColor: 'error' | 'warning' | 'info' = 'warning';
         let IconComponent = AlertTriangle;
         
         if (severityLevel.includes('blocking') || severityLevel.includes('blocked') || severityLevel.includes('suspended')) {
-            tagClass = 'is-danger';
+            chipColor = 'error';
             IconComponent = Ban;
         } else if (severityLevel.includes('information') || severityLevel.includes('info')) {
-            tagClass = 'is-info';
+            chipColor = 'info';
             IconComponent = Info;
         } else if (severityLevel.includes('delay') || severityLevel.includes('retard')) {
-            tagClass = 'is-warning';
+            chipColor = 'warning';
             IconComponent = Clock;
         }
         
-        return { tagClass, icon: IconComponent, severityText };
+        return { chipColor, icon: IconComponent, severityText };
     }
 
     return (
@@ -148,7 +149,7 @@ const Departures: React.FC = () => {
                     <p className='departure__train-type'>{departure.transportationMode}</p>
                     <p className='departure__train-number'>
                         {departure.id && (
-                            <Link to={`/train/${encodeVehicleJourneyId(departure.id)}`} className='has-text-link'>
+                            <Link to={`/train/${encodeVehicleJourneyId(departure.id)}`} style={{ color: '#b3d4fc', textDecoration: 'underline' }}>
                                 {departure.trainNumber}
                             </Link>
                         )}
@@ -168,24 +169,25 @@ const Departures: React.FC = () => {
                     {/* Display disruptions */}
                     {departure.disruptions && departure.disruptions.length > 0 && (
                         <div className='departure__disruptions mt-2'>
-                            <div className='tags'>
+                            <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                                 {departure.disruptions.map((disruption, disIndex) => {
-                                    const { tagClass, icon, severityText } = getDisruptionSeverity(disruption);
+                                    const { chipColor, icon: IconComponent, severityText } = getDisruptionSeverity(disruption);
                                     const message = disruption.messages && disruption.messages.length > 0 
                                         ? disruption.messages[0].text || (disruption.messages[0] as { message?: string }).message 
                                         : disruption.message || 'Perturbation';
-                                    
-                                    const IconComponent = icon;
                                     return (
-                                        <span key={disIndex} className={`tag ${tagClass} is-small mr-1`} title={message}>
-                                            <span className='icon is-small mr-1'>
-                                                <IconComponent size={14} />
-                                            </span>
-                                            <span>{severityText !== 'unknown' ? severityText : 'Perturbation'}</span>
-                                        </span>
+                                        <Chip
+                                            key={disIndex}
+                                            size="small"
+                                            color={chipColor}
+                                            icon={<IconComponent size={14} />}
+                                            label={severityText !== 'unknown' ? severityText : 'Perturbation'}
+                                            title={message}
+                                            sx={{ mr: 0.5 }}
+                                        />
                                     );
                                 })}
-                            </div>
+                            </Box>
                         </div>
                     )}
                     {departure.id && <Stops idDeparture={departure.id} />}

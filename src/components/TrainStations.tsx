@@ -1,16 +1,16 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { Typography } from '@mui/material'
 
 interface TrainStationsProps {
     stations: Record<string, string> | null | undefined;
 }
 
 const TrainStations: React.FC<TrainStationsProps> = ({ stations }) => {
-    // Handle case where stations is undefined, null, or not an object
     if (!stations || typeof stations !== 'object') {
         return (
             <div className='train-stations'>
-                <p className='has-text-grey'>Aucune gare disponible pour cette ville.</p>
+                <Typography color="text.secondary">Aucune gare disponible pour cette ville.</Typography>
             </div>
         )
     }
@@ -20,7 +20,7 @@ const TrainStations: React.FC<TrainStationsProps> = ({ stations }) => {
     if (stationKeys.length === 0) {
         return (
             <div className='train-stations'>
-                <p className='has-text-grey'>Aucune gare disponible pour cette ville.</p>
+                <Typography color="text.secondary">Aucune gare disponible pour cette ville.</Typography>
             </div>
         )
     }
@@ -33,7 +33,7 @@ const TrainStations: React.FC<TrainStationsProps> = ({ stations }) => {
                     key={stationName}
                     to={`${stations[stationName]}`}
                 >
-                <span>{stationName}</span>
+                    <span>{stationName}</span>
                 </NavLink>
             ))}
         </div>
@@ -41,4 +41,3 @@ const TrainStations: React.FC<TrainStationsProps> = ({ stations }) => {
 }
 
 export default TrainStations
-

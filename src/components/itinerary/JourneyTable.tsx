@@ -1,4 +1,5 @@
 import React from 'react';
+import { Paper, Typography, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import type { JourneyItem } from '@/client/models/journey-item';
 import type { JourneyInfo } from '@/services/journeyService';
 import type { Disruption } from '@/client/models/disruption';
@@ -20,26 +21,26 @@ const JourneyTable: React.FC<JourneyTableProps> = ({
     onDetailClick,
 }) => {
     return (
-        <div className='box'>
-            <h2 className='title is-4 mb-5'>
-                Trains disponibles <span className='tag is-primary is-medium'>{journeys.length}</span>
-            </h2>
-            <div className='table-container'>
-                <table className='table is-fullwidth is-striped is-hoverable'>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Train</th>
-                            <th>Départ</th>
-                            <th>Arrivée</th>
-                            <th>Retard</th>
-                            <th>Perturbations</th>
-                            <th>Durée</th>
-                            <th>Wagons</th>
-                            <th>Détails</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+            <Typography variant="h6" sx={{ p: 2, pb: 0 }}>
+                Trains disponibles <Chip label={journeys.length} color="primary" size="small" sx={{ ml: 1 }} />
+            </Typography>
+            <TableContainer>
+                <Table size="small" stickyHeader>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Date</TableCell>
+                            <TableCell>Train</TableCell>
+                            <TableCell>Départ</TableCell>
+                            <TableCell>Arrivée</TableCell>
+                            <TableCell>Retard</TableCell>
+                            <TableCell>Perturbations</TableCell>
+                            <TableCell>Durée</TableCell>
+                            <TableCell>Wagons</TableCell>
+                            <TableCell>Détails</TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
                         {journeys.map((journey, index) => {
                             const journeyInfo = getJourneyInfo(journey);
                             const journeyDisruptions = getJourneyDisruptions(journey, journeyInfo);
@@ -56,12 +57,11 @@ const JourneyTable: React.FC<JourneyTableProps> = ({
                                 />
                             );
                         })}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Paper>
     );
 };
 
 export default JourneyTable;
-
