@@ -1,16 +1,10 @@
 import React from 'react';
 import { Box, Paper, Typography, Grid } from '@mui/material';
-import { PageHeader } from '@/components/skytrip';
 import PageLayout from '@/components/shared/PageLayout';
 
 const Stats: React.FC = () => {
     return (
         <div className="app-flight">
-            <PageHeader
-                title="Statistics"
-                subtitle="Visualisez vos indicateurs clés"
-                showNotification={false}
-            />
             <PageLayout>
                 <Typography variant="h4" sx={{ mb: 3 }}>Statistics</Typography>
                 <Grid container spacing={2}>

@@ -75,7 +75,7 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
             >
                 <Toolbar
                     sx={{
-                        minHeight: { xs: 56, sm: 64 },
+                        minHeight: { xs: 48, sm: 56 },
                         px: { xs: 1, sm: 2 },
                     }}
                 >
@@ -110,8 +110,8 @@ const AppShell: React.FC<AppShellProps> = ({ children }) => {
                 sx={{
                     flex: 1,
                     width: '100%',
-                    pt: { xs: 7, sm: 8 },
-                    pb: 10,
+                    pt: { xs: 6, sm: 7 },
+                    pb: 9,
                     minHeight: '100vh',
                 }}
             >

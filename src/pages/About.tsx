@@ -8,7 +8,6 @@ import {
     Chip,
 } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import PageLayout from '@/components/shared/PageLayout';
 import packageJson from '../../package.json';
 import { Info, Tag, ExternalLink, Star, Settings, CheckSquare, History, Train, Route, MapPin, Bus, Map, Search, Circle, BarChart3, Book, Code, Network, Palette, BookOpen, Wrench, Smartphone, TrendingUp, FlaskConical } from 'lucide-react';
@@ -66,11 +65,6 @@ const About: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="À propos"
-                subtitle="SNCF API Explorer - horaires, trajets et outils open data"
-                showNotification={false}
-            />
             <PageLayout>
                 <Paper sx={{ p: 2, mb: 2 }}>
                     <Typography variant="h5" sx={{ mb: 2, display: 'flex', alignItems: 'center', gap: 1 }}>

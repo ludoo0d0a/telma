@@ -4,7 +4,6 @@ import { getFavorites, removeFavorite, type FavoriteLocation } from '@/services/
 import { MapPin, Loader2 } from 'lucide-react';
 import FavoritesTable from '@/components/favorites/FavoritesTable';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import PageLayout from '@/components/shared/PageLayout';
 
 const Favorites: React.FC = () => {
@@ -29,11 +28,6 @@ const Favorites: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Vos favoris"
-                subtitle="Retrouvez rapidement vos gares et lieux sauvegardés"
-                showNotification={false}
-            />
             <PageLayout>
                 {loading ? (
                     <Paper sx={{ p: 4, textAlign: 'center' }}>

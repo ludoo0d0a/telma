@@ -9,7 +9,6 @@ import {
     Alert,
 } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import PageLayout from '@/components/shared/PageLayout';
 import { ArrowDown } from 'lucide-react';
 import { getLines } from '@/services/navitiaApi';
@@ -44,11 +43,6 @@ const Lines: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Lignes de transport"
-                subtitle="Consultez les lignes disponibles et leurs informations"
-                showNotification={false}
-            />
             <PageLayout>
                 {loading && lines.length === 0 && (
                     <Paper sx={{ p: 4, textAlign: 'center' }}>

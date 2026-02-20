@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { PageHeader, Tabs, FlightCard } from '@/components/skytrip';
+import { Tabs, FlightCard } from '@/components/skytrip';
 import { PlaneTakeoff, Bookmark } from 'lucide-react';
 
 const Sample2: React.FC = () => {
@@ -87,12 +87,6 @@ const Sample2: React.FC = () => {
 
   return (
     <div className="app-flight">
-      <PageHeader
-        title="Saved Flights"
-        subtitle="Retrouvez vos vols enregistrés"
-        backUrl="/"
-        showSearch={true}
-      />
       <main>
           <div className="skytrip-flight-card">
               <Tabs

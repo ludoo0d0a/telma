@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plane } from 'lucide-react';
-import { PageHeader, DateSelector, FlightList } from '@/components/skytrip';
+import { DateSelector, FlightList } from '@/components/skytrip';
 const Sample3: React.FC = () => {
     const navigate = useNavigate();
     const [selectedDate, setSelectedDate] = useState('Sat 22');
@@ -36,35 +36,6 @@ const Sample3: React.FC = () => {
 
     return (
         <div className="app-flight">
-            <PageHeader
-                title="Select Flight"
-                subtitle="Choisissez votre itinéraire"
-                onBack={() => navigate(-1)}
-                showBack={true}
-            >
-                <div className="flight-route">
-                    <div className="location">
-                        <h2>Bali</h2>
-                        <p className="code">DPS</p>
-                    </div>
-                    <div className="route-connector">
-                        <div className="dotted-line"></div>
-                        <div className="plane-icon">
-                            <Plane size={20} strokeWidth={2} />
-                        </div>
-                        <p className="duration">1h 45m</p>
-                    </div>
-                    <div className="location">
-                        <h2>Banten</h2>
-                        <p className="code">CGK</p>
-                    </div>
-                </div>
-
-                <div className="selected-date">
-                    <p>04 Jan 2023</p>
-                </div>
-            </PageHeader>
-
             <main>
                 <DateSelector
                     dates={dates}

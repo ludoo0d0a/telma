@@ -5,8 +5,6 @@ import Ad from '@/components/Ad';
 import CurrentLocationSection from '@/components/home/CurrentLocationSection';
 import DashboardSection from '@/components/home/DashboardSection';
 import { LayoutGrid, Route, List, Code, Train, MapPin, Clock, BarChart3, Map, Circle, Star, Bus, ArrowRight, Bookmark, Book } from 'lucide-react';
-import { PageHeader } from '@/components/skytrip';
-
 interface DashboardCard {
     title: string;
     description: string;
@@ -140,13 +138,8 @@ const Home: React.FC = () => {
     ];
 
     return (
-        <Box sx={{ minHeight: '100vh' }}>
-            <PageHeader
-                title="Dashboard"
-                subtitle="Accédez rapidement aux principales fonctionnalités"
-                showNotification={false}
-            />
-            <Box component="main" sx={{ px: 2, py: 2 }}>
+        <Box sx={{ width: '100%' }}>
+            <Box component="main" sx={{ px: 2, py: 1 }}>
                     {/* Authentication Section */}
                     {/*<AuthenticationSection />*/}
 

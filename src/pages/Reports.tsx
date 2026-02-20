@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { Route, TrafficCone, Settings, Loader2, Download } from 'lucide-react';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import QueryOverview from '@/components/shared/QueryOverview';
 import PageLayout from '@/components/shared/PageLayout';
 import { getLineReports, getTrafficReports, getEquipmentReports } from '@/services/navitiaApi';
@@ -95,11 +94,6 @@ const Reports: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Rapports et informations"
-                subtitle="Téléchargez les rapports de ligne, trafic ou équipements"
-                showNotification={false}
-            />
             <PageLayout fullHeight={!showResults}>
                 {!showResults && (
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

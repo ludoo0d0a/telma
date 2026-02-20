@@ -3,7 +3,6 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Box, Paper, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Chip, Alert } from '@mui/material';
 import Footer from '@/components/Footer';
 import PageLayout from '@/components/shared/PageLayout';
-import { PageHeader } from '@/components/skytrip';
 import GeoJSONMap from '@/components/GeoJSONMap';
 import { parseUTCDate, formatTime, formatDate } from '@/utils/dateUtils';
 import { cleanLocationName } from '@/services/locationService';
@@ -445,15 +444,6 @@ const Trip: React.FC = () => {
         return sections.filter((section: Section) => section.geojson);
     }, [sections]);
 
-    const TripHeader = (
-        <PageHeader
-            title="Détails du trajet"
-            subtitle="Horaires, arrêts et perturbations détaillés"
-            showNotification={false}
-            
-        />
-    );
-
     // Get markers for all waypoints (stops) from stop_date_times
     const journeyMarkers = useMemo<JourneyMarker[]>(() => {
         if (!allStops || allStops.length === 0) {
@@ -505,7 +495,6 @@ const Trip: React.FC = () => {
     if (loading) {
         return (
             <>
-                {TripHeader}
                 <PageLayout>
                     <Paper sx={{ p: 4, textAlign: 'center' }}>
                         <Loader2 size={48} className="animate-spin" />
@@ -529,7 +518,6 @@ const Trip: React.FC = () => {
             
             return (
                 <>
-                    {TripHeader}
                     <PageLayout>
                         <Paper sx={{ p: 4, textAlign: 'center', mb: 2 }}>
                             <Route size={48} color="var(--primary)" />
@@ -557,7 +545,6 @@ const Trip: React.FC = () => {
         
         return (
             <>
-                {TripHeader}
                 <PageLayout>
                     <Paper sx={{ p: 4, textAlign: 'center' }}>
                         <AlertTriangle size={48} color="var(--primary)" />
@@ -634,7 +621,6 @@ const Trip: React.FC = () => {
 
     return (
         <>
-            {TripHeader}
             <PageLayout>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
                     <Button

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Box, Typography, Button, Grid } from '@mui/material';
-import { PageHeader } from '@/components/skytrip';
 import { Clock, Ban, Wrench, HeartPulse, DoorClosed, MessageSquareWarning } from 'lucide-react';
 import PageLayout from '@/components/shared/PageLayout';
 
@@ -20,12 +19,7 @@ const RaiseIssue: React.FC = () => {
     };
 
     return (
-        <Box sx={{ minHeight: '100vh' }}>
-            <PageHeader
-                title="Raise an Issue"
-                subtitle="Signalez un problème en quelques secondes"
-                showNotification={false}
-            />
+        <Box sx={{ width: '100%' }}>
             <PageLayout>
                 <Typography variant="h4" align="center" gutterBottom>Raise an Issue</Typography>
                 <Grid container spacing={2} justifyContent="center">

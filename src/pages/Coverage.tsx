@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Paper, Typography, CircularProgress, Alert } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import PageLayout from '@/components/shared/PageLayout';
 import { getCoverage, getCoverageDetails } from '@/services/navitiaApi';
 import type { CoverageResponse, Coverage } from '@/client/models';
@@ -59,11 +58,6 @@ const CoveragePage: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Zones de couverture"
-                subtitle="Consultez les régions et réseaux disponibles"
-                showNotification={false}
-            />
             <PageLayout>
                 {loading && !selectedCoverage && (
                     <Paper sx={{ p: 4, textAlign: 'center' }}>

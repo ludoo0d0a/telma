@@ -12,7 +12,6 @@ import {
     CircularProgress,
 } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import Ad from '@/components/Ad';
 import QueryOverview from '@/components/shared/QueryOverview';
 import PageLayout from '@/components/shared/PageLayout';
@@ -79,11 +78,6 @@ const Places: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Recherche de lieux"
-                subtitle="Trouvez les gares et arrêts à proximité ou par mot-clé"
-                showNotification={false}
-            />
             <PageLayout fullHeight={!showResults}>
                 {!showResults && (
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

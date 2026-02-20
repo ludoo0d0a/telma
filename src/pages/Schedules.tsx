@@ -12,7 +12,6 @@ import {
 } from '@mui/material';
 import { MapPin, Route, Flag, Loader2, Search } from 'lucide-react';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import QueryOverview from '@/components/shared/QueryOverview';
 import PageLayout from '@/components/shared/PageLayout';
 import { getStopSchedules, getRouteSchedules, getTerminusSchedules, formatDateTime } from '@/services/navitiaApi';
@@ -82,11 +81,6 @@ const Schedules: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Horaires et planning"
-                subtitle="Consultez les horaires par arrêt, ligne ou terminus"
-                showNotification={false}
-            />
             <PageLayout fullHeight={!showResults}>
                 {!showResults && (
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

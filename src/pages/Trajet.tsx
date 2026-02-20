@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Box, Button, Alert, Paper, Typography, CircularProgress } from '@mui/material';
 import Footer from '@/components/Footer';
 import Ad from '@/components/Ad';
-import { PageHeader } from '@/components/skytrip';
 import ItinerarySearchForm from '@/components/itinerary/ItinerarySearchForm';
 import DisruptionsList from '@/components/itinerary/DisruptionsList';
 import JourneyTable from '@/components/itinerary/JourneyTable';
@@ -592,12 +591,6 @@ const Trajet: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Recherche de trains"
-                subtitle="Planifiez vos trajets TER et visualisez les perturbations"
-                showNotification={false}
-                
-            />
             <PageLayout fullHeight={!showResults}>
                 {!showResults && (
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

@@ -9,7 +9,6 @@ import {
     CircularProgress,
 } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import QueryOverview from '@/components/shared/QueryOverview';
 import PageLayout from '@/components/shared/PageLayout';
 import GeoJSONMap from '@/components/GeoJSONMap';
@@ -60,11 +59,6 @@ const Isochrones: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Isochrones"
-                subtitle="Visualisez les zones accessibles selon un temps de trajet"
-                showNotification={false}
-            />
             <PageLayout fullHeight={!showResults}>
                 {!showResults && (
                     <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>

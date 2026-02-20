@@ -1,47 +1,33 @@
 import React from 'react';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 
 interface PageLayoutProps {
     children: React.ReactNode;
     /** When true, layout expands to fill viewport minus header. Default: false */
     fullHeight?: boolean;
-    /** Max width: false = full, 'sm' | 'md' | 'lg' | 'xl' */
-    maxWidth?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | false;
 }
 
 /**
- * Mobile-first page layout using MUI Container and Box.
- * Use for consistent page structure across the app.
+ * Mobile-first native-app layout: full width, minimal padding.
+ * Uses safe-area padding only (16px horizontal, 8px vertical).
  */
 const PageLayout: React.FC<PageLayoutProps> = ({
     children,
     fullHeight = false,
-    maxWidth = false,
 }) => {
     return (
         <Box
             component="section"
             sx={{
-                minHeight: fullHeight ? { xs: 'calc(100vh - 200px)' } : 'auto',
+                minHeight: fullHeight ? 'calc(100vh - 140px)' : 'auto',
                 display: 'flex',
                 flexDirection: 'column',
-                py: 2,
-                px: { xs: 2, sm: 3 },
                 width: '100%',
+                px: 2,
+                py: 1,
             }}
         >
-            <Container
-                maxWidth={maxWidth === false ? false : maxWidth}
-                disableGutters
-                sx={{
-                    flex: fullHeight ? 1 : '0 1 auto',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    width: '100%',
-                }}
-            >
-                {children}
-            </Container>
+            {children}
         </Box>
     );
 };

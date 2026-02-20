@@ -13,7 +13,6 @@ import {
     Stack,
 } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import PageLayout from '@/components/shared/PageLayout';
 import { getPlacesNearby, getDepartures, getArrivals, formatDateTime } from '@/services/navitiaApi';
 import { getVehicleJourney, extractVehicleJourneyId } from '@/services/vehicleJourneyService';
@@ -648,11 +647,6 @@ const LocationDetection: React.FC = () => {
 
     return (
         <>
-            <PageHeader
-                title="Détection de localisation"
-                subtitle="Identifiez votre position, la gare la plus proche et le train en cours"
-                showNotification={false}
-            />
             <PageLayout>
                 <Paper sx={{ p: 2, mb: 2 }}>
                     <Typography variant="h6" sx={{ mb: 2 }}>

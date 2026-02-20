@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Paper, Typography } from '@mui/material';
 import Footer from '@/components/Footer';
-import { PageHeader } from '@/components/skytrip';
 import TrainWaypointsMap from '@/components/TrainWaypointsMap';
 import Ad from '@/components/Ad';
 import { getVehicleJourney } from '@/services/vehicleJourneyService';
@@ -58,19 +57,9 @@ const Train: React.FC = () => {
 
     const handleRefresh = (): void => fetchTrainDetails(true);
 
-    const headerTitle = id ? 'Détails du train' : 'Recherche de train';
-    const TrainPageHeader = (
-        <PageHeader
-            title={headerTitle}
-            subtitle="Consultez un train précis ou lancez une recherche"
-            showNotification={false}
-        />
-    );
-
     if (!id) {
         return (
             <>
-                {TrainPageHeader}
                 <TrainSearch />
                 <Footer />
             </>
@@ -80,7 +69,6 @@ const Train: React.FC = () => {
     if (loading) {
         return (
             <>
-                {TrainPageHeader}
                 <TrainLoadingState />
             </>
         );
@@ -89,7 +77,6 @@ const Train: React.FC = () => {
     if (error || !trainData) {
         return (
             <>
-                {TrainPageHeader}
                 <TrainErrorState error={error} onRefresh={handleRefresh} refreshing={refreshing} />
             </>
         );
@@ -124,7 +111,6 @@ const Train: React.FC = () => {
 
     return (
         <>
-            {TrainPageHeader}
             <PageLayout>
                 <Paper sx={{ p: 2 }}>
                     <TrainHeader trainNumber={trainNumber} onRefresh={handleRefresh} refreshing={refreshing} />

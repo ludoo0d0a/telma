@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { SearchCard, FlightList, PageHeader } from '@/components/skytrip';
+import { SearchCard, FlightList } from '@/components/skytrip';
 
 const Sample1: React.FC = () => {
     const [activeTab, setActiveTab] = useState('one-way');
@@ -24,14 +24,6 @@ const Sample1: React.FC = () => {
 
     return (
         <div className="app-flight">
-            <PageHeader
-                title="Good morning!"
-                subtitle="Planifiez vos vols du jour"
-                backUrl="/"
-                showNotification={true}
-                hasPendingNotifications={true}
-            />
-
             <main>
                 <SearchCard
                     tabs={tabs}
