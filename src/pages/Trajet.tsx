@@ -16,7 +16,7 @@ import { cleanLocationName } from '@/services/locationService';
 import { getJourneyInfo, type JourneyInfo } from '@/services/journeyService';
 import { doesDisruptionMatchSectionByTrip, doesDisruptionMatchSectionByStopPoint } from '@/services/disruptionService';
 import { encodeTripId } from '@/utils/uriUtils';
-import { Loader2, RefreshCw, ChevronLeft } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
 import type { JourneyItem } from '@/client/models/journey-item';
 import type { Disruption } from '@/client/models/disruption';
 import type { Section } from '@/client/models/section';
@@ -589,102 +589,6 @@ const Trajet: React.FC = () => {
             setError('Veuillez sélectionner les gares de départ et d\'arrivée');
         }
     };
-
-    if (showResults) {
-        return (
-            <>
-                <nav className="navbar is-fixed-top">
-                    <PageHeader
-                        title="Résultats de l'itinéraire"
-                        subtitle={`${fromName || ''} → ${toName || ''}`}
-                        showNotification={false}
-                    />
-                </nav>
-                <section className='section'>
-                    <div className='container'>
-                        <div className="box mb-5">
-                            <button onClick={() => setShowResults(false)} className="button is-light is-fullwidth">
-                                <span className="icon"><ChevronLeft size={16} /></span>
-                                <span>Modifier la recherche</span>
-                            </button>
-                            <div className="mt-4 content is-small">
-                                <p><strong>De:</strong> {fromName}</p>
-                                <p><strong>À:</strong> {toName}</p>
-                                <p><strong>Date:</strong> {filterDate}</p>
-                                <p><strong>Heure:</strong> {filterTime}</p>
-                            </div>
-                        </div>
-
-                        <div className='level mb-5 is-justify-content-flex-end'>
-                            <div className='level-item'>
-                                <button
-                                    className='button is-primary'
-                                    onClick={handleRefresh}
-                                    disabled={loading}
-                                >
-                                    <span className='icon'>
-                                        {loading ? <Loader2 size={20} className="animate-spin" /> : <RefreshCw size={20} />}
-                                    </span>
-                                    <span>Actualiser</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <Ad format="horizontal" size="responsive" className="mb-5" />
-
-                        {loading && (
-                            <div className='box has-text-centered'>
-                                <div className='loader-wrapper'>
-                                    <div className='loader is-loading'></div>
-                                </div>
-                                <p className='mt-4 subtitle is-5'>Chargement des trains...</p>
-                            </div>
-                        )}
-
-                        {error && (
-                            <div className='notification is-danger'>
-                                <button className='delete' onClick={() => setError(null)}></button>
-                                <p className='title is-5'>Erreur</p>
-                                <p>{error}</p>
-                            </div>
-                        )}
-
-                        {!loading && <DisruptionsList disruptions={disruptions} />}
-
-                        {!loading && !error && terTrains.length > 0 && (
-                            <>
-                                <Ad format="auto" size="responsive" className="mb-5" />
-                                <JourneyTable
-                                    journeys={terTrains}
-                                    getJourneyInfo={(journey) => getJourneyInfo(journey, fromName, toName)}
-                                    getJourneyDisruptions={getJourneyDisruptions}
-                                    generateTripId={generateTripId}
-                                    onDetailClick={(journey, journeyInfo, journeyDisruptions, tripId) => {
-                                        sessionStorage.setItem(`trip_${tripId}`, JSON.stringify({
-                                            journey,
-                                            info: journeyInfo,
-                                            disruptions: journeyDisruptions
-                                        }));
-                                    }}
-                                />
-                                <Ad format="rectangle" size="responsive" className="mb-5" />
-                            </>
-                        )}
-
-                        {!loading && !error && terTrains.length === 0 && (
-                            <EmptyState
-                                fromName={fromName}
-                                toName={toName}
-                                fromId={fromId}
-                                toId={toId}
-                            />
-                        )}
-                    </div>
-                </section>
-                <Footer />
-            </>
-        )
-    }
 
     return (
         <>
