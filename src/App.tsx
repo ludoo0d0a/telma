@@ -28,7 +28,7 @@ import { trackPageView } from '@/utils/analytics'
 import Paywall from './components/Paywall'
 import PremiumPage from './pages/PremiumPage'
 import ProtectedRoute from './components/ProtectedRoute'
-import BottomNavbar from '@/components/BottomNavbar'
+import AppShell from '@/components/AppShell'
 import Sidebar from '@/components/Sidebar'
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext'
 import { AuthProvider } from './contexts/AuthContext'
@@ -46,6 +46,7 @@ const AppContent: React.FC = () => {
     return (
         <div className='App'>
             <Sidebar isOpen={isOpen} onClose={closeSidebar} />
+            <AppShell>
               { /*  <Snowfall
                 style={{
                     position: 'fixed',
@@ -86,7 +87,7 @@ const AppContent: React.FC = () => {
                 </Route>
                 <Route path='*' element={<Navigate to='/' replace />} />
             </Routes>
-            <BottomNavbar onMoreClick={toggleSidebar} />
+            </AppShell>
         </div>
     )
 }

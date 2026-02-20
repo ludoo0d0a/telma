@@ -2,17 +2,29 @@
 
 .bottom-navbar {
   position: fixed;
-  bottom: 1rem;
-  left: 50%;
-  transform: translateX(-50%);
-  width: calc(100% - 2rem);
-  max-width: 400px; // A max-width for larger screens
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  // Full width on mobile (M3), max-width on larger screens
+  @media (min-width: 600px) {
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(calc(100% - 2rem), 400px);
+    bottom: 1rem;
+    border-radius: 2rem;
+  }
   background-color: var(--background-light);
-  border-radius: 2rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   z-index: 1000;
-  border: 1px solid var(--background-darker);
+  border-top: 1px solid var(--background-darker);
+
+  @media (min-width: 600px) {
+    border-radius: 2rem;
+    border: 1px solid var(--background-darker);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  }
 }
 
 .bottom-navbar-menu {

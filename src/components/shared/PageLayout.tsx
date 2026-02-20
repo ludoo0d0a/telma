@@ -16,7 +16,7 @@ interface PageLayoutProps {
 const PageLayout: React.FC<PageLayoutProps> = ({
     children,
     fullHeight = false,
-    maxWidth = 'md',
+    maxWidth = false,
 }) => {
     return (
         <Box
@@ -27,15 +27,17 @@ const PageLayout: React.FC<PageLayoutProps> = ({
                 flexDirection: 'column',
                 py: 2,
                 px: { xs: 2, sm: 3 },
+                width: '100%',
             }}
         >
             <Container
-                maxWidth={maxWidth}
+                maxWidth={maxWidth === false ? false : maxWidth}
                 disableGutters
                 sx={{
                     flex: fullHeight ? 1 : '0 1 auto',
                     display: 'flex',
                     flexDirection: 'column',
+                    width: '100%',
                 }}
             >
                 {children}
