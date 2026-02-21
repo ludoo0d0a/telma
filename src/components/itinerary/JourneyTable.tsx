@@ -1,5 +1,5 @@
 import React from 'react';
-import { Paper, Typography, Chip, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { Typography, Chip, Box, Stack } from '@mui/material';
 import type { JourneyItem } from '@/client/models/journey-item';
 import type { JourneyInfo } from '@/services/journeyService';
 import type { Disruption } from '@/client/models/disruption';
@@ -21,46 +21,29 @@ const JourneyTable: React.FC<JourneyTableProps> = ({
     onDetailClick,
 }) => {
     return (
-        <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
-            <Typography variant="h6" sx={{ p: 2, pb: 0 }}>
+        <Box sx={{ width: '100%' }}>
+            <Typography variant="h6" sx={{ p: 2, pb: 1, display: 'flex', alignItems: 'center' }}>
                 Trains disponibles <Chip label={journeys.length} color="primary" size="small" sx={{ ml: 1 }} />
             </Typography>
-            <TableContainer>
-                <Table size="small" stickyHeader>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Date</TableCell>
-                            <TableCell>Train</TableCell>
-                            <TableCell>Départ</TableCell>
-                            <TableCell>Arrivée</TableCell>
-                            <TableCell>Retard</TableCell>
-                            <TableCell>Perturbations</TableCell>
-                            <TableCell>Durée</TableCell>
-                            <TableCell>Wagons</TableCell>
-                            <TableCell>Détails</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {journeys.map((journey, index) => {
-                            const journeyInfo = getJourneyInfo(journey);
-                            const journeyDisruptions = getJourneyDisruptions(journey, journeyInfo);
-                            const tripId = generateTripId(journey, journeyInfo);
+            <Stack spacing={1} sx={{ width: '100%', pb: 2 }}>
+                {journeys.map((journey, index) => {
+                    const journeyInfo = getJourneyInfo(journey);
+                    const journeyDisruptions = getJourneyDisruptions(journey, journeyInfo);
+                    const tripId = generateTripId(journey, journeyInfo);
 
-                            return (
-                                <JourneyTableRow
-                                    key={index}
-                                    journey={journey}
-                                    journeyInfo={journeyInfo}
-                                    journeyDisruptions={journeyDisruptions}
-                                    tripId={tripId}
-                                    onDetailClick={() => onDetailClick(journey, journeyInfo, journeyDisruptions, tripId)}
-                                />
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Paper>
+                    return (
+                        <JourneyTableRow
+                            key={index}
+                            journey={journey}
+                            journeyInfo={journeyInfo}
+                            journeyDisruptions={journeyDisruptions}
+                            tripId={tripId}
+                            onDetailClick={() => onDetailClick(journey, journeyInfo, journeyDisruptions, tripId)}
+                        />
+                    );
+                })}
+            </Stack>
+        </Box>
     );
 };
 
