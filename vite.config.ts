@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -12,7 +12,7 @@ const BASE_PATH = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    vue(),
     VitePWA({
       registerType: 'autoUpdate',
       base: BASE_URL,
@@ -83,9 +83,9 @@ export default defineConfig({
         classNameStrategy: 'non-scoped',
       },
     },
-    // Use happy-dom for UI tests (files matching *.ui.test.tsx)
+    // Use happy-dom for UI tests (files matching *.ui.test.ts)
     environmentMatchGlobs: [
-      ['**/*.ui.test.{ts,tsx}', 'happy-dom'],
+      ['**/*.ui.test.{ts,vue}', 'happy-dom'],
     ],
   },
 });

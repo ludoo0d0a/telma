@@ -1,5 +1,3 @@
-import ReactGA from 'react-ga4';
-
 const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
 
 /**
@@ -8,9 +6,20 @@ const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
  */
 export const initGA = () => {
   if (GA_TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.initialize(GA_TRACKING_ID, {
-      testMode: import.meta.env.DEV, // Disable in development
-    });
+    // Load gtag script
+    const script = document.createElement('script');
+    script.async = true;
+    script.src = `https://www.googletagmanager.com/gtag/js?id=${GA_TRACKING_ID}`;
+    document.head.appendChild(script);
+
+    window.dataLayer = window.dataLayer || [];
+    function gtag(...args: any[]) {
+      window.dataLayer.push(args);
+    }
+    gtag('js', new Date());
+    gtag('config', GA_TRACKING_ID);
+    
+    console.log('Google Analytics tracking ID:', GA_TRACKING_ID);
   }
 };
 
@@ -20,8 +29,8 @@ export const initGA = () => {
  * @param title - Optional page title
  */
 export const trackPageView = (path: string, title?: string) => {
-  if (GA_TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.gtag('event', 'page_view', {
+  if (GA_TRACKING_ID && typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', 'page_view', {
       page_path: path,
       page_title: title || document.title,
     });
@@ -41,15 +50,18 @@ export const trackEvent = (
   label?: string,
   value?: number
 ) => {
-  if (GA_TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.event({
-      category,
-      action,
-      label,
-      value,
+  if (GA_TRACKING_ID && typeof window !== 'undefined' && (window as any).gtag) {
+    (window as any).gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
     });
   }
 };
 
-
-
+declare global {
+  interface Window {
+    dataLayer?: any[];
+    gtag?: (...args: any[]) => void;
+  }
+}
