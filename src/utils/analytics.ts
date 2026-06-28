@@ -1,6 +1,4 @@
-import ReactGA from 'react-ga4';
-
-const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
+const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID || import.meta.env.VITE_GA_MEASUREMENT_ID;
 
 /**
  * Initialize Google Analytics
@@ -8,9 +6,8 @@ const GA_TRACKING_ID = import.meta.env.VITE_GA_TRACKING_ID;
  */
 export const initGA = () => {
   if (GA_TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.initialize(GA_TRACKING_ID, {
-      testMode: import.meta.env.DEV, // Disable in development
-    });
+    // GA will be initialized by vue-gtag plugin
+    console.log('Google Analytics initialized with ID:', GA_TRACKING_ID);
   }
 };
 
@@ -20,8 +17,8 @@ export const initGA = () => {
  * @param title - Optional page title
  */
 export const trackPageView = (path: string, title?: string) => {
-  if (GA_TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.gtag('event', 'page_view', {
+  if (GA_TRACKING_ID && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', 'page_view', {
       page_path: path,
       page_title: title || document.title,
     });
@@ -41,15 +38,21 @@ export const trackEvent = (
   label?: string,
   value?: number
 ) => {
-  if (GA_TRACKING_ID && typeof window !== 'undefined') {
-    ReactGA.event({
-      category,
-      action,
-      label,
-      value,
+  if (GA_TRACKING_ID && typeof window !== 'undefined' && window.gtag) {
+    window.gtag('event', action, {
+      event_category: category,
+      event_label: label,
+      value: value,
     });
   }
 };
+
+// Extend Window interface for gtag
+declare global {
+  interface Window {
+    gtag?: (...args: any[]) => void;
+  }
+}
 
 
 
