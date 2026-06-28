@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx",
+    "jsx": "preserve",
     "strict": false,
     "allowJs": true,
     "esModuleInterop": true,
@@ -22,6 +22,9 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "types": ["vite/client", "vitest/globals", "node"],
+    "vueCompilerOptions": {
+      "target": 3
+    },
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]

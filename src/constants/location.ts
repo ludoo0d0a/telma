@@ -1,0 +1,3 @@
+export const DEFAULT_RADIUS_NEARBY = 5000;
+export const DEFAULT_RADIUS_NEARBY_LARGE = 10000;
+
