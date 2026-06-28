@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import vue from '@vitejs/plugin-vue';
 import path from 'path';
 import { VitePWA } from 'vite-plugin-pwa';
 
@@ -12,7 +12,7 @@ const BASE_PATH = BASE_URL.endsWith('/') ? BASE_URL : `${BASE_URL}/`;
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
+    vue(),
     VitePWA({
       registerType: 'autoUpdate',
       base: BASE_URL,
